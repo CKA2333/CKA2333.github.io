@@ -12,6 +12,7 @@
   body.fade-out {
     opacity: 0;
   }
+
 </style>
 
 <head>
@@ -179,13 +180,13 @@
   <!-- Header -->
   <section id="header">
     <div class="container">
-      <h1 id="logo"><a href="/"></a></h1>
+      <h1 id="logo"><a href="/">Home</a></h1>
       <nav id="nav">
         <ul>
-          <li><a href="/#one">About Me</a></li>
-          <li><a href="/#two">Publications</a></li>
-          <li><a href="/#three" class="active">Projects</a></li>
-          <li><a href="/#four">Contact</a></li>
+          <li><a href="/main.html#one">About Me</a></li>
+          <li><a href="/main.html#two">Publications</a></li>
+          <li><a href="/main.html#three" >Projects</a></li>
+          <li><a href="/main.html#four">Contact</a></li>
         </ul>
       </nav>
     </div>
@@ -249,27 +250,24 @@ BIOGEM integrates a McKibben actuating structure by using stiff gelatin as outer
       });
     });
   </script>
-    <script>
-    // on initial load fade in
-    window.addEventListener("DOMContentLoaded", () => {
-        document.body.classList.add("page-loaded");
-    });
 
-    // intercept ALL internal links
-    document.querySelectorAll('a[href^="/"], a[href^="./"], a[href^="../"]').forEach(link => {
-        link.addEventListener("click", e => {
-        const href = link.getAttribute("href");
-        // ignore anchors on same page (they will smooth‐scroll instead)
-        if (href.startsWith("#")) return;
-        e.preventDefault();
-        // fade out
-        document.body.classList.remove("page-loaded");
-        document.body.classList.add("fade-out");
-        // after transition, navigate
-        setTimeout(() => window.location.href = href, 400);
-        });
+  <script>
+  // 只拦截所有指向 .html 的内部链接
+  document.querySelectorAll('a[href$=".html"], a[href*=".html#"]').forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      document.body.classList.remove("page-loaded");
+      document.body.classList.add("fade-out");
+      setTimeout(() => window.location.href = link.getAttribute("href"), 400);
     });
-    </script>
+  });
+  </script>
+    <script>
+    window.addEventListener('load', () => {
+      document.body.classList.add('page-loaded');
+    });
+  </script>
+
 
 
 
