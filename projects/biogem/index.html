@@ -1,0 +1,277 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<style>
+  body {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  body.page-loaded {
+    opacity: 1;
+  }
+  body.fade-out {
+    opacity: 0;
+  }
+</style>
+
+<head>
+  <meta charset="utf-8" />
+  <title>BIOGEM — Project | Qifeng Yang</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+
+  <style>
+    /* —— 全局 & 重置 —— */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: #fff;
+      color: #333;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* —— 顶栏 —— */
+    #header {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      background: #3FC08E;
+      padding: 1rem 0;
+      z-index: 1000;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    #header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+    }
+    #header #logo a {
+      color: #fff;
+      text-decoration: none;
+      font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+      font-weight: bold;
+    }
+    #header nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+    #header nav a {
+      color: #fff;
+      text-decoration: none;
+      font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+    }
+    #header nav a:hover,
+    #header nav .active {
+      text-decoration: underline;
+    }
+
+    /* —— 主体 & 布局 —— */
+    /* 留下与 header 等高的空白 */
+    #wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;        /* 如果你也想水平在 wrapper 里居中 #main */
+        min-height: calc(
+        100vh - ( calc(1rem + clamp(1.25rem,2.5vw,1.75rem) + 1rem) )
+        );
+        padding-top: 0;                  /* 去掉原先留给 header 的空间 */
+        background: #fff;
+    }
+    #main {
+      display: flex;
+      width: 80%;
+      /* 扣掉 wrapper 顶部 padding (≈ header 高度 + 1rem) */
+      height: calc(80vh - (calc(1rem + clamp(1.25rem, 2.5vw, 1.75rem) + 1rem)));
+      gap: 2rem;
+      padding: 1rem;
+    }
+
+    /* —— 左侧文字 —— */
+    .text-pane {
+      flex: 0 0 55%;
+      position: sticky;
+      top: calc(1rem + clamp(1.25rem, 2.5vw, 1.75rem) + 1rem);
+      align-self: start;
+    }
+    .text-pane h2 {
+      font-size: clamp(2rem, 4vw, 4rem);
+      color: #3FC08E;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+    .text-pane p {
+      font-size: clamp(1rem, 2vw, 1.5rem);
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* —— 右侧走马灯 —— */
+    .carousel {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+      /* 等比 16:9，宽度随父容器 */
+      aspect-ratio: 16 / 9;
+      height: auto;
+    }
+    .carousel-track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.5s ease;
+    }
+    .carousel-slide {
+      flex: 0 0 100%;
+      height: 100%;
+    }
+    .carousel-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .carousel-dots {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.5rem;
+    }
+    .carousel-dots button {
+      width: 12px; height: 12px;
+      border: none; border-radius: 50%;
+      background: #ccc;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .carousel-dots button.active {
+      background: #3FC08E;
+    }
+
+    /* —— 响应式 —— */
+    @media (max-width: 768px) {
+      #main {
+        flex-direction: column;
+        height: auto;
+      }
+      .text-pane {
+        position: relative;
+        top: 0;
+        flex: 1 1 auto;
+        padding-bottom: 1rem;
+      }
+      .carousel {
+        aspect-ratio: unset;
+        width: 100%;
+        height: 50vh;
+        margin-top: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <section id="header">
+    <div class="container">
+      <h1 id="logo"><a href="/"></a></h1>
+      <nav id="nav">
+        <ul>
+          <li><a href="/#one">About Me</a></li>
+          <li><a href="/#two">Publications</a></li>
+          <li><a href="/#three" class="active">Projects</a></li>
+          <li><a href="/#four">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Wrapper -->
+  <div id="wrapper">
+    <div id="main">
+      <!-- 左侧文字 -->
+      <div class="text-pane">
+        <h2>BIOGEM: A Fully Biodegradable Gelatin-Based McKibben Actuator with Embedded Sensing.</h2>
+        <p>
+        <Strong>Ge G., Lu H., Gao Y., Yang Q., Hester J., Cheng T., Luo Y. </strong>
+        </p>
+        <p>
+         We present BIOGEM, a fully biodegradable McKibben actuator with integrated sensing, made from gelatin-based composites. By tailoring the material compositions, we customize the mechanical and electrical properties of the biodegradable composites, creating an integrated biodegradable system that combines both actuation and sensing functionalities.
+
+BIOGEM integrates a McKibben actuating structure by using stiff gelatin as outer braiding and the stretchable gelatin as air chambers. It also integrates resistive strain sensing through ionic gelatin, allowing the actuator to monitor its own deformation without relying on conventional electronics. We characterize the actuator’s performance across key parameters including braid angle, wall thickness, and material stiffness, demonstrating reliable contraction and repeatable force output at low pressures. Biodegradation is validated through both enzyme-assisted and backyard soil studies, confirming the material’s sustainable end-of-life behavior under realistic conditions. We illustrate the potential of this platform through interactive, edible, and environmentally-degradable prototypes across human–computer interaction and soft robotics scenarios.
+        </p>
+      </div>
+
+      <!-- 右侧走马灯 -->
+      <div class="carousel">
+        <div class="carousel-track">
+          <div class="carousel-slide"><img src="/images/pic01.jpg" alt="Demo 1" /></div>
+          <div class="carousel-slide"><img src="/images/pic02.jpg" alt="Demo 2" /></div>
+          <div class="carousel-slide"><img src="/images/pic03.jpg" alt="Demo 3" /></div>
+          <div class="carousel-slide"><img src="/images/pic04.jpg" alt="Demo 4" /></div>
+        </div>
+        <div class="carousel-dots">
+          <button data-index="0" class="active"></button>
+          <button data-index="1"></button>
+          <button data-index="2"></button>
+          <button data-index="3"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carousel 控制脚本 -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const track = document.querySelector(".carousel-track");
+      const dots  = Array.from(document.querySelectorAll(".carousel-dots button"));
+
+      dots.forEach(dot => {
+        dot.addEventListener("click", () => {
+          const idx = +dot.dataset.index;
+          track.style.transform = `translateX(-${idx * 100}%)`;
+          dots.forEach(d => d.classList.remove("active"));
+          dot.classList.add("active");
+        });
+      });
+
+      window.addEventListener("resize", () => {
+        const active = document.querySelector(".carousel-dots button.active");
+        if (active) {
+          const idx = +active.dataset.index;
+          track.style.transform = `translateX(-${idx * 100}%)`;
+        }
+      });
+    });
+  </script>
+    <script>
+    // on initial load fade in
+    window.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("page-loaded");
+    });
+
+    // intercept ALL internal links
+    document.querySelectorAll('a[href^="/"], a[href^="./"], a[href^="../"]').forEach(link => {
+        link.addEventListener("click", e => {
+        const href = link.getAttribute("href");
+        // ignore anchors on same page (they will smooth‐scroll instead)
+        if (href.startsWith("#")) return;
+        e.preventDefault();
+        // fade out
+        document.body.classList.remove("page-loaded");
+        document.body.classList.add("fade-out");
+        // after transition, navigate
+        setTimeout(() => window.location.href = href, 400);
+        });
+    });
+    </script>
+
+
+
+</body>
+</html>
