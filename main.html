@@ -532,40 +532,36 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
-            <script>
-                        window.addEventListener('load', function() {
-                            // 页面完全载入后，加上 .loaded 触发淡入
-                            document.body.classList.add('loaded');
-                        });
-                        </script>
-                        <script>
-            // 现有的“页面载入后淡入”逻辑
-            window.addEventListener('load', function() {
-                document.body.classList.add('loaded');
-            });
+			<script>
+			window.addEventListener('load', function() {
+			document.body.classList.add('loaded');
+			});
 
-            // 拦截内部 <a> 点击，先淡出再跳转
-            document.querySelectorAll('a[href]').forEach(link => {
-                if (link.hostname === location.hostname) {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    document.body.classList.remove('loaded');
-                    document.body.classList.add('fade-out');
-                    setTimeout(() => window.location.href = this.href, 800);
-                });
-                }
-            });
+			// 只拦截非纯锚点、同域名的链接
+			document.querySelectorAll('a[href]').forEach(link => {
+			const href = link.getAttribute('href');
+			// 跳过以 "#" 开头的锚点链接
+			if (!href.startsWith('#') && link.hostname === location.hostname) {
+				link.addEventListener('click', function(e) {
+				e.preventDefault();
+				document.body.classList.remove('loaded');
+				document.body.classList.add('fade-out');
+				setTimeout(() => window.location.href = this.href, 400);
+				});
+			}
+			});
 
-            // 拦截表单提交，先淡出再提交
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                document.body.classList.remove('loaded');
-                document.body.classList.add('fade-out');
-                setTimeout(() => this.submit(), 800);
-                });
-            });
-            </script>
+			// 同理，如果有表单需要淡出再提交，也可以加上
+			document.querySelectorAll('form').forEach(form => {
+			form.addEventListener('submit', function(e) {
+				e.preventDefault();
+				document.body.classList.remove('loaded');
+				document.body.classList.add('fade-out');
+				setTimeout(() => this.submit(), 400);
+			});
+			});
+			</script>
+
 
             
 
