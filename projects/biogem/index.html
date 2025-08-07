@@ -12,7 +12,6 @@
   body.fade-out {
     opacity: 0;
   }
-
 </style>
 
 <head>
@@ -68,57 +67,77 @@
     }
 
     /* —— 主体 & 布局 —— */
-    /* 留下与 header 等高的空白 */
     #wrapper {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;        /* 如果你也想水平在 wrapper 里居中 #main */
-        min-height: calc(
-        100vh - ( calc(1rem + clamp(1.25rem,2.5vw,1.75rem) + 1rem) )
-        );
-        padding-top: 0;                  /* 去掉原先留给 header 的空间 */
+        justify-content: center;
+        min-height: 100vh;
+        padding-top: calc(1rem + clamp(1.25rem,2.5vw,1.75rem) + 1rem);
+        padding-bottom: 2rem;
         background: #fff;
     }
+    
+    /* 顶部标题区域 */
+    .header-section {
+      width: 98%;
+      max-width: 1600px;
+      text-align: center;
+      margin-bottom: clamp(2rem, 4vw, 3rem);
+    }
+    
+    .header-section h2 {
+      font-size: clamp(2.5rem, 5vw, 5rem);
+      color: #3FC08E;
+      margin-bottom: clamp(0.8rem, 1.5vw, 1.2rem);
+      line-height: 1.1;
+      font-weight: 700;
+    }
+    
+    .header-section .authors {
+      font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+      color: #666;
+      font-weight: 600;
+    }
+    
+    /* 主内容区域 */
     #main {
       display: flex;
-      width: 80%;
-      /* 扣掉 wrapper 顶部 padding (≈ header 高度 + 1rem) */
-      height: calc(80vh - (calc(1rem + clamp(1.25rem, 2.5vw, 1.75rem) + 1rem)));
-      gap: 2rem;
-      padding: 1rem;
+      width: 98%;
+      max-width: 1600px;
+      gap: clamp(3rem, 5vw, 5rem);
+      padding: clamp(1rem, 3vw, 2rem);
+      align-items: center; /* 改为居中对齐 */
     }
 
     /* —— 左侧文字 —— */
     .text-pane {
-      flex: 0 0 55%;
-      position: sticky;
-      top: calc(1rem + clamp(1.25rem, 2.5vw, 1.75rem) + 1rem);
-      align-self: start;
+      flex: 0 0 45%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center; /* 文字也居中 */
     }
     .text-pane h2 {
-      font-size: clamp(2rem, 4vw, 4rem);
-      color: #3FC08E;
-      margin-bottom: 1rem;
-      line-height: 1.2;
+      display: none; /* 隐藏原标题，已移到顶部 */
     }
     .text-pane p {
-      font-size: clamp(1rem, 2vw, 1.5rem);
+      font-size: clamp(1rem, 2vw, 1.4rem);
       color: #666;
-      line-height: 1.6;
-      margin-bottom: 1rem;
+      line-height: 1.65;
+      margin-bottom: 0; /* 移除底部边距，让最后一行贴底 */
     }
 
     /* —— 右侧走马灯 —— */
     .carousel {
-      flex: 1;
+      flex: 0 0 50%;
       position: relative;
       overflow: hidden;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-
-      /* 等比 16:9，宽度随父容器 */
-      aspect-ratio: 16 / 9;
-      height: auto;
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+      
+      /* 改为4:3比例，更适合展示细节 */
+      aspect-ratio: 4 / 3;
+      width: 100%;
     }
     .carousel-track {
       display: flex;
@@ -132,8 +151,9 @@
     .carousel-slide img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
+      background-color: #f8f9fa;
     }
     .carousel-dots {
       position: absolute;
@@ -146,7 +166,7 @@
     .carousel-dots button {
       width: 12px; height: 12px;
       border: none; border-radius: 50%;
-      background: #ccc;
+      background: rgba(255,255,255,0.6);
       cursor: pointer;
       transition: background 0.3s;
     }
@@ -155,22 +175,35 @@
     }
 
     /* —— 响应式 —— */
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
+      .header-section {
+        margin-bottom: clamp(1.5rem, 3vw, 2rem);
+        width: 95%;
+      }
+      
       #main {
         flex-direction: column;
-        height: auto;
+        width: 95%;
+        gap: clamp(1.5rem, 4vw, 2.5rem);
+        align-items: center;
       }
       .text-pane {
-        position: relative;
-        top: 0;
         flex: 1 1 auto;
-        padding-bottom: 1rem;
+        order: 2;
+        justify-content: flex-start; /* 移动端正常显示 */
       }
       .carousel {
-        aspect-ratio: unset;
+        flex: 0 0 auto;
         width: 100%;
-        height: 50vh;
-        margin-top: 1rem;
+        aspect-ratio: 4 / 3;
+        max-width: 600px;
+        order: 1;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .carousel {
+        aspect-ratio: 3 / 2;
       }
     }
   </style>
@@ -194,27 +227,32 @@
 
   <!-- Wrapper -->
   <div id="wrapper">
+    <!-- 顶部标题区域 -->
+    <div class="header-section">
+      <h2>BIOGEM: A Fully Biodegradable Gelatin-Based McKibben Actuator with Embedded Sensing.</h2>
+      <div class="authors">
+        <Strong>Ge G., Lu H., Gao Y., Yang Q., Hester J., Cheng T., Luo Y.</strong>
+      </div>
+    </div>
+    
+    <!-- 主内容区域 -->
     <div id="main">
       <!-- 左侧文字 -->
       <div class="text-pane">
-        <h2>BIOGEM: A Fully Biodegradable Gelatin-Based McKibben Actuator with Embedded Sensing.</h2>
-        <p>
-        <Strong>Ge G., Lu H., Gao Y., Yang Q., Hester J., Cheng T., Luo Y. </strong>
-        </p>
         <p>
          We present BIOGEM, a fully biodegradable McKibben actuator with integrated sensing, made from gelatin-based composites. By tailoring the material compositions, we customize the mechanical and electrical properties of the biodegradable composites, creating an integrated biodegradable system that combines both actuation and sensing functionalities.
 
-BIOGEM integrates a McKibben actuating structure by using stiff gelatin as outer braiding and the stretchable gelatin as air chambers. It also integrates resistive strain sensing through ionic gelatin, allowing the actuator to monitor its own deformation without relying on conventional electronics. We characterize the actuator’s performance across key parameters including braid angle, wall thickness, and material stiffness, demonstrating reliable contraction and repeatable force output at low pressures. Biodegradation is validated through both enzyme-assisted and backyard soil studies, confirming the material’s sustainable end-of-life behavior under realistic conditions. We illustrate the potential of this platform through interactive, edible, and environmentally-degradable prototypes across human–computer interaction and soft robotics scenarios.
+BIOGEM integrates a McKibben actuating structure by using stiff gelatin as outer braiding and the stretchable gelatin as air chambers. It also integrates resistive strain sensing through ionic gelatin, allowing the actuator to monitor its own deformation without relying on conventional electronics. We characterize the actuator's performance across key parameters including braid angle, wall thickness, and material stiffness, demonstrating reliable contraction and repeatable force output at low pressures. Biodegradation is validated through both enzyme-assisted and backyard soil studies, confirming the material's sustainable end-of-life behavior under realistic conditions. We illustrate the potential of this platform through interactive, edible, and environmentally-degradable prototypes across human–computer interaction and soft robotics scenarios.
         </p>
       </div>
 
       <!-- 右侧走马灯 -->
       <div class="carousel">
         <div class="carousel-track">
-          <div class="carousel-slide"><img src="/images/pic01.jpg" alt="Demo 1" /></div>
-          <div class="carousel-slide"><img src="/images/pic02.jpg" alt="Demo 2" /></div>
-          <div class="carousel-slide"><img src="/images/pic03.jpg" alt="Demo 3" /></div>
-          <div class="carousel-slide"><img src="/images/pic04.jpg" alt="Demo 4" /></div>
+          <div class="carousel-slide"><img src="/images/bio/bio.jpg" alt="Demo 1" /></div>
+          <div class="carousel-slide"><img src="/images/bio/soils.jpg" alt="Demo 2" /></div>
+          <div class="carousel-slide"><img src="/images/bio/eat.jpg" alt="Demo 3" /></div>
+          <div class="carousel-slide"><img src="/images/bio/ship.jpg" alt="Demo 4" /></div>
         </div>
         <div class="carousel-dots">
           <button data-index="0" class="active"></button>
@@ -267,9 +305,6 @@ BIOGEM integrates a McKibben actuating structure by using stiff gelatin as outer
       document.body.classList.add('page-loaded');
     });
   </script>
-
-
-
 
 </body>
 </html>

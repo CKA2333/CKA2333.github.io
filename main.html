@@ -10,36 +10,289 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
-        <style>
-        /* 页面初始隐藏 */
-        body {
-            opacity: 0;
-            transition: opacity 0.4s ease-in-out;
-        }
-        /* 当页面加载完成后，body 上会加上 .loaded */
-        body.loaded {
-            opacity: 1;
-        }
+<style>
+  /* —— 全局重置 —— */
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
 
-        body.fade-out {
-            opacity: 0 !important;
-        }
+  /* —— 页面进场/退场 —— */
+  body {
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+  }
+  body.loaded {
+    opacity: 1;
+  }
+  body.fade-out {
+    opacity: 0 !important;
+  }
 
-        #header {
-        position: fixed !important;
-        z-index: 1000; /* 保证在最上层 */
-        }
+  /* —— 侧边栏 & 布局 —— */
 
-        /* 因为 header 占了视口高度的一部分，给后面的内容一个顶高避免被遮挡 */
-        #wrapper {
-        padding-top: /* 这里填 header 的实际高度，比如 100px */ 100px;
-        }
 
-        </style>
+
+  /* —— Banner —— */
+  #one .image.main {
+    margin: 0;
+    width: 100%;
+  }
+  #one .image.main img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* —— Projects 列表 —— */
+  #three .features article {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+  }
+  #three .features article .image {
+    flex: 0 0 300px;
+    height: 200px;
+    margin-right: 1.5rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: #f8f9fa;
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.3s ease;
+  }
+  #three .features article .image:hover {
+    border-color: #3FC08E;
+  }
+  #three .features article .image img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+  #three .features article .image:hover img {
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+  #three .features article .inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  /* —— 自定义移动端菜单按钮 —— */
+  .mobile-menu-toggle {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 99999 !important;
+    background: #57BAA8;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 24px;
+  }
+  .mobile-menu-toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background: #fff;
+    margin: 5px 0;
+    transition: all 0.3s ease;
+  }
+  .mobile-menu-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  .mobile-menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .mobile-menu-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+  }
+
+  /* —— 移动端全屏菜单覆盖层 —— */
+  .mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #57BAA8;
+    z-index: 10000;
+    overflow-y: auto;
+    text-align: center;
+    padding: 80px 20px 40px;
+  }
+  .mobile-header.active {
+    display: block;
+  }
+  .mobile-header .profile-image {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+  }
+  .mobile-header .profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .mobile-header h1 {
+    color: #fff;
+    font-size: 2em;
+    margin: 20px 0 10px;
+  }
+  .mobile-header .email {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1em;
+    margin-bottom: 40px;
+  }
+  .mobile-header nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .mobile-header nav ul li a {
+    display: block;
+    padding: 20px 30px;
+    color: #fff;
+    font-size: 1.3em;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background 0.3s ease;
+  }
+  .mobile-header nav ul li a:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .mobile-header .social-links {
+    margin-top: 40px;
+    padding: 20px 0;
+  }
+  .mobile-header .social-links a {
+    display: inline-block;
+    margin: 0 15px;
+    color: #fff;
+    font-size: 1.5em;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+  }
+  .mobile-header .social-links a:hover {
+    opacity: 0.7;
+  }
+
+  /* —— 响应式 —— */
+  @media screen and (max-width: 768px) {
+    /* 桌面 header 隐藏 */
+    #header {
+      display: none !important;
+    }
+    /* 原生 toggle 隐藏（如果有） */
+    .toggle,
+    #navPanel {
+      display: none !important;
+    }
+    /* 显示自定义按钮 */
+    .mobile-menu-toggle {
+      display: block;
+    }
+    /* 全宽内容 */
+    #wrapper {
+      margin-left: 0 !important;
+      width: 100%;
+      padding: 0;
+    }
+    /* About Me 顶部留白避开按钮 */
+    #one {
+      padding-top: 60px;
+    }
+    /* 隐藏 banner 图 */
+    #one .image.main {
+      display: none;
+    }
+    /* 容器内边距 */
+    .container {
+      padding: 20px;
+    }
+    #one .container .major h2 {
+      font-size: 2em;
+      text-align: center;
+      color: #57BAA8;
+      margin-bottom: 1em;
+    }
+    /* 项目列表改为竖排 */
+    #three .features article {
+      flex-direction: column;
+    }
+    #three .features article .image {
+      width: 100%;
+      margin: 0 0 1rem;
+    }
+  }
+
+  @media screen and (min-width: 769px) {
+    /* 桌面隐藏自定义按钮 */
+    .mobile-menu-toggle {
+      display: none !important;
+    }
+    /* 恢复原生 header */
+    #header {
+      display: block !important;
+    }
+  }
+</style>
+
 	</head>
 	<body class="is-preload">
+		
+		<!-- Mobile Menu Toggle Button -->
+		<button class="mobile-menu-toggle" id="menuToggle">
+			<span></span>
+			<span></span>
+			<span></span>
+		</button>
+		
+		<!-- Mobile Header (Full Screen Menu) -->
+		<div class="mobile-header" id="mobileHeader">
+			<div class="profile-image">
+				<img src="images/self.jpg" alt="Qifeng Yang" />
+			</div>
+			<h1>Qifeng Yang</h1>
+			<p class="email">qyang24@uw.edu</p>
+			<nav>
+				<ul>
+					<li><a href="#one">About Me</a></li>
+					<li><a href="#two">Publication</a></li>
+					<li><a href="#three">Projects</a></li>
+					<li><a href="#four">Contact</a></li>
+				</ul>
+			</nav>
+			<div class="social-links">
+				<a href="https://www.linkedin.com/in/qifeng-yang-743332313/" target="_blank">
+					<i class="fab fa-linkedin"></i>
+				</a>
+				<a href="mailto:qyang24@uw.edu">
+					<i class="fas fa-envelope"></i>
+				</a>
+			</div>
+		</div>
 
-		<!-- Header -->
+		<!-- Header (Desktop) -->
 			<section id="header">
 				<header>
 					<span class="image self"><img src="images/self.jpg" alt="" /></span>
@@ -102,12 +355,12 @@
 								<li>
 									<strong>BIOGEM: A Fully Biodegradable Gelatin-Based McKibben Actuator with Embedded Sensing</strong><br>
 									Ge, G; Lu, H.; Gao, Y.; <strong>Yang, Q.</strong>; Hester, J.; Cheng, T.; Luo, Y.<br>
-									<em>Accepted for publication at ACM Symposium on User Interface Software and Technology (UIST) ’25</em>
+									<em>Accepted for publication at ACM Symposium on User Interface Software and Technology (UIST) '25</em>
 								</li>
 								<li>
 									<strong>karP: An Experiential Prototype for Kinesthetic Augmented Reality on Mobile — Playful, Portable, Producible</strong><br>
 									Pan, Z.; Ge, G; Lu, H.; Meng, Z.; Wu, H.; <strong>Yang, Q.</strong>; Liang, J.<br>
-									<em>DIS ’25 Companion, ACM, 2025. <a href="https://doi.org/10.1145/3715668.3735607">https://doi.org/10.1145/3715668.3735607</a></em>
+									<em>DIS '25 Companion, ACM, 2025. <a href="https://doi.org/10.1145/3715668.3735607">https://doi.org/10.1145/3715668.3735607</a></em>
 								</li>
 								<li>
 									<strong>Development of GelMA Ink for Multi-Scale Biological 3D Printing</strong><br>
@@ -123,12 +376,12 @@
 									<li>
 										<strong>Rapid Fabrication of Self-Folding Polyhedral Swarm Robots with Integrated Sensing</strong><br>
 										Ge, G; <strong>Yang, Q.</strong>; Nisser, M.; Luo, Y.<br>
-										<em>Targeting submission to: IEEE International Conference on Robotics and Automation (ICRA) ’26 (Deadline: 09/2025)</em>
+										<em>Targeting submission to: IEEE International Conference on Robotics and Automation (ICRA) '26 (Deadline: 09/2025)</em>
 									</li>
 									<li>
 										<strong>Closed-Loop CPR Self-Training System</strong><br>
-										J, Moon <strong>Yang, Q.</strong>; Ma, M.; Luo, Y.<br>; et al. 
-										<em>Targeting submission to: IEEE International Conference on Robotics and Automation (ICRA) ’26 (Deadline: 09/2025)</em>
+										J, Moon <strong>Yang, Q.</strong>; Ma, M.; Luo, Y.<br>et al. 
+										<em>Targeting submission to: IEEE International Conference on Robotics and Automation (ICRA) '26 (Deadline: 09/2025)</em>
 									</li>
 
 									<li>
@@ -148,22 +401,28 @@
 									<p></p>
 									<div class="features">
 										<article>
-											<a href="/projects/biogem/" class="image"><img src="images/pic01.jpg" alt="" /></a>
+											<a href="/projects/biogem/" class="image"><img src="images/bio/BioF.jpg" alt="" /></a>
 											<div class="inner">
 												<h4>BIOGEM: A Fully Biodegradable Gelatin-Based McKibben Actuator with Embedded Sensing</h4>
 												
 											</div>
 										</article>
 										<article>
-											<a href="/projects/Kar/" class="image"><img src="images/pic02.jpg" alt="" /></a>
+											<a href="/projects/Kar/" class="image"><img src="images/kar/kar1.png" alt="" /></a>
 											<div class="inner">
 												<h4>KarP: an experiential prototype for Kinesthetic Augmented Reality on mobile – Playful, Portable, Producible</h4>
 											</div>
 										</article>
 										<article>
-											<a href="/projects/MultiSleeve/" class="image"><img src="images/pic03.jpg" alt="" /></a>
+											<a href="/projects/MultiSleeve/" class="image"><img src="images/mul/electro.png" alt="" /></a>
 											<div class="inner">
 												<h4>Multimodal Sensing Sleeve for Rehabilitation</h4>
+											</div>
+										</article>
+										<article>
+											<a href="/projects/SwarmRobot/" class="image"><img src="images/Robot/cube.jpg" alt="" /></a>
+											<div class="inner">
+												<h4>Rapid Fabrication of Self-Folding Polyhedral Swarm Robots</h4>
 											</div>
 										</article>
 									</div>
@@ -174,340 +433,9 @@
 							<section id="four">
 								<div class="container">
 									<h3>Contact Me</h3>
-									<p>Feel free to reach out! Drop me a line anytime at <Strong><a href="mailto:qyang24@uw.edu">qyang24@uw.edu</a></Strong> and I’ll get back to you as soon as I can. Looking forward to connecting!</p>
+									<p>Feel free to reach out! Drop me a line anytime at <Strong><a href="mailto:qyang24@uw.edu">qyang24@uw.edu</a></Strong> and I'll get back to you as soon as I can. Looking forward to connecting!</p>
 								</div>
 							</section>
-
-						<!-- Five -->
-						<!--
-							<section id="five">
-								<div class="container">
-									<h3>Elements</h3>
-
-									<section>
-										<h4>Text</h4>
-										<p>This is <b>bold</b> and this is <strong>strong</strong>. This is <i>italic</i> and this is <em>emphasized</em>.
-										This is <sup>superscript</sup> text and this is <sub>subscript</sub> text.
-										This is <u>underlined</u> and this is code: <code>for (;;) { ... }</code>. Finally, <a href="#">this is a link</a>.</p>
-										<hr />
-										<header>
-											<h4>Heading with a Subtitle</h4>
-											<p>Lorem ipsum dolor sit amet nullam id egestas urna aliquam</p>
-										</header>
-										<p>Nunc lacinia ante nunc ac lobortis. Interdum adipiscing gravida odio porttitor sem non mi integer non faucibus ornare mi ut ante amet placerat aliquet. Volutpat eu sed ante lacinia sapien lorem accumsan varius montes viverra nibh in adipiscing blandit tempus accumsan.</p>
-										<header>
-											<h5>Heading with a Subtitle</h5>
-											<p>Lorem ipsum dolor sit amet nullam id egestas urna aliquam</p>
-										</header>
-										<p>Nunc lacinia ante nunc ac lobortis. Interdum adipiscing gravida odio porttitor sem non mi integer non faucibus ornare mi ut ante amet placerat aliquet. Volutpat eu sed ante lacinia sapien lorem accumsan varius montes viverra nibh in adipiscing blandit tempus accumsan.</p>
-										<hr />
-										<h2>Heading Level 2</h2>
-										<h3>Heading Level 3</h3>
-										<h4>Heading Level 4</h4>
-										<h5>Heading Level 5</h5>
-										<h6>Heading Level 6</h6>
-										<hr />
-										<h5>Blockquote</h5>
-										<blockquote>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan faucibus. Vestibulum ante ipsum primis in faucibus lorem ipsum dolor sit amet nullam adipiscing eu felis.</blockquote>
-										<h5>Preformatted</h5>
-										<pre><code>i = 0;
-
-while (!deck.isInOrder()) {
-    print 'Iteration ' + i;
-    deck.shuffle();
-    i++;
-}
-
-print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
-									</section>
-
-									<section>
-										<h4>Lists</h4>
-										<div class="row">
-											<div class="col-6 col-12-xsmall">
-												<h5>Unordered</h5>
-												<ul>
-													<li>Dolor pulvinar etiam magna etiam.</li>
-													<li>Sagittis adipiscing lorem eleifend.</li>
-													<li>Felis enim feugiat dolore viverra.</li>
-												</ul>
-												<h5>Alternate</h5>
-												<ul class="alt">
-													<li>Dolor pulvinar etiam magna etiam.</li>
-													<li>Sagittis adipiscing lorem eleifend.</li>
-													<li>Felis enim feugiat dolore viverra.</li>
-												</ul>
-											</div>
-											<div class="col-6 col-12-xsmall">
-												<h5>Ordered</h5>
-												<ol>
-													<li>Dolor pulvinar etiam magna etiam.</li>
-													<li>Etiam vel felis at lorem sed viverra.</li>
-													<li>Felis enim feugiat dolore viverra.</li>
-													<li>Dolor pulvinar etiam magna etiam.</li>
-													<li>Etiam vel felis at lorem sed viverra.</li>
-													<li>Felis enim feugiat dolore viverra.</li>
-												</ol>
-												<h5>Icons</h5>
-												<ul class="icons">
-													<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-													<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-													<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-													<li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
-													<li><a href="#" class="icon brands fa-dribbble"><span class="label">Dribbble</span></a></li>
-													<li><a href="#" class="icon brands fa-tumblr"><span class="label">Tumblr</span></a></li>
-												</ul>
-											</div>
-										</div>
-										<h5>Actions</h5>
-										<ul class="actions">
-											<li><a href="#" class="button primary">Default</a></li>
-											<li><a href="#" class="button">Default</a></li>
-											<li><a href="#" class="button alt">Default</a></li>
-										</ul>
-										<ul class="actions small">
-											<li><a href="#" class="button primary small">Small</a></li>
-											<li><a href="#" class="button small">Small</a></li>
-											<li><a href="#" class="button alt small">Small</a></li>
-										</ul>
-										<div class="row">
-											<div class="col-3 col-6-medium col-12-xsmall">
-												<ul class="actions stacked">
-													<li><a href="#" class="button primary">Default</a></li>
-													<li><a href="#" class="button">Default</a></li>
-													<li><a href="#" class="button alt">Default</a></li>
-												</ul>
-											</div>
-											<div class="col-3 col-6 col-12-xsmall">
-												<ul class="actions stacked">
-													<li><a href="#" class="button primary small">Small</a></li>
-													<li><a href="#" class="button small">Small</a></li>
-													<li><a href="#" class="button alt small">Small</a></li>
-												</ul>
-											</div>
-											<div class="col-3 col-6-medium col-12-xsmall">
-												<ul class="actions stacked">
-													<li><a href="#" class="button primary fit">Default</a></li>
-													<li><a href="#" class="button fit">Default</a></li>
-													<li><a href="#" class="button alt fit">Default</a></li>
-												</ul>
-											</div>
-											<div class="col-3 col-6-medium col-12-xsmall">
-												<ul class="actions stacked">
-													<li><a href="#" class="button primary small fit">Small</a></li>
-													<li><a href="#" class="button small fit">Small</a></li>
-													<li><a href="#" class="button alt small fit">Small</a></li>
-												</ul>
-											</div>
-										</div>
-									</section>
-
-									<section>
-										<h4>Table</h4>
-										<h5>Default</h5>
-										<div class="table-wrapper">
-											<table>
-												<thead>
-													<tr>
-														<th>Name</th>
-														<th>Description</th>
-														<th>Price</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr>
-														<td>Item One</td>
-														<td>Ante turpis integer aliquet porttitor.</td>
-														<td>29.99</td>
-													</tr>
-													<tr>
-														<td>Item Two</td>
-														<td>Vis ac commodo adipiscing arcu aliquet.</td>
-														<td>19.99</td>
-													</tr>
-													<tr>
-														<td>Item Three</td>
-														<td> Morbi faucibus arcu accumsan lorem.</td>
-														<td>29.99</td>
-													</tr>
-													<tr>
-														<td>Item Four</td>
-														<td>Vitae integer tempus condimentum.</td>
-														<td>19.99</td>
-													</tr>
-													<tr>
-														<td>Item Five</td>
-														<td>Ante turpis integer aliquet porttitor.</td>
-														<td>29.99</td>
-													</tr>
-												</tbody>
-												<tfoot>
-													<tr>
-														<td colspan="2"></td>
-														<td>100.00</td>
-													</tr>
-												</tfoot>
-											</table>
-										</div>
-
-										<h5>Alternate</h5>
-										<div class="table-wrapper">
-											<table class="alt">
-												<thead>
-													<tr>
-														<th>Name</th>
-														<th>Description</th>
-														<th>Price</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr>
-														<td>Item One</td>
-														<td>Ante turpis integer aliquet porttitor.</td>
-														<td>29.99</td>
-													</tr>
-													<tr>
-														<td>Item Two</td>
-														<td>Vis ac commodo adipiscing arcu aliquet.</td>
-														<td>19.99</td>
-													</tr>
-													<tr>
-														<td>Item Three</td>
-														<td> Morbi faucibus arcu accumsan lorem.</td>
-														<td>29.99</td>
-													</tr>
-													<tr>
-														<td>Item Four</td>
-														<td>Vitae integer tempus condimentum.</td>
-														<td>19.99</td>
-													</tr>
-													<tr>
-														<td>Item Five</td>
-														<td>Ante turpis integer aliquet porttitor.</td>
-														<td>29.99</td>
-													</tr>
-												</tbody>
-												<tfoot>
-													<tr>
-														<td colspan="2"></td>
-														<td>100.00</td>
-													</tr>
-												</tfoot>
-											</table>
-										</div>
-									</section>
-
-									<section>
-										<h4>Buttons</h4>
-										<ul class="actions">
-											<li><a href="#" class="button primary">Primary</a></li>
-											<li><a href="#" class="button">Default</a></li>
-											<li><a href="#" class="button alt">Alternate</a></li>
-										</ul>
-										<ul class="actions">
-											<li><a href="#" class="button primary large">Large</a></li>
-											<li><a href="#" class="button">Default</a></li>
-											<li><a href="#" class="button alt small">Small</a></li>
-										</ul>
-										<ul class="actions fit">
-											<li><a href="#" class="button primary fit">Fit</a></li>
-											<li><a href="#" class="button fit">Fit</a></li>
-											<li><a href="#" class="button alt fit">Fit</a></li>
-										</ul>
-										<ul class="actions fit small">
-											<li><a href="#" class="button primary fit small">Fit + Small</a></li>
-											<li><a href="#" class="button fit small">Fit + Small</a></li>
-											<li><a href="#" class="button alt fit small">Fit + Small</a></li>
-										</ul>
-										<ul class="actions">
-											<li><a href="#" class="button primary icon solid fa-download">Icon</a></li>
-											<li><a href="#" class="button icon solid fa-download">Icon</a></li>
-											<li><a href="#" class="button alt icon solid fa-check">Icon</a></li>
-										</ul>
-										<ul class="actions">
-											<li><span class="button primary disabled">Primary</span></li>
-											<li><span class="button disabled">Default</span></li>
-											<li><span class="button alt disabled">Alternate</span></li>
-										</ul>
-									</section>
-
-									<section>
-										<h4>Form</h4>
-										<form method="post" action="#">
-											<div class="row gtr-uniform">
-												<div class="col-6 col-12-xsmall">
-													<input type="text" name="demo-name" id="demo-name" value="" placeholder="Name" />
-												</div>
-												<div class="col-6 col-12-xsmall">
-													<input type="email" name="demo-email" id="demo-email" value="" placeholder="Email" />
-												</div>
-												<div class="col-12">
-													<select name="demo-category" id="demo-category">
-														<option value="">- Category -</option>
-														<option value="1">Manufacturing</option>
-														<option value="1">Shipping</option>
-														<option value="1">Administration</option>
-														<option value="1">Human Resources</option>
-													</select>
-												</div>
-												<div class="col-4 col-12-medium">
-													<input type="radio" id="demo-priority-low" name="demo-priority" checked>
-													<label for="demo-priority-low">Low Priority</label>
-												</div>
-												<div class="col-4 col-12-medium">
-													<input type="radio" id="demo-priority-normal" name="demo-priority">
-													<label for="demo-priority-normal">Normal Priority</label>
-												</div>
-												<div class="col-4 col-12-medium">
-													<input type="radio" id="demo-priority-high" name="demo-priority">
-													<label for="demo-priority-high">High Priority</label>
-												</div>
-												<div class="col-6 col-12-medium">
-													<input type="checkbox" id="demo-copy" name="demo-copy">
-													<label for="demo-copy">Email me a copy of this message</label>
-												</div>
-												<div class="col-6 col-12-medium">
-													<input type="checkbox" id="demo-human" name="demo-human" checked>
-													<label for="demo-human">I am a human and not a robot</label>
-												</div>
-												<div class="col-12">
-													<textarea name="demo-message" id="demo-message" placeholder="Enter your message" rows="6"></textarea>
-												</div>
-												<div class="col-12">
-													<ul class="actions">
-														<li><input type="submit" value="Send Message" /></li>
-														<li><input type="reset" value="Reset" class="alt" /></li>
-													</ul>
-												</div>
-											</div>
-										</form>
-									</section>
-
-									<section>
-										<h4>Image</h4>
-										<h5>Fit</h5>
-										<span class="image fit"><img src="images/banner.jpg" alt="" /></span>
-										<div class="box alt">
-											<div class="row gtr-50 gtr-uniform">
-												<div class="col-4"><span class="image fit"><img src="images/pic01.jpg" alt="" /></span></div>
-												<div class="col-4"><span class="image fit"><img src="images/pic02.jpg" alt="" /></span></div>
-												<div class="col-4"><span class="image fit"><img src="images/pic03.jpg" alt="" /></span></div>
-												<div class="col-4"><span class="image fit"><img src="images/pic02.jpg" alt="" /></span></div>
-												<div class="col-4"><span class="image fit"><img src="images/pic03.jpg" alt="" /></span></div>
-												<div class="col-4"><span class="image fit"><img src="images/pic01.jpg" alt="" /></span></div>
-												<div class="col-4"><span class="image fit"><img src="images/pic03.jpg" alt="" /></span></div>
-												<div class="col-4"><span class="image fit"><img src="images/pic01.jpg" alt="" /></span></div>
-												<div class="col-4"><span class="image fit"><img src="images/pic02.jpg" alt="" /></span></div>
-											</div>
-										</div>
-										<h5>Left &amp; Right</h5>
-										<p><span class="image left"><img src="images/avatar.jpg" alt="" /></span>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent.</p>
-										<p><span class="image right"><img src="images/avatar.jpg" alt="" /></span>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent.</p>
-									</section>
-
-								</div>
-							</section>
-						-->
 
 					</div>
 
@@ -515,7 +443,7 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 					<section id="footer">
 						<div class="container">
 							<ul class="copyright">
-								<li>&copy; Qifeng Yan. All rights reserved.</li>
+								<li>&copy; Qifeng Yang. All rights reserved.</li>
 							</ul>
 						</div>
 					</section>
@@ -532,36 +460,70 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 			<script src="assets/js/main.js"></script>
 			<script>
 			window.addEventListener('load', function() {
-			document.body.classList.add('loaded');
+				document.body.classList.add('loaded');
 			});
+
+			// Mobile menu toggle
+			const menuToggle = document.getElementById('menuToggle');
+			const mobileHeader = document.getElementById('mobileHeader');
+			
+			if (menuToggle && mobileHeader) {
+				menuToggle.addEventListener('click', function() {
+					this.classList.toggle('active');
+					mobileHeader.classList.toggle('active');
+				});
+				
+				// Close menu when clicking a nav link on mobile
+				mobileHeader.querySelectorAll('nav a').forEach(link => {
+					link.addEventListener('click', function(e) {
+						// If it's an anchor link (starts with #)
+						if (this.getAttribute('href').startsWith('#')) {
+							e.preventDefault();
+							
+							// Close the menu
+							menuToggle.classList.remove('active');
+							mobileHeader.classList.remove('active');
+							
+							// Smooth scroll to section
+							const targetId = this.getAttribute('href').substring(1);
+							const targetSection = document.getElementById(targetId);
+							if (targetSection) {
+								setTimeout(() => {
+									targetSection.scrollIntoView({ 
+										behavior: 'smooth',
+										block: 'start'
+									});
+								}, 300); // Wait for menu to close
+							}
+						}
+					});
+				});
+			}
 
 			// 只拦截非纯锚点、同域名的链接
 			document.querySelectorAll('a[href]').forEach(link => {
-			const href = link.getAttribute('href');
-			// 跳过以 "#" 开头的锚点链接
-			if (!href.startsWith('#') && link.hostname === location.hostname) {
-				link.addEventListener('click', function(e) {
-				e.preventDefault();
-				document.body.classList.remove('loaded');
-				document.body.classList.add('fade-out');
-				setTimeout(() => window.location.href = this.href, 400);
-				});
-			}
+				const href = link.getAttribute('href');
+				// 跳过以 "#" 开头的锚点链接
+				if (!href.startsWith('#') && link.hostname === location.hostname) {
+					link.addEventListener('click', function(e) {
+						e.preventDefault();
+						document.body.classList.remove('loaded');
+						document.body.classList.add('fade-out');
+						setTimeout(() => window.location.href = this.href, 400);
+					});
+				}
 			});
 
 			// 同理，如果有表单需要淡出再提交，也可以加上
 			document.querySelectorAll('form').forEach(form => {
-			form.addEventListener('submit', function(e) {
-				e.preventDefault();
-				document.body.classList.remove('loaded');
-				document.body.classList.add('fade-out');
-				setTimeout(() => this.submit(), 400);
-			});
+				form.addEventListener('submit', function(e) {
+					e.preventDefault();
+					document.body.classList.remove('loaded');
+					document.body.classList.add('fade-out');
+					setTimeout(() => this.submit(), 400);
+				});
 			});
 			</script>
-
-
-            
 
 	</body>
 </html>

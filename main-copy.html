@@ -1,0 +1,555 @@
+<!DOCTYPE HTML>
+<!--
+	Read Only by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Qifeng Yang Welcome</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+        <style>
+        /* Reset margins and paddings to remove white space at top */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        
+        /* 页面初始隐藏 */
+        body {
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+        }
+        /* 当页面加载完成后，body 上会加上 .loaded */
+        body.loaded {
+            opacity: 1;
+        }
+
+        body.fade-out {
+            opacity: 0 !important;
+        }
+		
+        #header {
+            position: fixed !important;
+            z-index: 1000; /* 保证在最上层 */
+            top: 0;
+            left: 0;
+        }
+
+        /* Remove any default padding/margin from wrapper */
+        #wrapper {
+            margin: 0;
+            padding: 0;
+            margin-left: 375px; /* For desktop sidebar */
+        }
+        
+        /* Ensure main starts at top */
+        #main {
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Ensure first section starts at top */
+        #one {
+            margin-top: 0;
+            padding-top: 0;
+        }
+        
+        /* Ensure banner image has no top margin */
+        #one .image.main {
+            margin: 0;
+            width: 100%;
+        }
+        
+        #one .image.main img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* Project images styling */
+        #three .features article {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        #three .features article .image {
+            flex: 0 0 300px;
+            height: 200px;
+            margin-right: 1.5rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+
+        #three .features article .image:hover {
+            border-color: #3FC08E;
+        }
+
+        #three .features article .image img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        #three .features article .image:hover img {
+            transform: translate(-50%, -50%) scale(1.02);
+        }
+
+        #three .features article .inner {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        /* Mobile menu button - hidden by default */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+  			z-index: 99999 !important;
+            background: #57BAA8;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+        }
+        
+        .mobile-menu-toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 5px auto;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-toggle.active {
+            background: rgba(255,255,255,0.9);
+        }
+        
+        .mobile-menu-toggle.active span {
+            background: #57BAA8;
+        }
+        
+        .mobile-menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .mobile-menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+		section[id] {
+		scroll-margin-top: 80px;
+		}
+
+        /* Mobile Menu Overlay */
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .mobile-menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* 响应式 - 手机端 */
+        @media screen and (max-width: 768px) {
+            /* Show mobile menu button */
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            /* Adjust header for mobile */
+            #header {
+                width: 280px;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 10000;
+            }
+            
+            /* Show header when menu is active */
+            body.menu-active #header {
+                transform: translateX(0);
+            }
+            
+            /* Show overlay when menu is active */
+            body.menu-active .mobile-menu-overlay {
+                display: block;
+                opacity: 1;
+            }
+            
+            /* Adjust wrapper for mobile */
+            #wrapper {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            /* Hide banner on mobile */
+            #one .image.main {
+                display: none;
+            }
+            
+            /* Adjust first section padding */
+            #one {
+                padding-top: 60px;
+            }
+            
+            /* Container padding */
+            .container {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            
+            /* Project layout for mobile */
+            #three .features article {
+                flex-direction: column;
+            }
+            
+            #three .features article .image {
+                flex: none;
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+			  #header .toggle,
+			.toggle {
+				display: none !important;
+			}
+
+			
+        }
+
+
+        </style>
+	</head>
+	<body class="is-preload">
+
+		<!-- Mobile Menu Toggle Button -->
+		<button class="mobile-menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+			<span></span>
+			<span></span>
+			<span></span>
+		</button>
+		
+		<!-- Mobile Menu Overlay -->
+		<div class="mobile-menu-overlay" id="menuOverlay"></div>
+
+		<!-- Header -->
+			<section id="header">
+				<header>
+					<span class="image self"><img src="images/self.jpg" alt="" /></span>
+					<h1 id="logo"><a href="#">Qifeng Yang</a></h1>
+					<p> qyang24@uw.edu<br />
+				</header>
+				<nav id="nav">
+					<ul>
+						<li><a href="index.html" class="active">Home</a></li>
+						<li><a href="#one" class="active">About Me</a></li>
+						<li><a href="#two">Publication</a></li>
+						<li><a href="#three">Projects</a></li>
+						<li><a href="#four">Contact</a></li>
+					</ul>
+				</nav>
+
+				<footer>
+					<ul class="icons">
+				
+						<li><a href="https://www.linkedin.com/in/qifeng-yang-743332313/" class="icon brands fa-linkedin"><span class="label">Linkedin</span></a></li>
+						<li><a href="#four" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+					</ul>
+				</footer>
+			</section>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- One -->
+							<section id="one">
+								<div class="image main" data-position="center">
+									<img src="images/banner.jpg" alt="" />
+								</div>
+								<div class="container">
+									<header class="major">
+										<h2>About Me</h2>
+									</header>
+								<p>
+								Hi! I am Qifeng Yang, an undergraduate student in the Department of Electrical and Computer Engineering at the University of Washington, Seattle. Currently, I conduct research at the <a href="https://yyueluo.com/group.html">Wearable Intelligence Lab</a>, where I focus on developing novel technologies at the intersection of electrical & computer engineering and human-computer interaction (HCI).
+								</p>
+
+								<p>
+								My research interests include hardware and firmware engineering, human-computer/robot interaction, and wearable devices. I'm passionate about designing reliable, human-centered systems that transform sensor data into actionable feedback.
+								</p>
+
+									
+										
+									</div>
+							</section>
+
+						<!-- Two -->
+							<section id="two">
+							<div class="container">
+								<h3>Publications</h3>
+
+								<h4>Accepted Papers:</h4>
+								<ol class="publication-list">
+								<li>
+									<strong>BIOGEM: A Fully Biodegradable Gelatin-Based McKibben Actuator with Embedded Sensing</strong><br>
+									Ge, G; Lu, H.; Gao, Y.; <strong>Yang, Q.</strong>; Hester, J.; Cheng, T.; Luo, Y.<br>
+									<em>Accepted for publication at ACM Symposium on User Interface Software and Technology (UIST) '25</em>
+								</li>
+								<li>
+									<strong>karP: An Experiential Prototype for Kinesthetic Augmented Reality on Mobile — Playful, Portable, Producible</strong><br>
+									Pan, Z.; Ge, G; Lu, H.; Meng, Z.; Wu, H.; <strong>Yang, Q.</strong>; Liang, J.<br>
+									<em>DIS '25 Companion, ACM, 2025. <a href="https://doi.org/10.1145/3715668.3735607">https://doi.org/10.1145/3715668.3735607</a></em>
+								</li>
+								<li>
+									<strong>Development of GelMA Ink for Multi-Scale Biological 3D Printing</strong><br>
+									Yang, S.; <strong>Yang, Q.</strong><br>
+									<em>AIP Conference Proceedings, Vol. 2589, 020022, 2022. <a href="https://doi.org/10.1063/5.0123152">https://doi.org/10.1063/5.0123152</a></em>
+								</li>
+
+
+								</ol>
+
+								<h4>Proceedings Papers:</h4>
+								<ol class="publication-list">
+									<li>
+										<strong>Rapid Fabrication of Self-Folding Polyhedral Swarm Robots with Integrated Sensing</strong><br>
+										Ge, G; <strong>Yang, Q.</strong>; Nisser, M.; Luo, Y.<br>
+										<em>Targeting submission to: IEEE International Conference on Robotics and Automation (ICRA) '26 (Deadline: 09/2025)</em>
+									</li>
+									<li>
+										<strong>Closed-Loop CPR Self-Training System</strong><br>
+										J, Moon; <strong>Yang, Q.</strong>; Ma, M.; Luo, Y.; et al.<br>
+										<em>Targeting submission to: IEEE International Conference on Robotics and Automation (ICRA) '26 (Deadline: 09/2025)</em>
+									</li>
+
+									<li>
+										<strong>Multimodal Sensing Sleeve for Rehabilitation</strong><br>
+										Zhang, S.; Ma, M.; <strong>Yang, Q.</strong>;  Ge, G; Taylor, J.; Luo, Y.<br>
+										<em>Targeting submission to: ACM CHI (Deadline: 09/2025)</em>
+									</li>
+								</ol>
+							</div>
+							</section>
+
+
+						<!-- Three -->
+							<section id="three">
+								<div class="container">
+									<h3>Projects</h3>
+									<p></p>
+									<div class="features">
+										<article>
+											<a href="/projects/biogem/" class="image"><img src="images/bio/BioF.jpg" alt="" /></a>
+											<div class="inner">
+												<h4>BIOGEM: A Fully Biodegradable Gelatin-Based McKibben Actuator with Embedded Sensing</h4>
+												
+											</div>
+										</article>
+										<article>
+											<a href="/projects/Kar/" class="image"><img src="images/kar/kar1.png" alt="" /></a>
+											<div class="inner">
+												<h4>KarP: an experiential prototype for Kinesthetic Augmented Reality on mobile – Playful, Portable, Producible</h4>
+											</div>
+										</article>
+										<article>
+											<a href="/projects/MultiSleeve/" class="image"><img src="images/mul/electro.png" alt="" /></a>
+											<div class="inner">
+												<h4>Multimodal Sensing Sleeve for Rehabilitation</h4>
+											</div>
+										</article>
+										<article>
+											<a href="/projects/SwarmRobot/" class="image"><img src="images/Robot/cube.jpg" alt="" /></a>
+											<div class="inner">
+												<h4>Rapid Fabrication of Self-Folding Polyhedral Swarm Robots</h4>
+											</div>
+										</article>
+									</div>
+								</div>
+							</section>
+
+						<!-- Four -->
+							<section id="four">
+								<div class="container">
+									<h3>Contact Me</h3>
+									<p>Feel free to reach out! Drop me a line anytime at <Strong><a href="mailto:qyang24@uw.edu">qyang24@uw.edu</a></Strong> and I'll get back to you as soon as I can. Looking forward to connecting!</p>
+								</div>
+							</section>
+
+					</div>
+
+				<!-- Footer -->
+					<section id="footer">
+						<div class="container">
+							<ul class="copyright">
+								<li>&copy; Qifeng Yang. All rights reserved.</li>
+							</ul>
+						</div>
+					</section>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script>
+			window.addEventListener('load', function() {
+				document.body.classList.add('loaded');
+			});
+
+			// Mobile menu functionality
+			(function() {
+				const menuToggle = document.getElementById('menuToggle');
+				const menuOverlay = document.getElementById('menuOverlay');
+				const body = document.body;
+				const navLinks = document.querySelectorAll('#nav a');
+				
+				if (menuToggle) {
+					// Toggle menu when button is clicked
+					menuToggle.addEventListener('click', function(e) {
+						e.stopPropagation();
+						body.classList.toggle('menu-active');
+						this.classList.toggle('active');
+					});
+				}
+				
+				// Close menu when overlay is clicked
+				if (menuOverlay) {
+					menuOverlay.addEventListener('click', function() {
+						body.classList.remove('menu-active');
+						menuToggle.classList.remove('active');
+					});
+				}
+				
+				// Close menu when nav link is clicked (on mobile)
+				navLinks.forEach(function(link) {
+					link.addEventListener('click', function() {
+						if (window.innerWidth <= 768) {
+							body.classList.remove('menu-active');
+							menuToggle.classList.remove('active');
+						}
+					});
+				});
+				
+				// Close menu on window resize if becoming desktop size
+				window.addEventListener('resize', function() {
+					if (window.innerWidth > 768) {
+						body.classList.remove('menu-active');
+						menuToggle.classList.remove('active');
+					}
+				});
+			})();
+
+			// 只拦截非纯锚点、同域名的链接
+			document.querySelectorAll('a[href]').forEach(link => {
+				const href = link.getAttribute('href');
+				// 跳过以 "#" 开头的锚点链接
+				if (!href.startsWith('#') && link.hostname === location.hostname) {
+					link.addEventListener('click', function(e) {
+						e.preventDefault();
+						document.body.classList.remove('loaded');
+						document.body.classList.add('fade-out');
+						setTimeout(() => window.location.href = this.href, 400);
+					});
+				}
+			});
+
+			// 同理，如果有表单需要淡出再提交，也可以加上
+			document.querySelectorAll('form').forEach(form => {
+				form.addEventListener('submit', function(e) {
+					e.preventDefault();
+					document.body.classList.remove('loaded');
+					document.body.classList.add('fade-out');
+					setTimeout(() => this.submit(), 400);
+				});
+			});
+			</script>
+<script>
+$(function() {
+  // 1. 计算 header 的实际高度
+  var headerH = $('#header').outerHeight();
+
+  // 2. 先解绑 scrolly（防止它抢先拦截），再绑定我们自己的“淡出+跳转+淡入”逻辑
+  $('#nav a[href^="#"]')
+    .off('click.scrolly')
+    .on('click', function(e) {
+      e.preventDefault();
+
+      // 关闭移动菜单
+      $('body').removeClass('menu-active');
+      $('#menuToggle').removeClass('active');
+
+      // 找到目标元素
+      var target = $(this.hash);
+      if (!target.length) return;
+
+      // 计算跳转后应滚到的位置
+      var destY = target.offset().top - headerH;
+
+      // ---- 核心改动开始 ----
+      // 1) 淡出
+      $('body').removeClass('loaded').addClass('fade-out');
+
+      // 2) 等 400ms，让 CSS 完成淡出过渡
+      setTimeout(function() {
+        // 3) 瞬间跳转到目标位置（无滚动动画）
+        $(window).scrollTop(destY);
+        // 4) 淡入
+        $('body').removeClass('fade-out').addClass('loaded');
+      }, 400);
+      // ---- 核心改动结束 ----
+    });
+});
+
+</script>
+
+	</body>
+</html>
