@@ -24,12 +24,12 @@
             height: 100%;
         }
         
-        /* 页面初始隐藏 */
+        /* Page initially hidden */
         body {
             opacity: 0;
             transition: opacity 0.4s ease-in-out;
         }
-        /* 当页面加载完成后，body 上会加上 .loaded */
+        /* After page loads, .loaded class is added to body */
         body.loaded {
             opacity: 1;
         }
@@ -40,7 +40,7 @@
 		
         #header {
             position: fixed !important;
-            z-index: 1000; /* 保证在最上层 */
+            z-index: 1000; /* Ensure on top layer */
             top: 0;
             left: 0;
         }
@@ -191,7 +191,7 @@
             opacity: 1;
         }
 
-        /* 响应式 - 手机端 */
+        /* Responsive - Mobile */
         @media screen and (max-width: 768px) {
             /* Show mobile menu button */
             .mobile-menu-toggle {
@@ -488,10 +488,10 @@
 				});
 			})();
 
-			// 只拦截非纯锚点、同域名的链接
+			// Only intercept same-domain links (not pure anchors)
 			document.querySelectorAll('a[href]').forEach(link => {
 				const href = link.getAttribute('href');
-				// 跳过以 "#" 开头的锚点链接
+				// Skip anchor links starting with "#"
 				if (!href.startsWith('#') && link.hostname === location.hostname) {
 					link.addEventListener('click', function(e) {
 						e.preventDefault();
@@ -502,7 +502,7 @@
 				}
 			});
 
-			// 同理，如果有表单需要淡出再提交，也可以加上
+			// Similarly, if there's a form that needs fade-out before submitting, you can add it here
 			document.querySelectorAll('form').forEach(form => {
 				form.addEventListener('submit', function(e) {
 					e.preventDefault();
@@ -514,38 +514,38 @@
 			</script>
 <script>
 $(function() {
-  // 1. 计算 header 的实际高度
+  // 1. Calculate the actual height of header
   var headerH = $('#header').outerHeight();
 
-  // 2. 先解绑 scrolly（防止它抢先拦截），再绑定我们自己的“淡出+跳转+淡入”逻辑
+  // 2. Unbind scrolly (prevent it from intercepting), then bind our own "fade-out+jump+fade-in" logic
   $('#nav a[href^="#"]')
     .off('click.scrolly')
     .on('click', function(e) {
       e.preventDefault();
 
-      // 关闭移动菜单
+      // Close mobile menu
       $('body').removeClass('menu-active');
       $('#menuToggle').removeClass('active');
 
-      // 找到目标元素
+      // Find target element
       var target = $(this.hash);
       if (!target.length) return;
 
-      // 计算跳转后应滚到的位置
+      // Calculate the position to scroll after jumping
       var destY = target.offset().top - headerH;
 
-      // ---- 核心改动开始 ----
-      // 1) 淡出
+      // ---- Core Change Start ----
+      // 1) Fade out
       $('body').removeClass('loaded').addClass('fade-out');
 
-      // 2) 等 400ms，让 CSS 完成淡出过渡
+      // 2) Wait 400ms for CSS to complete fade-out transition
       setTimeout(function() {
-        // 3) 瞬间跳转到目标位置（无滚动动画）
+        // 3) Jump to target position instantly (no scroll animation)
         $(window).scrollTop(destY);
-        // 4) 淡入
+        // 4) Fade in
         $('body').removeClass('fade-out').addClass('loaded');
       }, 400);
-      // ---- 核心改动结束 ----
+      // ---- Core Change End ----
     });
 });
 
