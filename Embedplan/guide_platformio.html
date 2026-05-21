@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Guide: PlatformIO + ESP32 安装指南</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#252836;--border:#2d3148;--primary:#6c63ff;--primary-light:#8b85ff;--success:#4ade80;--warning:#fbbf24;--danger:#f87171;--text:#e2e8f0;--muted:#94a3b8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.6;}
+a{color:var(--primary-light);text-decoration:none;}
+a:hover{text-decoration:underline;}
+code{background:var(--surface2);padding:2px 7px;border-radius:4px;font-family:'Courier New',monospace;font-size:.85em;color:#e879f9;}
+pre{background:#0d1117;border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:8px;padding:16px 18px;overflow-x:auto;margin:10px 0 14px;}
+pre code{background:none;padding:0;color:#a3e635;font-size:.84rem;display:block;line-height:1.7;}
+.header{background:linear-gradient(135deg,#6c63ff,#a855f7);padding:18px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.back-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:.82rem;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+.back-btn:hover{background:rgba(255,255,255,.25);text-decoration:none;}
+h1{font-size:1.2rem;font-weight:700;}
+.subtitle{font-size:.8rem;opacity:.8;margin-top:3px;}
+.layout{max-width:820px;margin:0 auto;padding:28px 20px;}
+.overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:24px;}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.ov-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.ov-val{font-size:.9rem;font-weight:600;}
+.badge{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:10px;font-weight:600;}
+.free{background:rgba(74,222,128,.15);color:#4ade80;}
+.paid{background:rgba(251,191,36,.15);color:#fbbf24;}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:24px;}
+.toc h3{font-size:.88rem;color:var(--primary-light);margin-bottom:10px;font-weight:600;}
+.toc ol{padding-left:20px;columns:2;column-gap:20px;}
+.toc li{font-size:.83rem;line-height:2.1;}
+.toc a{color:var(--muted);}
+.toc a:hover{color:var(--primary-light);text-decoration:none;}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden;}
+.step-hdr{padding:14px 20px;background:var(--surface2);display:flex;align-items:center;gap:12px;}
+.step-num{background:var(--primary);color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.88rem;flex-shrink:0;}
+.step-title{font-size:.95rem;font-weight:600;flex:1;}
+.step-eta{font-size:.72rem;color:var(--muted);white-space:nowrap;}
+.step-body{padding:16px 20px 18px;}
+.step-body p{font-size:.87rem;color:var(--muted);margin-bottom:10px;line-height:1.75;}
+.step-body ul,.step-body ol{padding-left:20px;margin-bottom:10px;}
+.step-body li{font-size:.87rem;color:var(--muted);line-height:1.9;margin-bottom:3px;}
+.step-body strong{color:var(--text);}
+.tip{background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.tip-lbl{font-size:.67rem;font-weight:700;color:#4ade80;text-transform:uppercase;margin-bottom:3px;}
+.warn{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.warn-lbl{font-size:.67rem;font-weight:700;color:#fbbf24;text-transform:uppercase;margin-bottom:3px;}
+.err-box{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.err-lbl{font-size:.67rem;font-weight:700;color:#f87171;text-transform:uppercase;margin-bottom:3px;}
+.substep{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);}
+.substep:last-child{border-bottom:none;}
+.sn{width:22px;height:22px;border-radius:50%;background:rgba(108,99,255,.2);color:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;margin-top:2px;}
+.st{font-size:.87rem;color:var(--muted);line-height:1.65;}
+.st strong{color:var(--text);}
+.file-tree{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-family:'Courier New',monospace;font-size:.83rem;line-height:2.1;margin:10px 0;}
+.ft-dir{color:var(--primary-light);}
+.ft-file{color:#4ade80;}
+.ft-cm{color:var(--muted);}
+.resources{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-top:28px;}
+.resources h3{color:var(--primary-light);font-size:.95rem;margin-bottom:12px;}
+.res-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:.86rem;}
+.res-item:last-child{border-bottom:none;}
+.res-name{color:var(--text);}
+.res-link{color:var(--primary-light);font-size:.8rem;}
+@media(max-width:600px){.toc ol{columns:1;}.overview{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="embedded_plan.html" class="back-btn">← 返回计划</a>
+  <div>
+    <h1>⚙️ PlatformIO + ESP32 完整安装指南</h1>
+    <p class="subtitle">Phase 1 必备 · 全程免费软件 · 硬件约 $5–8 · 预计 30–45 分钟</p>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="overview">
+  <div class="ov-card"><div class="ov-label">软件费用</div><div class="ov-val"><span class="badge free">完全免费</span></div></div>
+  <div class="ov-card"><div class="ov-label">硬件费用</div><div class="ov-val"><span class="badge paid">$5–8 ESP32</span></div></div>
+  <div class="ov-card"><div class="ov-label">操作系统</div><div class="ov-val">Win / Mac / Linux</div></div>
+  <div class="ov-card"><div class="ov-label">预计耗时</div><div class="ov-val">30–45 分钟</div></div>
+</div>
+
+<div class="toc">
+  <h3>目录</h3>
+  <ol>
+    <li><a href="#s1">硬件准备 + 购买建议</a></li>
+    <li><a href="#s2">安装 VS Code</a></li>
+    <li><a href="#s3">安装 PlatformIO 扩展</a></li>
+    <li><a href="#s4">安装 ESP32 USB 驱动</a></li>
+    <li><a href="#s5">创建第一个项目</a></li>
+    <li><a href="#s6">理解项目结构</a></li>
+    <li><a href="#s7">写 LED 闪烁 + 串口程序</a></li>
+    <li><a href="#s8">编译和烧录</a></li>
+    <li><a href="#s9">串口监视器</a></li>
+    <li><a href="#s10">常见问题排查</a></li>
+  </ol>
+</div>
+
+<!-- STEP 1 -->
+<div class="step" id="s1">
+  <div class="step-hdr">
+    <div class="step-num">1</div>
+    <div class="step-title">硬件准备 + 购买建议</div>
+    <div class="step-eta">5 分钟阅读</div>
+  </div>
+  <div class="step-body">
+    <p>你只需要买一块 <strong>ESP32 开发板</strong>，其余全是免费软件。</p>
+    <ul>
+      <li><strong>ESP32 DevKitV1（推荐）</strong> — $3–5 (AliExpress) / $8–12 (Amazon)。搜索 "ESP32 38-pin DevKit" 或 "ESP32-WROOM-32"</li>
+      <li><strong>USB Micro-B 数据线</strong> — 注意要数据线（不是充电线），很多充电线只有电源没有数据针。如果有 Android 旧手机线就够了</li>
+      <li><strong>电脑</strong> — Windows/Mac/Linux 都可以</li>
+    </ul>
+    <div class="tip">
+      <div class="tip-lbl">💡 购买建议</div>
+      <p>AliExpress 搜 "ESP32 DevKit" 最便宜，买 2 块以防万一（$6–8 两块）。如果急需，Amazon 有 Prime 隔天到的版本约 $10–12。</p>
+    </div>
+    <div class="warn">
+      <div class="warn-lbl">⚠️ 注意芯片版本</div>
+      <p>市面上有两种驱动芯片：<strong>CP2102</strong>（Silicon Labs）和 <strong>CH340</strong>（国产），两者驱动不同，Step 4 会分别讲安装方法。收到板子后看 USB 接口旁边的芯片型号。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="s2">
+  <div class="step-hdr">
+    <div class="step-num">2</div>
+    <div class="step-title">安装 VS Code</div>
+    <div class="step-eta">5 分钟</div>
+  </div>
+  <div class="step-body">
+    <div class="substep">
+      <div class="sn">1</div>
+      <div class="st">访问 <a href="https://code.visualstudio.com" target="_blank">code.visualstudio.com</a>，点击大蓝按钮下载</div>
+    </div>
+    <div class="substep">
+      <div class="sn">2</div>
+      <div class="st"><strong>Windows：</strong>运行 .exe 安装包，全部默认，勾选 "Add to PATH" 和 "Open with Code"（右键菜单）</div>
+    </div>
+    <div class="substep">
+      <div class="sn">3</div>
+      <div class="st"><strong>Mac：</strong>拖到 Applications 文件夹，首次打开右键→Open 绕过 Gatekeeper</div>
+    </div>
+    <div class="substep">
+      <div class="sn">4</div>
+      <div class="st">打开 VS Code，界面左侧有 5 个图标（文件、搜索、版本控制、调试、扩展），后面主要用 <strong>扩展（Extensions）</strong> 图标</div>
+    </div>
+    <div class="tip">
+      <div class="tip-lbl">💡 已装 VS Code？</div>
+      <p>直接跳到 Step 3。不需要重装。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="s3">
+  <div class="step-hdr">
+    <div class="step-num">3</div>
+    <div class="step-title">安装 PlatformIO IDE 扩展</div>
+    <div class="step-eta">10 分钟（含下载）</div>
+  </div>
+  <div class="step-body">
+    <div class="substep">
+      <div class="sn">1</div>
+      <div class="st">按 <code>Ctrl+Shift+X</code>（Windows）或 <code>Cmd+Shift+X</code>（Mac）打开扩展面板</div>
+    </div>
+    <div class="substep">
+      <div class="sn">2</div>
+      <div class="st">搜索框输入 <strong>"PlatformIO IDE"</strong>，找到蓝色蚂蚁图标的官方扩展（作者 PlatformIO）</div>
+    </div>
+    <div class="substep">
+      <div class="sn">3</div>
+      <div class="st">点击 <strong>Install</strong>。PlatformIO 会自动安装 Python 环境，需要 5–10 分钟，进度条在右下角</div>
+    </div>
+    <div class="substep">
+      <div class="sn">4</div>
+      <div class="st">安装完成后，VS Code 右下角弹出 "Reload Required"，点击 <strong>Reload Now</strong></div>
+    </div>
+    <div class="substep">
+      <div class="sn">5</div>
+      <div class="st">重载后，左侧栏底部出现🐜（蚂蚁）图标，表示安装成功。点击它进入 PlatformIO Home</div>
+    </div>
+    <div class="warn">
+      <div class="warn-lbl">⚠️ 安装卡住了？</div>
+      <p>PlatformIO 需要下载 Python 和工具链，网络慢时可能超过 10 分钟。耐心等待，不要强制关闭。如果真的失败，删除扩展重新安装。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="s4">
+  <div class="step-hdr">
+    <div class="step-num">4</div>
+    <div class="step-title">安装 ESP32 USB 驱动</div>
+    <div class="step-eta">5–10 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>ESP32 开发板通过 USB 转串口芯片连接电脑，需要对应驱动。</p>
+    <p><strong>先辨认你的芯片型号：</strong>看板子 USB 接口旁边，小黑芯片上的字。常见两种：</p>
+
+    <p><strong>CP2102（Silicon Labs）：</strong></p>
+    <div class="substep">
+      <div class="sn">1</div>
+      <div class="st">访问 <a href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers" target="_blank">Silicon Labs 驱动下载页</a></div>
+    </div>
+    <div class="substep">
+      <div class="sn">2</div>
+      <div class="st">下载 "CP210x Universal Windows Driver"（Windows）或 Mac 版本，双击安装</div>
+    </div>
+
+    <p style="margin-top:12px"><strong>CH340（国产芯片，AliExpress 板子常见）：</strong></p>
+    <div class="substep">
+      <div class="sn">1</div>
+      <div class="st">访问 <a href="https://www.wch-ic.com/downloads/CH341SER_EXE.html" target="_blank">WCH 官网 CH340 驱动</a></div>
+    </div>
+    <div class="substep">
+      <div class="sn">2</div>
+      <div class="st">下载 CH341SER.EXE，双击安装，点击 INSTALL 按钮</div>
+    </div>
+
+    <p style="margin-top:12px"><strong>验证驱动：</strong></p>
+    <div class="substep">
+      <div class="sn">1</div>
+      <div class="st">插入 ESP32，<strong>Windows</strong>：打开设备管理器（Win+X → Device Manager），在 "Ports (COM & LPT)" 下看到 "CP210x USB to UART" 或 "CH340" 后面有 COMx 编号</div>
+    </div>
+    <div class="substep">
+      <div class="sn">2</div>
+      <div class="st"><strong>Mac：</strong>打开终端，输入 <code>ls /dev/cu.*</code>，看到 <code>/dev/cu.SLAB_USBtoUART</code> 或 <code>/dev/cu.usbserial-xxx</code></div>
+    </div>
+    <div class="tip">
+      <div class="tip-lbl">💡 Mac Ventura 及以上</div>
+      <p>新版 Mac 系统可能需要允许驱动：系统设置 → 隐私与安全 → 允许驱动加载。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 5 -->
+<div class="step" id="s5">
+  <div class="step-hdr">
+    <div class="step-num">5</div>
+    <div class="step-title">创建第一个 ESP32 项目</div>
+    <div class="step-eta">5 分钟（+ 首次构建下载 5–10 分钟）</div>
+  </div>
+  <div class="step-body">
+    <div class="substep">
+      <div class="sn">1</div>
+      <div class="st">点击左侧🐜图标 → 进入 PlatformIO Home → 点击 <strong>"New Project"</strong></div>
+    </div>
+    <div class="substep">
+      <div class="sn">2</div>
+      <div class="st"><strong>Name：</strong>输入 <code>hello_esp32</code></div>
+    </div>
+    <div class="substep">
+      <div class="sn">3</div>
+      <div class="st"><strong>Board：</strong>搜索框输入 "ESP32 Dev"，选择 <strong>"Espressif ESP32 Dev Module"</strong></div>
+    </div>
+    <div class="substep">
+      <div class="sn">4</div>
+      <div class="st"><strong>Framework：</strong>选 <strong>Arduino</strong>（入门最友好，对 C++ 兼容好）</div>
+    </div>
+    <div class="substep">
+      <div class="sn">5</div>
+      <div class="st"><strong>Location：</strong>勾选 "Use default location" 或自定义路径</div>
+    </div>
+    <div class="substep">
+      <div class="sn">6</div>
+      <div class="st">点击 <strong>Finish</strong>。首次创建会下载 ESP32 工具链（~200MB），需要 5–10 分钟，右下角有进度条</div>
+    </div>
+    <div class="warn">
+      <div class="warn-lbl">⚠️ 首次下载很慢？</div>
+      <p>这是正常的，PlatformIO 需要下载编译器（xtensa-gcc）。只有第一次慢，之后创建 ESP32 项目瞬间完成。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 6 -->
+<div class="step" id="s6">
+  <div class="step-hdr">
+    <div class="step-num">6</div>
+    <div class="step-title">理解项目结构</div>
+    <div class="step-eta">3 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>PlatformIO 项目和 Arduino IDE 的 .ino 文件不同，结构更专业：</p>
+    <div class="file-tree">
+<span class="ft-dir">hello_esp32/</span>
+├── <span class="ft-dir">src/</span>
+│   └── <span class="ft-file">main.cpp</span>         <span class="ft-cm">← 你的主程序，从这里开始写</span>
+├── <span class="ft-dir">include/</span>             <span class="ft-cm">← 头文件 (.h)，自定义函数声明</span>
+├── <span class="ft-dir">lib/</span>                 <span class="ft-cm">← 本地库，放不在 registry 里的库</span>
+├── <span class="ft-dir">test/</span>                <span class="ft-cm">← 单元测试文件</span>
+└── <span class="ft-file">platformio.ini</span>       <span class="ft-cm">← 项目配置：板子型号、库依赖、串口速率</span>
+    </div>
+    <p>打开 <code>platformio.ini</code> 看看内容：</p>
+    <pre><code>[env:esp32dev]
+platform = espressif32
+board = esp32dev
+framework = arduino
+monitor_speed = 115200    ; 串口波特率，和代码里 Serial.begin() 保持一致</code></pre>
+    <p>以后要添加库、改板子型号、设置串口速率，都在这个文件里改。</p>
+    <div class="tip">
+      <div class="tip-lbl">💡 和 Arduino IDE 的关系</div>
+      <p><code>src/main.cpp</code> 里的写法和 Arduino .ino 几乎一样，都有 <code>setup()</code> 和 <code>loop()</code>，只是多了 <code>#include &lt;Arduino.h&gt;</code>。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 7 -->
+<div class="step" id="s7">
+  <div class="step-hdr">
+    <div class="step-num">7</div>
+    <div class="step-title">写第一个程序：LED 闪烁 + 串口输出</div>
+    <div class="step-eta">5 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>打开 <code>src/main.cpp</code>，把内容替换为：</p>
+    <pre><code>#include &lt;Arduino.h&gt;
+
+// ESP32 内置 LED 通常在 GPIO 2（板子上标 "2" 或 "LED"）
+const int LED_PIN = 2;
+
+void setup() {
+  Serial.begin(115200);          // 初始化串口，波特率 115200
+  pinMode(LED_PIN, OUTPUT);      // 设 GPIO 2 为输出
+  Serial.println("ESP32 started!");
+}
+
+void loop() {
+  digitalWrite(LED_PIN, HIGH);   // LED 亮
+  Serial.println("LED ON");
+  delay(500);
+
+  digitalWrite(LED_PIN, LOW);    // LED 灭
+  Serial.println("LED OFF");
+  delay(500);
+}</code></pre>
+    <div class="warn">
+      <div class="warn-lbl">⚠️ 不同板子 LED 引脚不同</div>
+      <p>如果 GPIO 2 没有内置 LED，尝试 GPIO 22 或 GPIO 13。也可以接外部 LED（LED + 220Ω 电阻 → GPIO 引脚）。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 8 -->
+<div class="step" id="s8">
+  <div class="step-hdr">
+    <div class="step-num">8</div>
+    <div class="step-title">编译和烧录</div>
+    <div class="step-eta">3–5 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>VS Code 底部工具栏（PlatformIO toolbar）有几个关键按钮：</p>
+    <ul>
+      <li><strong>✓ Build</strong>（Ctrl+Alt+B）：编译，检查代码有没有语法错误</li>
+      <li><strong>→ Upload</strong>（Ctrl+Alt+U）：编译 + 烧录到板子</li>
+      <li><strong>🔌 Serial Monitor</strong>（Ctrl+Alt+S）：打开串口查看输出</li>
+    </ul>
+    <div class="substep">
+      <div class="sn">1</div>
+      <div class="st">先点 <strong>✓ Build</strong>，等 Terminal 里出现 <code>SUCCESS</code></div>
+    </div>
+    <div class="substep">
+      <div class="sn">2</div>
+      <div class="st">插上 ESP32，点 <strong>→ Upload</strong>。看到 <code>Connecting...</code> 时，如果卡住超过 5 秒，按住板子上的 <strong>BOOT 按钮</strong> 直到开始传输</div>
+    </div>
+    <div class="substep">
+      <div class="sn">3</div>
+      <div class="st">出现 <code>Leaving... Hard resetting via RTS pin...</code> 表示烧录成功</div>
+    </div>
+    <div class="err-box">
+      <div class="err-lbl">❌ "No serial port found" 错误</div>
+      <p>说明 PlatformIO 找不到 ESP32。检查：① USB 线是数据线 ② 驱动已安装（Step 4）③ platformio.ini 加 <code>upload_port = COMx</code>（Windows 填你的 COM 口号）</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 9 -->
+<div class="step" id="s9">
+  <div class="step-hdr">
+    <div class="step-num">9</div>
+    <div class="step-title">使用串口监视器</div>
+    <div class="step-eta">2 分钟</div>
+  </div>
+  <div class="step-body">
+    <div class="substep">
+      <div class="sn">1</div>
+      <div class="st">点击底部工具栏的🔌图标，或按 <code>Ctrl+Alt+S</code>，打开 Serial Monitor</div>
+    </div>
+    <div class="substep">
+      <div class="sn">2</div>
+      <div class="st">确认波特率是 <strong>115200</strong>（和 <code>Serial.begin(115200)</code> 一致）</div>
+    </div>
+    <div class="substep">
+      <div class="sn">3</div>
+      <div class="st">你应该看到 <code>LED ON</code> 和 <code>LED OFF</code> 交替出现，同时板子上 LED 在闪烁</div>
+    </div>
+    <pre><code>ESP32 started!
+LED ON
+LED OFF
+LED ON
+LED OFF
+...</code></pre>
+    <div class="tip">
+      <div class="tip-lbl">💡 Serial.print vs println</div>
+      <p><code>Serial.print()</code> 不换行，<code>Serial.println()</code> 换行。调试时用 <code>Serial.printf("value = %d\n", x)</code> 格式化输出更方便。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 10 -->
+<div class="step" id="s10">
+  <div class="step-hdr">
+    <div class="step-num">10</div>
+    <div class="step-title">常见问题排查</div>
+    <div class="step-eta">备查</div>
+  </div>
+  <div class="step-body">
+    <p><strong>问题 1：上传时一直显示 <code>Connecting.........___</code></strong></p>
+    <ul>
+      <li>按住 BOOT 按钮 → 点 Upload → 看到 <code>Connecting</code> 后松开</li>
+      <li>部分板子需要上传时按住 BOOT + IO0 两个按钮</li>
+    </ul>
+
+    <p style="margin-top:10px"><strong>问题 2：<code>Brownout detector was triggered</code></strong></p>
+    <ul>
+      <li>USB 供电不足。换一个电脑上 USB 3.0 口（蓝色口），或用带供电的 USB Hub</li>
+    </ul>
+
+    <p style="margin-top:10px"><strong>问题 3：串口乱码</strong></p>
+    <ul>
+      <li>波特率不匹配。检查 Serial Monitor 的波特率和代码里 <code>Serial.begin()</code> 是否一致</li>
+    </ul>
+
+    <p style="margin-top:10px"><strong>问题 4：<code>espressif32 platform not found</code></strong></p>
+    <ul>
+      <li>网络问题导致平台下载失败。打开 VS Code 终端运行：<code>pio platform install espressif32</code></li>
+    </ul>
+
+    <p style="margin-top:10px"><strong>问题 5：Mac 找不到串口</strong></p>
+    <ul>
+      <li>运行 <code>ls /dev/cu.*</code> 查看可用端口，在 platformio.ini 加 <code>upload_port = /dev/cu.SLAB_USBtoUART</code></li>
+    </ul>
+    <div class="tip">
+      <div class="tip-lbl">💡 加库的方法</div>
+      <p>在 platformio.ini 的 <code>[env:esp32dev]</code> 下加 <code>lib_deps = arduino-libraries/Arduino_LSM6DS3</code>（示例），保存后 PlatformIO 自动下载。也可以在 PlatformIO Home → Libraries 搜索。</p>
+    </div>
+  </div>
+</div>
+
+<div class="resources">
+  <h3>📚 相关资源</h3>
+  <div class="res-item">
+    <span class="res-name">VS Code 官网下载 <span class="badge free">免费</span></span>
+    <a href="https://code.visualstudio.com" target="_blank">code.visualstudio.com →</a>
+  </div>
+  <div class="res-item">
+    <span class="res-name">PlatformIO 官网 <span class="badge free">免费</span></span>
+    <a href="https://platformio.org" target="_blank">platformio.org →</a>
+  </div>
+  <div class="res-item">
+    <span class="res-name">CP2102 驱动下载 <span class="badge free">免费</span></span>
+    <a href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers" target="_blank">silabs.com →</a>
+  </div>
+  <div class="res-item">
+    <span class="res-name">CH340 驱动下载 <span class="badge free">免费</span></span>
+    <a href="https://www.wch-ic.com/downloads/CH341SER_EXE.html" target="_blank">wch-ic.com →</a>
+  </div>
+  <div class="res-item">
+    <span class="res-name">PlatformIO ESP32 官方文档 <span class="badge free">免费</span></span>
+    <a href="https://docs.platformio.org/en/latest/boards/espressif32/esp32dev.html" target="_blank">docs.platformio.org →</a>
+  </div>
+  <div class="res-item">
+    <span class="res-name">learncpp.com（C++ 免费教程）<span class="badge free">免费</span></span>
+    <a href="https://www.learncpp.com" target="_blank">learncpp.com →</a>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

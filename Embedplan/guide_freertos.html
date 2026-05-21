@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Guide: FreeRTOS + ESP32 实战指南</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#252836;--border:#2d3148;--primary:#6c63ff;--primary-light:#8b85ff;--success:#4ade80;--warning:#fbbf24;--danger:#f87171;--text:#e2e8f0;--muted:#94a3b8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.6;}
+a{color:var(--primary-light);text-decoration:none;}a:hover{text-decoration:underline;}
+code{background:var(--surface2);padding:2px 7px;border-radius:4px;font-family:'Courier New',monospace;font-size:.85em;color:#e879f9;}
+pre{background:#0d1117;border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:8px;padding:16px 18px;overflow-x:auto;margin:10px 0 14px;}
+pre code{background:none;padding:0;color:#a3e635;font-size:.84rem;display:block;line-height:1.7;}
+.header{background:linear-gradient(135deg,#6c63ff,#a855f7);padding:18px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.back-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:.82rem;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+.back-btn:hover{background:rgba(255,255,255,.25);text-decoration:none;}
+h1{font-size:1.2rem;font-weight:700;}
+.subtitle{font-size:.8rem;opacity:.8;margin-top:3px;}
+.layout{max-width:820px;margin:0 auto;padding:28px 20px;}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:24px;}
+.toc h3{font-size:.88rem;color:var(--primary-light);margin-bottom:10px;font-weight:600;}
+.toc ol{padding-left:20px;columns:2;column-gap:24px;}
+.toc li{font-size:.83rem;line-height:2.1;}
+.toc a{color:var(--muted);}
+.toc a:hover{color:var(--primary-light);text-decoration:none;}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden;}
+.step-hdr{padding:14px 20px;background:var(--surface2);display:flex;align-items:center;gap:12px;}
+.step-num{background:var(--primary);color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.88rem;flex-shrink:0;}
+.step-title{font-size:.95rem;font-weight:600;flex:1;}
+.step-eta{font-size:.72rem;color:var(--muted);white-space:nowrap;}
+.step-body{padding:16px 20px 18px;}
+.step-body p{font-size:.87rem;color:var(--muted);margin-bottom:10px;line-height:1.75;}
+.step-body ul,.step-body ol{padding-left:20px;margin-bottom:10px;}
+.step-body li{font-size:.87rem;color:var(--muted);line-height:1.9;margin-bottom:3px;}
+.step-body strong{color:var(--text);}
+.tip{background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.tip-lbl{font-size:.67rem;font-weight:700;color:#4ade80;text-transform:uppercase;margin-bottom:3px;}
+.warn{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.warn-lbl{font-size:.67rem;font-weight:700;color:#fbbf24;text-transform:uppercase;margin-bottom:3px;}
+.concept-box{background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.25);border-radius:8px;padding:12px 16px;margin:10px 0;}
+.concept-lbl{font-size:.67rem;font-weight:700;color:var(--primary-light);text-transform:uppercase;margin-bottom:4px;}
+.diagram{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-family:'Courier New',monospace;font-size:.82rem;line-height:1.8;margin:10px 0;color:var(--muted);}
+.resources{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-top:28px;}
+.resources h3{color:var(--primary-light);font-size:.95rem;margin-bottom:12px;}
+.res-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:.86rem;}
+.res-item:last-child{border-bottom:none;}
+.badge{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:10px;font-weight:600;margin-left:4px;}
+.free{background:rgba(74,222,128,.15);color:#4ade80;}
+
+/* Codex AI Agent */
+.codex-agent{position:fixed;right:24px;top:112px;width:360px;max-width:calc(100vw - 48px);max-height:calc(100vh - 136px);z-index:50;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 18px 60px rgba(0,0,0,.42);display:flex;flex-direction:column;overflow:hidden;}
+.codex-agent.collapsed{height:auto;}
+.codex-agent.collapsed .codex-body,.codex-agent.collapsed .codex-key,.codex-agent.collapsed .codex-input-row,.codex-agent.collapsed .codex-model-row{display:none;}
+.codex-head{background:linear-gradient(135deg,#6c63ff,#a855f7);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.codex-title{font-size:.9rem;font-weight:700;color:#fff;}
+.codex-status{display:block;font-size:.68rem;font-weight:500;opacity:.78;margin-top:1px;}
+.codex-head button{width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.14);color:#fff;cursor:pointer;font-size:.9rem;}
+.codex-key{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px;}
+.codex-key.hidden{display:none;}
+.codex-key label{font-size:.72rem;color:var(--muted);}
+.codex-key input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);outline:none;}
+.codex-key input:focus{border-color:var(--primary);}
+.codex-key-actions{display:flex;gap:8px;}
+.codex-key-actions button,.codex-send{background:var(--primary);border:none;color:#fff;border-radius:8px;padding:8px 10px;cursor:pointer;font-size:.78rem;font-weight:600;}
+.codex-key-actions .secondary{background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+.codex-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;min-height:220px;}
+.codex-msg{max-width:92%;padding:9px 12px;border-radius:12px;font-size:.82rem;line-height:1.6;white-space:pre-wrap;word-break:break-word;}
+.codex-msg.user{align-self:flex-end;background:rgba(108,99,255,.25);border-bottom-right-radius:4px;}
+.codex-msg.agent{align-self:flex-start;background:var(--surface2);border-bottom-left-radius:4px;}
+.codex-msg.thinking{align-self:flex-start;color:var(--muted);font-style:italic;background:transparent;padding-left:2px;}
+.codex-model-row{padding:8px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.codex-model-row label{font-size:.7rem;color:var(--muted);}
+.codex-model-row select{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:5px 7px;font-size:.72rem;outline:none;}
+.codex-input-row{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;}
+.codex-input-row textarea{flex:1;min-height:38px;max-height:120px;resize:none;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 10px;color:var(--text);font:inherit;font-size:.82rem;outline:none;}
+.codex-input-row textarea:focus{border-color:var(--primary);}
+.codex-send:disabled{opacity:.5;cursor:default;}
+@media(max-width:1260px){.codex-agent{top:auto;bottom:24px;right:24px;max-height:70vh;}.codex-agent.collapsed{width:auto;}}
+@media(max-width:600px){.toc ol{columns:1;}.codex-agent{right:12px;bottom:12px;max-width:calc(100vw - 24px);width:calc(100vw - 24px);max-height:76vh;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="embedded_plan.html" class="back-btn">← 返回计划</a>
+  <div>
+    <h1>🔄 FreeRTOS + ESP32 实战指南</h1>
+    <p class="subtitle">Phase 2 核心 · 官方免费 PDF 教材 · 从单任务到多任务</p>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="toc">
+  <h3>目录</h3>
+  <ol>
+    <li><a href="#s1">获取免费学习资料</a></li>
+    <li><a href="#s2">FreeRTOS 核心概念</a></li>
+    <li><a href="#s3">第一个任务（Task）</a></li>
+    <li><a href="#s4">Queue 跨任务通信</a></li>
+    <li><a href="#s5">Mutex 保护共享资源</a></li>
+    <li><a href="#s6">Binary Semaphore（ISR→Task）</a></li>
+    <li><a href="#s7">完整项目：ADC → Queue → Print</a></li>
+    <li><a href="#s8">Stack Overflow 检测与调试</a></li>
+    <li><a href="#s9">常见陷阱</a></li>
+  </ol>
+</div>
+
+<!-- STEP 1 -->
+<div class="step" id="s1">
+  <div class="step-hdr">
+    <div class="step-num">1</div>
+    <div class="step-title">获取免费学习资料</div>
+    <div class="step-eta">10 分钟下载</div>
+  </div>
+  <div class="step-body">
+    <p>FreeRTOS 官方提供完整的免费教材，质量极高：</p>
+    <ul>
+      <li><strong>《Mastering the FreeRTOS Kernel》官方免费 PDF</strong> → <a href="https://www.freertos.org/Documentation/RTOS_book.html" target="_blank">freertos.org/Documentation/RTOS_book.html</a><br>下载后存好，这是 Phase 2 的主教材</li>
+      <li><strong>Shawn Hymel FreeRTOS 视频系列</strong>（DigiKey YouTube）→ <a href="https://www.youtube.com/playlist?list=PLEBQazB0HUyQ4hAPU1cJED6t3DU0h34bz" target="_blank">YouTube Playlist</a><br>共 10 集，配合书看，每集约 20 分钟，完全免费</li>
+      <li><strong>FreeRTOS 官方 ESP32 文档</strong> → <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/freertos.html" target="_blank">Espressif FreeRTOS 文档</a></li>
+    </ul>
+    <div class="tip">
+      <div class="tip-lbl">📖 学习顺序建议</div>
+      <p>书 Ch1–3（Heap 管理）→ 视频 Ep1–2 → 书 Ch4–6（Task）→ 视频 Ep3–5 → 实际写代码。<strong>边看边写代码</strong>，光看不练记不住。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="s2">
+  <div class="step-hdr">
+    <div class="step-num">2</div>
+    <div class="step-title">FreeRTOS 核心概念（先看懂这些）</div>
+    <div class="step-eta">15 分钟阅读</div>
+  </div>
+  <div class="step-body">
+    <div class="concept-box">
+      <div class="concept-lbl">什么是 RTOS？</div>
+      <p style="margin:0;font-size:.87rem;color:var(--muted)">Real-Time Operating System = 实时操作系统。FreeRTOS 让你在单片机上<strong>同时"运行"多个任务</strong>，本质是快速切换（任务调度器每 1ms 切换一次，速度快到看起来像并行）。</p>
+    </div>
+    <p><strong>四个核心概念：</strong></p>
+    <ul>
+      <li><strong>Task（任务）</strong>：就是一个无限循环的函数，有自己的栈空间和优先级。类比：进程</li>
+      <li><strong>Scheduler（调度器）</strong>：决定哪个任务现在运行。FreeRTOS 默认抢占式调度，高优先级任务随时可以打断低优先级</li>
+      <li><strong>Queue（队列）</strong>：任务间传数据的管道，线程安全，先进先出</li>
+      <li><strong>Semaphore / Mutex</strong>：同步机制，防止两个任务同时访问同一个资源（如 SPI 总线）</li>
+    </ul>
+    <div class="diagram">
+Task A (优先级 2) ──────┐
+                         ├── Scheduler ──→ CPU 执行
+Task B (优先级 1) ──────┘
+
+Task A 等待 → B 运行 → A 就绪 → A 抢占 B → A 运行
+    </div>
+    <p><strong>FreeRTOS 任务状态：</strong></p>
+    <ul>
+      <li><strong>Running</strong>：正在 CPU 上执行（同一时刻只有一个）</li>
+      <li><strong>Ready</strong>：准备好了，等 Scheduler 分配 CPU</li>
+      <li><strong>Blocked</strong>：在等待某个事件（延时、Queue 数据、Semaphore）</li>
+      <li><strong>Suspended</strong>：被手动暂停</li>
+    </ul>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="s3">
+  <div class="step-hdr">
+    <div class="step-num">3</div>
+    <div class="step-title">创建第一个任务</div>
+    <div class="step-eta">20 分钟写代码</div>
+  </div>
+  <div class="step-body">
+    <p>在 PlatformIO 项目里，ESP32 的 Arduino 框架已经内置 FreeRTOS，<strong>不需要额外安装任何库</strong>。</p>
+    <p>把 <code>src/main.cpp</code> 改成：</p>
+    <pre><code>#include &lt;Arduino.h&gt;
+
+// 任务函数：任务必须是无限循环（永远不能 return）
+void taskBlink(void* parameter) {
+  const int LED = 2;
+  pinMode(LED, OUTPUT);
+
+  for (;;) {                        // for(;;) 等同于 while(true)
+    digitalWrite(LED, HIGH);
+    vTaskDelay(500 / portTICK_PERIOD_MS);  // 延时 500ms，释放 CPU
+    digitalWrite(LED, LOW);
+    vTaskDelay(500 / portTICK_PERIOD_MS);
+  }
+}
+
+void taskPrint(void* parameter) {
+  for (;;) {
+    Serial.println("Hello from Task 2!");
+    vTaskDelay(1000 / portTICK_PERIOD_MS);  // 1000ms
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  // xTaskCreate(任务函数, 名字, 栈大小(bytes), 参数, 优先级, 句柄)
+  xTaskCreate(taskBlink, "Blink", 1024, NULL, 1, NULL);
+  xTaskCreate(taskPrint, "Print", 2048, NULL, 1, NULL);
+
+  // setup() 结束后 FreeRTOS Scheduler 自动启动
+}
+
+void loop() {
+  // Arduino 的 loop() 在 FreeRTOS 下其实也是一个任务
+  // 当你用 FreeRTOS 时，最好把逻辑都放在任务里，loop() 留空
+  vTaskDelay(1000 / portTICK_PERIOD_MS);
+}</code></pre>
+    <div class="warn">
+      <div class="warn-lbl">⚠️ 用 vTaskDelay 不是 delay()</div>
+      <p><code>delay(500)</code> 会阻塞 CPU（其他任务无法运行）。<code>vTaskDelay()</code> 会让当前任务进入 Blocked 状态，调度器可以运行其他任务。<strong>FreeRTOS 里永远用 vTaskDelay。</strong></p>
+    </div>
+    <div class="tip">
+      <div class="tip-lbl">💡 栈大小怎么选？</div>
+      <p>从 2048 字节开始，如果崩溃再加大。用 <code>uxTaskGetStackHighWaterMark(NULL)</code> 查看历史最小剩余栈（Step 8 详讲）。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="s4">
+  <div class="step-hdr">
+    <div class="step-num">4</div>
+    <div class="step-title">Queue — 任务间传递数据</div>
+    <div class="step-eta">30 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>任务不能用全局变量直接通信（竞争条件），要用 <strong>Queue</strong> 安全传数据：</p>
+    <pre><code>#include &lt;Arduino.h&gt;
+
+QueueHandle_t dataQueue;   // Queue 句柄（全局变量）
+
+// 生产者任务：模拟传感器读数（每 200ms 发一次数据）
+void taskSensor(void* param) {
+  int value = 0;
+  for (;;) {
+    value++;
+    // xQueueSend(队列, 数据指针, 等待时间)
+    // portMAX_DELAY = 永远等直到 Queue 有空间
+    if (xQueueSend(dataQueue, &value, portMAX_DELAY) == pdPASS) {
+      Serial.printf("Sensor sent: %d\n", value);
+    }
+    vTaskDelay(200 / portTICK_PERIOD_MS);
+  }
+}
+
+// 消费者任务：从 Queue 取数据处理
+void taskProcess(void* param) {
+  int received;
+  for (;;) {
+    // xQueueReceive(队列, 存储指针, 等待时间)
+    if (xQueueReceive(dataQueue, &received, portMAX_DELAY) == pdPASS) {
+      Serial.printf("Processor got: %d, squared: %d\n", received, received * received);
+    }
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  // xQueueCreate(队列长度, 每个元素大小)
+  dataQueue = xQueueCreate(10, sizeof(int));
+
+  if (dataQueue == NULL) {
+    Serial.println("Queue creation failed!");
+    return;
+  }
+
+  xTaskCreate(taskSensor,  "Sensor",  2048, NULL, 2, NULL);  // 优先级 2（高）
+  xTaskCreate(taskProcess, "Process", 2048, NULL, 1, NULL);  // 优先级 1（低）
+}
+
+void loop() { vTaskDelay(1000 / portTICK_PERIOD_MS); }</code></pre>
+    <div class="concept-box">
+      <div class="concept-lbl">Queue 工作原理</div>
+      <p style="margin:0;font-size:.87rem;color:var(--muted)">Queue 是 FIFO（先进先出）缓冲区。<code>xQueueSend()</code> 把数据<strong>复制</strong>进 Queue；<code>xQueueReceive()</code> 把数据<strong>取出</strong>并复制到你的变量。Queue 满时 Send 会阻塞，Queue 空时 Receive 会阻塞。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 5 -->
+<div class="step" id="s5">
+  <div class="step-hdr">
+    <div class="step-num">5</div>
+    <div class="step-title">Mutex — 保护共享资源</div>
+    <div class="step-eta">20 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>当多个任务共用同一个资源（如 I2C 总线、全局缓冲区），要用 <strong>Mutex</strong> 确保每次只有一个任务访问：</p>
+    <pre><code>#include &lt;Arduino.h&gt;
+
+SemaphoreHandle_t i2cMutex;  // 保护 I2C 总线的 Mutex
+
+// 模拟两个传感器任务共用 I2C
+void taskSensorA(void* param) {
+  for (;;) {
+    // 请求 Mutex，最多等 100ms
+    if (xSemaphoreTake(i2cMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+      // ---- 临界区开始（只有我能运行到这里）----
+      Serial.println("Sensor A: reading I2C...");
+      vTaskDelay(50 / portTICK_PERIOD_MS);  // 模拟 I2C 通信耗时
+      Serial.println("Sensor A: done");
+      // ---- 临界区结束 ----
+      xSemaphoreGive(i2cMutex);  // 释放 Mutex
+    } else {
+      Serial.println("Sensor A: couldn't get mutex, skipping");
+    }
+    vTaskDelay(500 / portTICK_PERIOD_MS);
+  }
+}
+
+void taskSensorB(void* param) {
+  for (;;) {
+    if (xSemaphoreTake(i2cMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+      Serial.println("Sensor B: reading I2C...");
+      vTaskDelay(30 / portTICK_PERIOD_MS);
+      Serial.println("Sensor B: done");
+      xSemaphoreGive(i2cMutex);
+    }
+    vTaskDelay(300 / portTICK_PERIOD_MS);
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  i2cMutex = xSemaphoreCreateMutex();
+  xTaskCreate(taskSensorA, "SensorA", 2048, NULL, 1, NULL);
+  xTaskCreate(taskSensorB, "SensorB", 2048, NULL, 1, NULL);
+}
+
+void loop() { vTaskDelay(1000 / portTICK_PERIOD_MS); }</code></pre>
+    <div class="tip">
+      <div class="tip-lbl">💡 Mutex vs Binary Semaphore 的区别</div>
+      <p><strong>Mutex</strong>：有"所有权"，只有加锁的任务才能解锁，自动支持优先级继承（防 Priority Inversion）。用于保护共享资源。<br><strong>Binary Semaphore</strong>：没有所有权，任何任务都可以 give/take，适合 ISR 通知任务。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 6 -->
+<div class="step" id="s6">
+  <div class="step-hdr">
+    <div class="step-num">6</div>
+    <div class="step-title">Binary Semaphore — ISR 通知任务</div>
+    <div class="step-eta">20 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>中断服务程序（ISR）中不能做复杂操作，常见模式：<strong>ISR give Semaphore → 任务 take 后处理</strong></p>
+    <pre><code>#include &lt;Arduino.h&gt;
+
+SemaphoreHandle_t buttonSem;
+const int BUTTON_PIN = 0;   // ESP32 BOOT 按钮在 GPIO 0
+
+// ISR：中断时只做一件事——give semaphore
+void IRAM_ATTR buttonISR() {
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  // ISR 里只能用 FromISR 版本的函数！
+  xSemaphoreGiveFromISR(buttonSem, &xHigherPriorityTaskWoken);
+  // 如果 give 唤醒了更高优先级任务，立即切换
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+// 处理任务：等待 Semaphore，取到后处理
+void taskButtonHandler(void* param) {
+  for (;;) {
+    // 永远等待（portMAX_DELAY），直到 ISR 给出 semaphore
+    if (xSemaphoreTake(buttonSem, portMAX_DELAY) == pdTRUE) {
+      Serial.printf("Button pressed! Free heap: %d bytes\n", esp_get_free_heap_size());
+    }
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  buttonSem = xSemaphoreCreateBinary();
+
+  // GPIO 0 下降沿触发中断
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonISR, FALLING);
+
+  xTaskCreate(taskButtonHandler, "BtnHandler", 2048, NULL, 2, NULL);
+}
+
+void loop() { vTaskDelay(1000 / portTICK_PERIOD_MS); }</code></pre>
+    <div class="warn">
+      <div class="warn-lbl">⚠️ ISR 规则</div>
+      <p>ISR 中只能调用带 <code>FromISR</code> 后缀的 FreeRTOS 函数（<code>xQueueSendFromISR</code>、<code>xSemaphoreGiveFromISR</code>）。普通版本会死锁。ISR 中不能 <code>vTaskDelay</code>、不能打印。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 7 -->
+<div class="step" id="s7">
+  <div class="step-hdr">
+    <div class="step-num">7</div>
+    <div class="step-title">完整项目：ADC → Queue → Print</div>
+    <div class="step-eta">45 分钟项目</div>
+  </div>
+  <div class="step-body">
+    <p>这是 Phase 2 的核心实践项目，整合所有概念：</p>
+    <ul>
+      <li><strong>Task A（优先级 2）</strong>：每 100ms 读一次 ADC（GPIO 34，接电位器或悬空）</li>
+      <li><strong>Task B（优先级 1）</strong>：从 Queue 取数据，计算平均值，串口打印</li>
+    </ul>
+    <pre><code>#include &lt;Arduino.h&gt;
+
+// 数据结构：包含时间戳和 ADC 值
+struct SensorData {
+  uint32_t timestamp_ms;
+  int      adc_value;
+};
+
+QueueHandle_t adcQueue;
+const int ADC_PIN = 34;   // ESP32 ADC1 CH6（GPIO 34 是输入专用）
+
+// Task A：ADC 采集
+void taskADC(void* param) {
+  SensorData data;
+  for (;;) {
+    data.timestamp_ms = millis();
+    data.adc_value    = analogRead(ADC_PIN);  // 0–4095（12-bit）
+
+    // 发送到 Queue，等待最多 10ms
+    if (xQueueSend(adcQueue, &data, pdMS_TO_TICKS(10)) != pdPASS) {
+      Serial.println("ADC Queue full! Dropping sample.");
+    }
+    vTaskDelay(pdMS_TO_TICKS(100));  // 10Hz 采样
+  }
+}
+
+// Task B：数据处理和打印
+void taskPrint(void* param) {
+  SensorData data;
+  float     rolling_avg = 0;
+  int       count = 0;
+
+  for (;;) {
+    if (xQueueReceive(adcQueue, &data, portMAX_DELAY) == pdPASS) {
+      count++;
+      rolling_avg = rolling_avg * 0.9f + data.adc_value * 0.1f;  // 指数移动平均
+      Serial.printf("[%6lu ms] ADC=%4d  Avg=%.1f\n",
+                    data.timestamp_ms, data.adc_value, rolling_avg);
+    }
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  analogReadResolution(12);  // ESP32 默认 12-bit
+
+  adcQueue = xQueueCreate(20, sizeof(SensorData));  // 20 个元素的 Queue
+  if (!adcQueue) { Serial.println("Queue create failed!"); return; }
+
+  xTaskCreate(taskADC,   "ADC",   2048, NULL, 2, NULL);
+  xTaskCreate(taskPrint, "Print", 4096, NULL, 1, NULL);
+
+  Serial.println("System started. Sampling at 10Hz...");
+}
+
+void loop() { vTaskDelay(pdMS_TO_TICKS(1000)); }</code></pre>
+    <div class="tip">
+      <div class="tip-lbl">💡 测试方法</div>
+      <p>GPIO 34 悬空时 ADC 会读到随机值（正常现象）。连接一个 10kΩ 电位器（两端接 3.3V 和 GND，中间接 GPIO 34）可以看到平滑变化的值。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 8 -->
+<div class="step" id="s8">
+  <div class="step-hdr">
+    <div class="step-num">8</div>
+    <div class="step-title">Stack Overflow 检测与调试</div>
+    <div class="step-eta">15 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>任务栈分配不够会导致随机崩溃，最难调试。FreeRTOS 提供内置检测：</p>
+    <pre><code>// 在任何任务里加这行，查看历史最小剩余栈（word 为单位）
+UBaseType_t watermark = uxTaskGetStackHighWaterMark(NULL);
+Serial.printf("Task stack remaining: %u words (%u bytes)\n",
+              watermark, watermark * 4);
+
+// 建议：watermark < 50 words 时增大任务栈大小</code></pre>
+
+    <p>在项目中加一个监控任务：</p>
+    <pre><code>TaskHandle_t hADC, hPrint;  // 保存任务句柄
+
+void taskMonitor(void* param) {
+  for (;;) {
+    Serial.println("=== Stack Monitor ===");
+    Serial.printf("ADC task:   %u words left\n", uxTaskGetStackHighWaterMark(hADC));
+    Serial.printf("Print task: %u words left\n", uxTaskGetStackHighWaterMark(hPrint));
+    Serial.printf("Free heap:  %u bytes\n", esp_get_free_heap_size());
+    vTaskDelay(pdMS_TO_TICKS(5000));  // 每 5 秒打印一次
+  }
+}
+
+// 在 setup() 里：
+xTaskCreate(taskADC,     "ADC",     2048, NULL, 2, &hADC);
+xTaskCreate(taskPrint,   "Print",   4096, NULL, 1, &hPrint);
+xTaskCreate(taskMonitor, "Monitor", 2048, NULL, 1, NULL);</code></pre>
+    <div class="warn">
+      <div class="warn-lbl">⚠️ 常见崩溃原因</div>
+      <p>① 任务栈太小（用了大数组、递归、printf）② ISR 里调用了非 FromISR 函数 ③ 在任务里创建了大的局部数组（应改为静态或 heap 分配）</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 9 -->
+<div class="step" id="s9">
+  <div class="step-hdr">
+    <div class="step-num">9</div>
+    <div class="step-title">常见陷阱（省掉你几小时调试时间）</div>
+    <div class="step-eta">5 分钟阅读</div>
+  </div>
+  <div class="step-body">
+    <ul>
+      <li><strong>用 delay() 代替 vTaskDelay()</strong> → 整个 CPU 卡死，其他任务无法运行</li>
+      <li><strong>任务函数 return 了</strong> → 必须是无限循环，return 会触发断言失败。如果想退出，调用 <code>vTaskDelete(NULL)</code></li>
+      <li><strong>Queue/Semaphore 未创建就使用</strong> → 检查 <code>xQueueCreate()</code> 返回值是否为 NULL</li>
+      <li><strong>两个任务都 give Mutex</strong> → Mutex 有所有权，只有 take 的任务才能 give，否则行为未定义</li>
+      <li><strong>ISR 中调用普通 FreeRTOS 函数</strong> → 必须用 <code>FromISR</code> 版本</li>
+      <li><strong>优先级设错了</strong> → FreeRTOS 数字越大优先级越高（与 Linux 相反）</li>
+    </ul>
+  </div>
+</div>
+
+<div class="resources">
+  <h3>📚 相关资源</h3>
+  <div class="res-item">
+    <span>《Mastering FreeRTOS》官方免费 PDF <span class="badge free">免费</span></span>
+    <a href="https://www.freertos.org/Documentation/RTOS_book.html" target="_blank">freertos.org →</a>
+  </div>
+  <div class="res-item">
+    <span>Shawn Hymel FreeRTOS 视频系列 <span class="badge free">免费</span></span>
+    <a href="https://www.youtube.com/playlist?list=PLEBQazB0HUyQ4hAPU1cJED6t3DU0h34bz" target="_blank">YouTube →</a>
+  </div>
+  <div class="res-item">
+    <span>FreeRTOS API 官方文档 <span class="badge free">免费</span></span>
+    <a href="https://www.freertos.org/a00106.html" target="_blank">freertos.org/API →</a>
+  </div>
+  <div class="res-item">
+    <span>ESP32 FreeRTOS 文档 <span class="badge free">免费</span></span>
+    <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/freertos.html" target="_blank">espressif.com →</a>
+  </div>
+</div>
+
+</div>
+
+<aside class="codex-agent" id="codex-agent">
+  <div class="codex-head">
+    <div>
+      <span class="codex-title">Codex Core Agent</span>
+      <span class="codex-status" id="codex-status">FreeRTOS / ESP32 learning copilot</span>
+    </div>
+    <button type="button" onclick="codexToggle()" aria-label="Toggle Codex agent">-</button>
+  </div>
+
+  <div class="codex-key" id="codex-key">
+    <label for="codex-api-key">OpenAI API Key, saved only in this browser localStorage</label>
+    <input id="codex-api-key" type="password" placeholder="sk-...">
+    <div class="codex-key-actions">
+      <button type="button" onclick="codexSaveKey()">Save key</button>
+      <button type="button" class="secondary" onclick="codexClearKey()">Clear</button>
+    </div>
+  </div>
+
+  <div class="codex-body" id="codex-messages"></div>
+
+  <div class="codex-model-row">
+    <label for="codex-model">Model</label>
+    <select id="codex-model">
+      <option value="gpt-5.2-codex" selected>gpt-5.2-codex (Codex Core)</option>
+      <option value="gpt-5.1-codex">gpt-5.1-codex</option>
+      <option value="gpt-5.2">gpt-5.2</option>
+      <option value="gpt-5-mini">gpt-5 mini</option>
+    </select>
+  </div>
+
+  <div class="codex-input-row">
+    <textarea id="codex-input" rows="1" placeholder="Ask about Task, Queue, Mutex, ISR..." onkeydown="codexKey(event)"></textarea>
+    <button type="button" class="codex-send" id="codex-send" onclick="codexSend()">Send</button>
+  </div>
+</aside>
+
+<script>
+const CODEX_SYSTEM = `You are Codex Core, Qifeng Yang's embedded systems learning agent.
+The current page is a FreeRTOS + ESP32 practical guide covering Task, Scheduler, Queue, Mutex, Binary Semaphore, ISR-to-task notification, stack debugging, and common RTOS pitfalls.
+
+Answer in Chinese by default. Keep embedded terms such as FreeRTOS, Task, Queue, Mutex, Semaphore, ISR, Scheduler, Stack, Heap, ESP32, PlatformIO, and Arduino in English.
+Prefer concise, practical answers with runnable ESP32 Arduino/PlatformIO C++ examples when useful.
+When explaining concepts, include the interview angle: what an interviewer might ask, the key answer, and the common trap.
+Do not invent hardware details. If the user asks for wiring, state assumptions clearly.`;
+
+let codexPreviousResponseId = localStorage.getItem('codex_previous_response_id') || null;
+
+function codexToggle() {
+  const panel = document.getElementById('codex-agent');
+  panel.classList.toggle('collapsed');
+  panel.classList.toggle('open-mobile', !panel.classList.contains('collapsed'));
+  panel.querySelector('.codex-head button').textContent = panel.classList.contains('collapsed') ? '+' : '-';
+}
+
+function codexInit() {
+  codexCheckKey();
+  if (!document.getElementById('codex-messages').children.length) {
+    codexAddAgent('你好，我是 Codex Core。可以问我 FreeRTOS 的 Task / Queue / Mutex / ISR，也可以让我把代码改成适合 ESP32 + PlatformIO 的版本。');
+  }
+}
+
+function codexCheckKey() {
+  const hasKey = Boolean(localStorage.getItem('codex_openai_api_key'));
+  document.getElementById('codex-key').classList.toggle('hidden', hasKey);
+  document.getElementById('codex-status').textContent = hasKey ? 'Connected with local API key' : 'Add OpenAI API key to enable';
+}
+
+function codexSaveKey() {
+  const input = document.getElementById('codex-api-key');
+  const key = input.value.trim();
+  if (!key.startsWith('sk-')) {
+    alert('Please enter a valid OpenAI API key that starts with sk-.');
+    return;
+  }
+  localStorage.setItem('codex_openai_api_key', key);
+  input.value = '';
+  codexCheckKey();
+}
+
+function codexClearKey() {
+  localStorage.removeItem('codex_openai_api_key');
+  localStorage.removeItem('codex_previous_response_id');
+  codexPreviousResponseId = null;
+  codexCheckKey();
+}
+
+function codexAddMessage(text, cls) {
+  const el = document.createElement('div');
+  el.className = `codex-msg ${cls}`;
+  el.textContent = text;
+  document.getElementById('codex-messages').appendChild(el);
+  codexScroll();
+  return el;
+}
+
+function codexAddUser(text) { return codexAddMessage(text, 'user'); }
+function codexAddAgent(text) { return codexAddMessage(text, 'agent'); }
+
+function codexScroll() {
+  const box = document.getElementById('codex-messages');
+  box.scrollTop = box.scrollHeight;
+}
+
+function codexKey(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    codexSend();
+  }
+}
+
+function codexExtractText(data) {
+  if (data.output_text) return data.output_text;
+  const chunks = [];
+  for (const item of data.output || []) {
+    if (item.type === 'message') {
+      for (const content of item.content || []) {
+        if (content.type === 'output_text' && content.text) chunks.push(content.text);
+        if (content.type === 'text' && content.text) chunks.push(content.text);
+      }
+    }
+  }
+  return chunks.join('\n').trim() || '(empty response)';
+}
+
+async function codexSend() {
+  const input = document.getElementById('codex-input');
+  const text = input.value.trim();
+  const key = localStorage.getItem('codex_openai_api_key');
+  if (!text) return;
+  if (!key) {
+    document.getElementById('codex-key').classList.remove('hidden');
+    return;
+  }
+
+  input.value = '';
+  input.style.height = 'auto';
+  codexAddUser(text);
+
+  const sendBtn = document.getElementById('codex-send');
+  sendBtn.disabled = true;
+  const thinking = codexAddMessage('Thinking...', 'thinking');
+
+  const body = {
+    model: document.getElementById('codex-model').value,
+    instructions: CODEX_SYSTEM,
+    input: text,
+    max_output_tokens: 1200
+  };
+  if (codexPreviousResponseId) body.previous_response_id = codexPreviousResponseId;
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    thinking.remove();
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      const msg = data.error?.message || `HTTP ${res.status}`;
+      codexAddAgent(`Request failed: ${msg}`);
+      return;
+    }
+
+    codexPreviousResponseId = data.id || null;
+    if (codexPreviousResponseId) localStorage.setItem('codex_previous_response_id', codexPreviousResponseId);
+    codexAddAgent(codexExtractText(data));
+  } catch (err) {
+    thinking.remove();
+    codexAddAgent(`Network error: ${err.message}\n\nTip: if this is a browser CORS or key-safety issue, use a small backend proxy instead of calling OpenAI directly from a public page.`);
+  } finally {
+    sendBtn.disabled = false;
+    input.focus();
+  }
+}
+
+document.getElementById('codex-input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+codexInit();
+</script>
+</body>
+</html>

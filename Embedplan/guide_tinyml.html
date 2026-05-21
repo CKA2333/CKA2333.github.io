@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Guide: TinyML + Edge Impulse 完整指南</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#252836;--border:#2d3148;--primary:#6c63ff;--primary-light:#8b85ff;--success:#4ade80;--warning:#fbbf24;--danger:#f87171;--text:#e2e8f0;--muted:#94a3b8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.6;}
+a{color:var(--primary-light);text-decoration:none;}a:hover{text-decoration:underline;}
+code{background:var(--surface2);padding:2px 7px;border-radius:4px;font-family:'Courier New',monospace;font-size:.85em;color:#e879f9;}
+pre{background:#0d1117;border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:8px;padding:16px 18px;overflow-x:auto;margin:10px 0 14px;}
+pre code{background:none;padding:0;color:#a3e635;font-size:.84rem;display:block;line-height:1.7;}
+.header{background:linear-gradient(135deg,#059669,#6c63ff);padding:18px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.back-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:.82rem;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+.back-btn:hover{background:rgba(255,255,255,.25);text-decoration:none;}
+h1{font-size:1.2rem;font-weight:700;}
+.subtitle{font-size:.8rem;opacity:.8;margin-top:3px;}
+.layout{max-width:820px;margin:0 auto;padding:28px 20px;}
+.overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;margin-bottom:24px;}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.ov-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.ov-val{font-size:.88rem;font-weight:600;}
+.badge{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:10px;font-weight:600;margin-left:4px;}
+.free{background:rgba(74,222,128,.15);color:#4ade80;}
+.low{background:rgba(251,191,36,.15);color:#fbbf24;}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:24px;}
+.toc h3{font-size:.88rem;color:var(--primary-light);margin-bottom:10px;}
+.toc ol{padding-left:20px;columns:2;column-gap:24px;}
+.toc li{font-size:.83rem;line-height:2.1;}
+.toc a{color:var(--muted);}
+.toc a:hover{color:var(--primary-light);text-decoration:none;}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden;}
+.step-hdr{padding:14px 20px;background:var(--surface2);display:flex;align-items:center;gap:12px;}
+.step-num{background:var(--primary);color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.88rem;flex-shrink:0;}
+.step-title{font-size:.95rem;font-weight:600;flex:1;}
+.step-eta{font-size:.72rem;color:var(--muted);white-space:nowrap;}
+.step-body{padding:16px 20px 18px;}
+.step-body p{font-size:.87rem;color:var(--muted);margin-bottom:10px;line-height:1.75;}
+.step-body ul,.step-body ol{padding-left:20px;margin-bottom:10px;}
+.step-body li{font-size:.87rem;color:var(--muted);line-height:1.9;margin-bottom:3px;}
+.step-body strong{color:var(--text);}
+.tip{background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.tip-lbl{font-size:.67rem;font-weight:700;color:#4ade80;text-transform:uppercase;margin-bottom:3px;}
+.warn{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.warn-lbl{font-size:.67rem;font-weight:700;color:#fbbf24;text-transform:uppercase;margin-bottom:3px;}
+.highlight{background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.25);border-radius:8px;padding:12px 16px;margin:10px 0;}
+.hl-lbl{font-size:.67rem;font-weight:700;color:var(--primary-light);text-transform:uppercase;margin-bottom:4px;}
+.pipeline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px;background:var(--surface2);border-radius:8px;margin:10px 0;}
+.pipe-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.83rem;text-align:center;}
+.pipe-item .pi-title{font-weight:600;color:var(--text);}
+.pipe-item .pi-sub{font-size:.72rem;color:var(--muted);margin-top:2px;}
+.pipe-arrow{color:var(--primary-light);font-size:1.2rem;flex-shrink:0;}
+.resources{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-top:28px;}
+.resources h3{color:var(--primary-light);font-size:.95rem;margin-bottom:12px;}
+.res-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:.86rem;}
+.res-item:last-child{border-bottom:none;}
+@media(max-width:600px){.toc ol{columns:1;}.pipeline{flex-direction:column;}.pipe-arrow{transform:rotate(90deg);}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="embedded_plan.html" class="back-btn">← 返回计划</a>
+  <div>
+    <h1>🧠 TinyML + Edge Impulse 完整指南</h1>
+    <p class="subtitle">Phase 3 核心 · 你最强的差异化技能 · 全程免费工具链</p>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="overview">
+  <div class="ov-card"><div class="ov-label">Edge Impulse</div><div class="ov-val"><span class="badge free">完全免费</span></div></div>
+  <div class="ov-card"><div class="ov-label">训练算力</div><div class="ov-val"><span class="badge free">Google Colab GPU</span></div></div>
+  <div class="ov-card"><div class="ov-label">最低硬件</div><div class="ov-val"><span class="badge low">$5 ESP32</span></div></div>
+  <div class="ov-card"><div class="ov-label">完成时间</div><div class="ov-val">2–3 周</div></div>
+</div>
+
+<div class="toc">
+  <h3>目录</h3>
+  <ol>
+    <li><a href="#s1">TinyML 是什么</a></li>
+    <li><a href="#s2">Edge Impulse 注册</a></li>
+    <li><a href="#s3">数据采集（免硬件方案）</a></li>
+    <li><a href="#s4">创建 Impulse 流程</a></li>
+    <li><a href="#s5">DSP 特征提取块</a></li>
+    <li><a href="#s6">训练分类器</a></li>
+    <li><a href="#s7">测试和优化</a></li>
+    <li><a href="#s8">部署到 ESP32</a></li>
+    <li><a href="#s9">TFLite Micro 基础</a></li>
+    <li><a href="#s10">int8 量化实战</a></li>
+  </ol>
+</div>
+
+<!-- STEP 1 -->
+<div class="step" id="s1">
+  <div class="step-hdr">
+    <div class="step-num">1</div>
+    <div class="step-title">TinyML 是什么 — 你的核心竞争力</div>
+    <div class="step-eta">5 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>TinyML = 在极低功耗的微控制器（MCU）上运行机器学习推理。不需要联网，不需要云端服务器，模型直接跑在设备上。</p>
+    <div class="pipeline">
+      <div class="pipe-item"><div class="pi-title">传感器数据</div><div class="pi-sub">IMU / 麦克风 / ADC</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-item"><div class="pi-title">特征提取</div><div class="pi-sub">DSP / FFT / MFCC</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-item"><div class="pi-title">神经网络</div><div class="pi-sub">训练好的模型</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-item"><div class="pi-title">分类结果</div><div class="pi-sub">在 MCU 上输出</div></div>
+    </div>
+    <p><strong>典型应用（你能在 ESP32 上实现的）：</strong></p>
+    <ul>
+      <li>手势识别（加速度计数据 → 5 种手势）</li>
+      <li>关键词检测（"Hey Siri" 类似的唤醒词）</li>
+      <li>异常检测（震动/声音异常报警）</li>
+      <li>活动识别（走路/跑步/静止）</li>
+    </ul>
+    <div class="highlight">
+      <div class="hl-lbl">🎯 面试加分</div>
+      <p style="margin:0;font-size:.87rem;color:var(--muted)">能说出"我在 ESP32 上部署了手势识别模型，模型量化后 50KB，推理延迟 8ms，精度 94%"，在 Apple Sensing / Nordic / Qualcomm 面试中效果极强。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="s2">
+  <div class="step-hdr">
+    <div class="step-num">2</div>
+    <div class="step-title">Edge Impulse 注册和创建项目</div>
+    <div class="step-eta">10 分钟</div>
+  </div>
+  <div class="step-body">
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <a href="https://studio.edgeimpulse.com/signup" target="_blank" style="background:var(--primary);color:#fff;padding:8px 16px;border-radius:8px;font-size:.85rem;font-weight:600;display:inline-block">→ 立即注册 Edge Impulse（免费）</a>
+    </div>
+    <ul>
+      <li>访问 <a href="https://studio.edgeimpulse.com/signup" target="_blank">studio.edgeimpulse.com/signup</a>，用 Google 账号注册，完全免费</li>
+      <li>注册后点击 <strong>"Create new project"</strong></li>
+      <li>Project type 选 <strong>"Accelerometer data"</strong>（或 "Audio"，取决于你要做什么）</li>
+      <li>给项目命名，如 <code>gesture-recognition</code></li>
+    </ul>
+    <div class="tip">
+      <div class="tip-lbl">💡 免费版限制</div>
+      <p>免费版支持：无限项目、训练 20 分钟/次、导出 Arduino/ESP32 库。完全够用。付费版只是更快的训练，对我们没必要。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="s3">
+  <div class="step-hdr">
+    <div class="step-num">3</div>
+    <div class="step-title">数据采集（两种方案：免硬件 vs 真实传感器）</div>
+    <div class="step-eta">1–2 小时采集</div>
+  </div>
+  <div class="step-body">
+    <p><strong>方案 A：用手机采集（不需要额外硬件，立即开始）</strong></p>
+    <ul>
+      <li>Edge Impulse 项目 → Data Acquisition → 点击 <strong>"Connect using your mobile phone"</strong></li>
+      <li>手机扫描 QR 码，打开链接</li>
+      <li>手机可以作为加速度计数据源，直接用内置传感器采集</li>
+      <li>标签：gesture_circle / gesture_up_down / idle（至少 3 类）</li>
+      <li>每类采集 <strong>2 分钟数据</strong>（约 120 个 2 秒样本），质量比数量重要</li>
+    </ul>
+    <p style="margin-top:12px"><strong>方案 B：ESP32 + 加速度计（更贴近真实项目）</strong></p>
+    <p>ESP32 本身没有 IMU，需要外接 <strong>MPU6050</strong>（$1–2，AliExpress）或 <strong>ADXL345</strong>。</p>
+    <p>platformio.ini 添加库：</p>
+    <pre><code>[env:esp32dev]
+platform = espressif32
+board = esp32dev
+framework = arduino
+lib_deps =
+  electroniccats/MPU6050@^1.3.0
+  https://github.com/edgeimpulse/arduino-data-forwarder</code></pre>
+    <p>安装 Edge Impulse CLI（免费）：</p>
+    <pre><code># 需要先装 Node.js (nodejs.org, 免费)
+npm install -g edge-impulse-cli
+
+# 连接 ESP32，运行数据转发
+edge-impulse-data-forwarder</code></pre>
+    <div class="warn">
+      <div class="warn-lbl">⚠️ 建议先用手机方案</div>
+      <p>初次使用 Edge Impulse，先用手机采集数据跑通完整流程，再考虑连硬件。<strong>方案 A 今天就能有结果。</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="s4">
+  <div class="step-hdr">
+    <div class="step-num">4</div>
+    <div class="step-title">创建 Impulse（定义处理流程）</div>
+    <div class="step-eta">15 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>采集完数据后，点击左侧 <strong>"Impulse design"</strong>，这是整个 pipeline 的配置页面：</p>
+    <ol>
+      <li><strong>Input block：</strong>Time series data，Window size = <code>2000 ms</code>，Window increase = <code>200 ms</code>（80% overlap，数据增强效果）</li>
+      <li><strong>Processing block：</strong>点 "+ Add a processing block"，选择：
+        <ul>
+          <li><strong>Spectral Analysis</strong>（推荐）：提取 FFT 频域特征，适合周期性手势</li>
+          <li>或 <strong>Flatten</strong>：直接用原始统计值（均值/方差），更简单</li>
+        </ul>
+      </li>
+      <li><strong>Learning block：</strong>选 <strong>"Classification"</strong>（Neural Network），类别数填你的类别数量</li>
+      <li>点 <strong>"Save Impulse"</strong></li>
+    </ol>
+    <div class="highlight">
+      <div class="hl-lbl">🧠 DSP Block vs ML Block</div>
+      <p style="margin:0;font-size:.87rem;color:var(--muted)"><strong>DSP Block</strong>（Spectral Analysis）：确定性算法，把原始时间序列变成频域特征向量。<strong>ML Block</strong>（Neural Network）：训练一个分类器来区分这些特征向量。两阶段设计让 MCU 上特征提取可以用 CMSIS-DSP 加速。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 5 -->
+<div class="step" id="s5">
+  <div class="step-hdr">
+    <div class="step-num">5</div>
+    <div class="step-title">配置 DSP 特征提取块</div>
+    <div class="step-eta">10 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>点击左侧 <strong>"Spectral features"</strong>：</p>
+    <ul>
+      <li><strong>Scale axes：</strong>默认 1，不用改</li>
+      <li><strong>Type：</strong>FFT（频域，推荐），或 Wavelet（信号局部特征）</li>
+      <li><strong>FFT length：</strong>32 或 64（越大特征越细，计算越贵）</li>
+      <li>点击 <strong>"Save parameters"</strong> 然后 <strong>"Generate features"</strong></li>
+    </ul>
+    <p>生成后会看到 <strong>Feature Explorer</strong>，一个 2D/3D 散点图显示不同类别的特征分布。<strong>如果不同类的点分得很开，模型会训练得很好。</strong></p>
+    <div class="tip">
+      <div class="tip-lbl">💡 特征分不开怎么办？</div>
+      <p>① 采集更多数据（每类 5 分钟以上）② 动作做得更夸张一点 ③ 换 Processing block（试试 Raw data 或 Flatten）</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 6 -->
+<div class="step" id="s6">
+  <div class="step-hdr">
+    <div class="step-num">6</div>
+    <div class="step-title">训练神经网络</div>
+    <div class="step-eta">10–20 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>点击左侧 <strong>"NN Classifier"</strong>：</p>
+    <ul>
+      <li><strong>Training cycles：</strong>100（默认），初次试跑够了</li>
+      <li><strong>Learning rate：</strong>0.0005（默认）</li>
+      <li><strong>Validation set size：</strong>20%（默认）</li>
+      <li>网络架构默认是 2 层全连接（足够手势识别），点击 <strong>"Start training"</strong></li>
+    </ul>
+    <p>训练完成后看 <strong>Accuracy</strong> 和 <strong>Confusion Matrix</strong>：</p>
+    <ul>
+      <li>Accuracy > 90%：很好，可以部署</li>
+      <li>Accuracy 70–90%：看混淆矩阵，哪两类容易混淆，针对性补数据</li>
+      <li>Accuracy < 70%：数据质量问题，重新采集更均匀的数据</li>
+    </ul>
+    <div class="highlight">
+      <div class="hl-lbl">📊 Edge Impulse 自动量化</div>
+      <p style="margin:0;font-size:.87rem;color:var(--muted)">训练结束后，Edge Impulse 会自动显示 <strong>int8 量化</strong>后的精度对比（float32 vs int8）。一般精度损失 < 2%，但模型大小减少 4×，这就是 TinyML 的核心魔法。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 7 -->
+<div class="step" id="s7">
+  <div class="step-hdr">
+    <div class="step-num">7</div>
+    <div class="step-title">测试和优化</div>
+    <div class="step-eta">30 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>点击 <strong>"Model testing"</strong>，用测试集评估真实性能：</p>
+    <ul>
+      <li>点击 <strong>"Classify all"</strong>，等待结果</li>
+      <li>查看每个样本的预测结果，找出哪些错了</li>
+      <li>回到 Data acquisition，给错误的类别补充数据，重新训练</li>
+    </ul>
+    <p><strong>优化小技巧：</strong></p>
+    <ul>
+      <li>用 <strong>EON Tuner</strong>（左侧菜单）：Edge Impulse 自动搜索最优模型架构，找到精度/大小最佳平衡点</li>
+      <li>调整 Window size：手势时间长的用 3000ms，快速手势用 1000ms</li>
+      <li>增加 Training cycles 到 300：通常能提升 2–5% 精度</li>
+    </ul>
+  </div>
+</div>
+
+<!-- STEP 8 -->
+<div class="step" id="s8">
+  <div class="step-hdr">
+    <div class="step-num">8</div>
+    <div class="step-title">部署到 ESP32（Arduino Library）</div>
+    <div class="step-eta">30 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>点击左侧 <strong>"Deployment"</strong>：</p>
+    <ul>
+      <li>搜索 <strong>"Arduino library"</strong>，点击 Build</li>
+      <li>下载 .zip 文件（约 200–500 KB）</li>
+    </ul>
+    <p>在 PlatformIO 项目中使用：</p>
+    <pre><code>; platformio.ini 中添加本地库路径
+[env:esp32dev]
+platform = espressif32
+board = esp32dev
+framework = arduino
+lib_deps = symlink:///path/to/gesture-recognition-arduino  ; 或直接复制到 lib/ 目录</code></pre>
+
+    <p>把 .zip 解压到项目 <code>lib/</code> 目录，然后写推理代码：</p>
+    <pre><code>#include &lt;Arduino.h&gt;
+#include &lt;gesture-recognition_inferencing.h&gt;  // Edge Impulse 生成的头文件
+
+// 推理所需的输入缓冲区（大小由 EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE 定义）
+float features[EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE];
+int feature_ix = 0;
+
+void setup() {
+  Serial.begin(115200);
+  Serial.printf("Model: %s\n", EI_CLASSIFIER_PROJECT_NAME);
+  Serial.printf("Classes: %d\n", EI_CLASSIFIER_LABEL_COUNT);
+}
+
+void loop() {
+  // 假设你已经采集了一个 window 的加速度数据到 features[]
+  // （实际项目里从 MPU6050 读取）
+
+  // 创建推理输入信号
+  signal_t signal;
+  numpy::signal_from_buffer(features, EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE, &signal);
+
+  // 运行推理
+  ei_impulse_result_t result;
+  EI_IMPULSE_ERROR err = run_classifier(&signal, &result, false);
+
+  if (err != EI_IMPULSE_OK) {
+    Serial.printf("Classifier error: %d\n", err);
+    return;
+  }
+
+  // 打印结果
+  Serial.printf("Inference time: %d ms\n", result.timing.classification);
+  for (int i = 0; i < EI_CLASSIFIER_LABEL_COUNT; i++) {
+    Serial.printf("  %s: %.2f\n",
+      result.classification[i].label,
+      result.classification[i].value);
+  }
+
+  delay(500);
+}</code></pre>
+    <div class="tip">
+      <div class="tip-lbl">💡 推理速度</div>
+      <p>ESP32 上典型推理时间：简单手势模型 5–15ms，含 FFT 的完整 pipeline 15–50ms。远快于人体反应速度（200ms），完全实时。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 9 -->
+<div class="step" id="s9">
+  <div class="step-hdr">
+    <div class="step-num">9</div>
+    <div class="step-title">TFLite Micro 基础（理解底层）</div>
+    <div class="step-eta">1–2 小时阅读</div>
+  </div>
+  <div class="step-body">
+    <p>Edge Impulse 底层用的就是 TFLite Micro。理解底层帮助你面试时讲清楚原理：</p>
+    <ul>
+      <li><strong>TFLite Micro</strong> = TensorFlow Lite 的 MCU 版本，不依赖 OS，不动态分配内存</li>
+      <li><strong>Tensor Arena</strong>：一块静态分配的 RAM，供推理时所有中间张量使用。大小 = 你需要手动调整的参数</li>
+      <li><strong>OpResolver</strong>：注册模型用到的算子（Conv2D、FullyConnected 等），不用的不注册，节省 Flash</li>
+    </ul>
+    <p><strong>Hello World 例子（TFLite 官方，免费）：</strong></p>
+    <ul>
+      <li>教程：<a href="https://www.tensorflow.org/lite/microcontrollers/get_started_low_level" target="_blank">tensorflow.org/lite/microcontrollers</a></li>
+      <li>这个 Hello World 训练一个 sin(x) 拟合网络，推理输出控制 LED 亮度</li>
+      <li>跑通后你就理解了：<strong>模型文件（.tflite 转 .cc 数组）→ 加载 → Tensor Arena 分配 → 推理 → 读取输出</strong></li>
+    </ul>
+    <pre><code>// TFLite Micro 推理流程（概念代码）
+#include "tensorflow/lite/micro/micro_interpreter.h"
+
+const int kTensorArenaSize = 20 * 1024;  // 20KB，按需调整
+uint8_t tensor_arena[kTensorArenaSize];  // 静态分配（关键！MCU 没有 new/malloc）
+
+tflite::MicroInterpreter interpreter(model, resolver,
+                                     tensor_arena, kTensorArenaSize);
+interpreter.AllocateTensors();  // 在 arena 里分配各层张量
+
+TfLiteTensor* input  = interpreter.input(0);
+TfLiteTensor* output = interpreter.output(0);
+
+input->data.f[0] = x;           // 填充输入
+interpreter.Invoke();            // 运行推理
+float result = output->data.f[0]; // 读取输出</code></pre>
+  </div>
+</div>
+
+<!-- STEP 10 -->
+<div class="step" id="s10">
+  <div class="step-hdr">
+    <div class="step-num">10</div>
+    <div class="step-title">int8 量化实战（面试必讲）</div>
+    <div class="step-eta">1 小时实操</div>
+  </div>
+  <div class="step-body">
+    <p>量化是 TinyML 最核心的技术，把 float32 模型压缩 4× 并加速推理：</p>
+    <p><strong>在 Google Colab 实现量化（免费 GPU）：</strong></p>
+    <pre><code>import tensorflow as tf
+import numpy as np
+
+# 假设你已经训练了一个 Keras 模型 model
+# 方法 1: Post-Training Quantization（训练后量化，最简单）
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+
+# 提供校准数据集（代表性输入，100–500 个样本）
+def representative_dataset():
+    for sample in calibration_data[:100]:
+        yield [sample.reshape(1, -1).astype(np.float32)]
+
+converter.representative_dataset = representative_dataset
+converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
+converter.inference_input_type  = tf.int8
+converter.inference_output_type = tf.int8
+
+tflite_model = converter.convert()
+
+# 保存
+with open('model_int8.tflite', 'wb') as f:
+    f.write(tflite_model)
+
+print(f"Float32 size: {len(tf.lite.TFLiteConverter.from_keras_model(model).convert())/1024:.1f} KB")
+print(f"Int8 size:    {len(tflite_model)/1024:.1f} KB")
+# 典型输出：Float32 size: 200.0 KB → Int8 size: 52.0 KB（4× 压缩）</code></pre>
+
+    <p><strong>把 .tflite 转成 C 数组（烧进 Flash）：</strong></p>
+    <pre><code># 在终端运行（需要 xxd 工具，Linux/Mac 自带，Windows 用 WSL）
+xxd -i model_int8.tflite > model_data.cc
+
+# 生成的 model_data.cc 包含：
+# const unsigned char g_model[] = { 0x1c, 0x00, 0x00, 0x00, ... };
+# const int g_model_len = 12345;</code></pre>
+    <div class="tip">
+      <div class="tip-lbl">💡 量化精度损失实测</div>
+      <p>手势识别：float32 精度 96.2% → int8 精度 95.8%（损失 0.4%，完全可接受）。模型大小：float32 180KB → int8 48KB。ESP32 Flash 4MB，完全放得下。</p>
+    </div>
+  </div>
+</div>
+
+<div class="resources">
+  <h3>📚 相关资源（全部免费）</h3>
+  <div class="res-item">
+    <span>Edge Impulse Studio <span class="badge free">免费</span></span>
+    <a href="https://studio.edgeimpulse.com" target="_blank">studio.edgeimpulse.com →</a>
+  </div>
+  <div class="res-item">
+    <span>Edge Impulse 官方文档 <span class="badge free">免费</span></span>
+    <a href="https://docs.edgeimpulse.com" target="_blank">docs.edgeimpulse.com →</a>
+  </div>
+  <div class="res-item">
+    <span>TFLite Micro 入门教程 <span class="badge free">免费</span></span>
+    <a href="https://www.tensorflow.org/lite/microcontrollers/get_started_low_level" target="_blank">tensorflow.org →</a>
+  </div>
+  <div class="res-item">
+    <span>Pete Warden TinyML 课程（edX）<span class="badge free">免费 audit</span></span>
+    <a href="https://www.edx.org/professional-certificate/harvardx-tiny-machine-learning" target="_blank">edx.org →</a>
+  </div>
+  <div class="res-item">
+    <span>Google Colab（免费 GPU）<span class="badge free">免费</span></span>
+    <a href="https://colab.research.google.com" target="_blank">colab.research.google.com →</a>
+  </div>
+  <div class="res-item">
+    <span>CMSIS-NN（ARM 推理加速）<span class="badge free">免费</span></span>
+    <a href="https://github.com/ARM-software/CMSIS-NN" target="_blank">github.com/ARM-software/CMSIS-NN →</a>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>C++ Algorithm Cheat Sheet</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap');
+
+:root {
+  --bg: #0a0c12;
+  --surface: #111320;
+  --surface2: #1a1e30;
+  --border: #252a40;
+  --primary: #5c7cfa;
+  --accent: #f7931e;
+  --green: #40c97f;
+  --red: #f7535a;
+  --yellow: #fbbf24;
+  --text: #dde3f5;
+  --muted: #7a849e;
+  --code-bg: #0d1021;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(135deg, #0e1225 0%, #1a1e35 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 28px 40px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(92,124,250,0.18) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: -40px; left: 200px;
+  width: 150px; height: 150px;
+  background: radial-gradient(circle, rgba(247,147,30,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.header h1 {
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #fff;
+}
+.header-sub {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-top: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.badge-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.badge {
+  font-size: 0.72rem;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+.badge-blue  { background: rgba(92,124,250,0.15); border: 1px solid rgba(92,124,250,0.3); color: #8aa4ff; }
+.badge-orange{ background: rgba(247,147,30,0.15); border: 1px solid rgba(247,147,30,0.3); color: #f7931e; }
+.badge-green { background: rgba(64,201,127,0.15); border: 1px solid rgba(64,201,127,0.3); color: #40c97f; }
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  gap: 4px;
+}
+.tab-btn {
+  padding: 13px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+/* ── CONTENT ── */
+.content {
+  padding: 32px 40px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── SECTION ── */
+.section-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+  margin-top: 32px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.section-title:first-child { margin-top: 0; }
+
+/* ── GRID ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.card-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-blue   { background: var(--primary); }
+.dot-orange { background: var(--accent); }
+.dot-green  { background: var(--green); }
+.dot-red    { background: var(--red); }
+.dot-yellow { background: var(--yellow); }
+
+/* ── TABLE ── */
+.truth-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+}
+.truth-table th {
+  text-align: center;
+  padding: 6px 10px;
+  color: var(--muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+.truth-table td {
+  text-align: center;
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(37,42,64,0.5);
+}
+.truth-table tr:last-child td { border-bottom: none; }
+.v1  { color: var(--primary); }
+.v0  { color: var(--muted); }
+.res { color: var(--green); font-weight: 700; }
+
+/* ── CODE BLOCK ── */
+.code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.85;
+  overflow-x: auto;
+}
+.code-block .line { display: block; }
+.c  { color: var(--muted); }           /* comment */
+.kw { color: #c792ea; }                /* keyword */
+.fn { color: var(--primary); }         /* function */
+.st { color: var(--green); }           /* string/value */
+.op { color: var(--accent); }          /* operator */
+.tp { color: #ffcb6b; }                /* type */
+
+/* ── IDENTITY ROW ── */
+.id-list { list-style: none; }
+.id-item {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(37,42,64,0.5);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.79rem;
+}
+.id-item:last-child { border-bottom: none; }
+.id-eq  { color: var(--yellow); font-weight: 700; min-width: 160px; flex-shrink: 0; }
+.id-desc { color: var(--muted); font-size: 0.74rem; font-family: 'Syne', sans-serif; }
+
+/* ── PATTERN CARD ── */
+.pattern {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.pattern-hdr {
+  padding: 11px 16px;
+  background: rgba(92,124,250,0.08);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pattern-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.pattern-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.ptag {
+  font-size: 0.67rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+.ptag-blue   { background: rgba(92,124,250,0.2); color: #8aa4ff; }
+.ptag-orange { background: rgba(247,147,30,0.2); color: #f7931e; }
+.ptag-green  { background: rgba(64,201,127,0.2); color: #40c97f; }
+.pattern-body { padding: 14px 16px; }
+.pattern-body .code-block { margin-top: 0; }
+.note {
+  font-size: 0.76rem;
+  color: var(--muted);
+  margin-top: 9px;
+  line-height: 1.6;
+  font-family: 'Syne', sans-serif;
+}
+.note strong { color: var(--text); }
+
+/* ── OP ROW ── */
+.op-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(37,42,64,0.5);
+  font-size: 0.81rem;
+}
+.op-row:last-child { border-bottom: none; }
+.op-sym {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 30px;
+}
+.op-rule { color: var(--muted); font-size: 0.77rem; }
+
+/* ── INLINE CODE ── */
+code {
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(92,124,250,0.1);
+  border: 1px solid rgba(92,124,250,0.2);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.79em;
+  color: #8aa4ff;
+}
+
+/* ── BIG OP DISPLAY ── */
+.op-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.op-cell {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  text-align: center;
+}
+.op-cell .sym {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.op-cell .name { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
+.op-cell .rule { font-size: 0.7rem; color: var(--text); margin-top: 5px; font-family: 'JetBrains Mono', monospace; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>⚡ C++ Algorithm Cheat Sheet</h1>
+      <div class="header-sub">// 基础代码逻辑总结 · Month 1 LeetCode</div>
+      <div class="badge-row">
+        <span class="badge badge-blue">Bit Manipulation</span>
+        <span class="badge badge-orange">Array & Two Pointers</span>
+        <span class="badge badge-green">No extra libraries</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('bit', this)">🔢 Bit Manipulation</button>
+  <button class="tab-btn" onclick="switchTab('arr', this)">📦 Array & Two Pointers</button>
+  <button class="tab-btn" onclick="switchTab('map', this)">🗺️ Map & Hash</button>
+</div>
+
+<div class="content">
+
+<!-- ═══════════════════ BIT TAB ═══════════════════ -->
+<div id="tab-bit" class="tab-panel active">
+
+  <div class="section-title">六大位运算符</div>
+  <div class="op-grid">
+    <div class="op-cell">
+      <div class="sym">&</div>
+      <div class="name">AND</div>
+      <div class="rule">两个都是1 → 1<br>否则 → 0</div>
+    </div>
+    <div class="op-cell">
+      <div class="sym">|</div>
+      <div class="name">OR</div>
+      <div class="rule">有一个是1 → 1<br>都是0 → 0</div>
+    </div>
+    <div class="op-cell">
+      <div class="sym">^</div>
+      <div class="name">XOR</div>
+      <div class="rule">不同 → 1<br>相同 → 0</div>
+    </div>
+    <div class="op-cell">
+      <div class="sym">~</div>
+      <div class="name">NOT</div>
+      <div class="rule">1 → 0<br>0 → 1（翻转全部）</div>
+    </div>
+    <div class="op-cell">
+      <div class="sym">&lt;&lt;</div>
+      <div class="name">左移</div>
+      <div class="rule">n &lt;&lt; k<br>= n × 2ᵏ</div>
+    </div>
+    <div class="op-cell">
+      <div class="sym">&gt;&gt;</div>
+      <div class="name">右移</div>
+      <div class="rule">n &gt;&gt; k<br>= n ÷ 2ᵏ</div>
+    </div>
+  </div>
+
+  <div class="section-title">真值表（背下来）</div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>AND &nbsp;<code>&</code></div>
+      <table class="truth-table">
+        <tr><th>A</th><th>B</th><th>A & B</th></tr>
+        <tr><td class="v0">0</td><td class="v0">0</td><td class="res">0</td></tr>
+        <tr><td class="v0">0</td><td class="v1">1</td><td class="res">0</td></tr>
+        <tr><td class="v1">1</td><td class="v0">0</td><td class="res">0</td></tr>
+        <tr><td class="v1">1</td><td class="v1">1</td><td class="res">1</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-orange"></span>OR &nbsp;<code>|</code></div>
+      <table class="truth-table">
+        <tr><th>A</th><th>B</th><th>A | B</th></tr>
+        <tr><td class="v0">0</td><td class="v0">0</td><td class="res">0</td></tr>
+        <tr><td class="v0">0</td><td class="v1">1</td><td class="res">1</td></tr>
+        <tr><td class="v1">1</td><td class="v0">0</td><td class="res">1</td></tr>
+        <tr><td class="v1">1</td><td class="v1">1</td><td class="res">1</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-green"></span>XOR &nbsp;<code>^</code></div>
+      <table class="truth-table">
+        <tr><th>A</th><th>B</th><th>A ^ B</th></tr>
+        <tr><td class="v0">0</td><td class="v0">0</td><td class="res">0</td></tr>
+        <tr><td class="v0">0</td><td class="v1">1</td><td class="res">1</td></tr>
+        <tr><td class="v1">1</td><td class="v0">0</td><td class="res">1</td></tr>
+        <tr><td class="v1">1</td><td class="v1">1</td><td class="res">0</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">核心恒等式（XOR 最多）</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>XOR 恒等式</div>
+      <ul class="id-list">
+        <li class="id-item"><span class="id-eq">A ^ A = 0</span><span class="id-desc">自己消掉自己 → 找唯一数的核心</span></li>
+        <li class="id-item"><span class="id-eq">A ^ 0 = A</span><span class="id-desc">和 0 XOR 不变</span></li>
+        <li class="id-item"><span class="id-eq">A ^ B ^ A = B</span><span class="id-desc">两个A可以消掉</span></li>
+        <li class="id-item"><span class="id-eq">A ^ B = B ^ A</span><span class="id-desc">交换律</span></li>
+        <li class="id-item"><span class="id-eq">(A^B)^C = A^(B^C)</span><span class="id-desc">结合律</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-orange"></span>AND / OR / NOT 恒等式</div>
+      <ul class="id-list">
+        <li class="id-item"><span class="id-eq">A & 0 = 0</span><span class="id-desc">AND 0 全清零</span></li>
+        <li class="id-item"><span class="id-eq">A & 1 = A</span><span class="id-desc">AND 1 保留（用于 mask）</span></li>
+        <li class="id-item"><span class="id-eq">A | 0 = A</span><span class="id-desc">OR 0 不变</span></li>
+        <li class="id-item"><span class="id-eq">A | A = A</span><span class="id-desc">幂等律</span></li>
+        <li class="id-item"><span class="id-eq">~(~A) = A</span><span class="id-desc">双 NOT 还原</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title">位操作常用技巧（直接用在题目里）</div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">取第 k 位的值</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-blue">#191 Hamming Weight</span>
+        <span class="ptag ptag-blue">#137 Single Number II</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// 取 num 的第 k 位（0-indexed，从右数）</span></span>
+<span class="line"><span class="tp">int</span> bit = (num <span class="op">>></span> k) <span class="op">&</span> <span class="st">1</span>;</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 遍历所有 32 位</span></span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span> k = <span class="st">0</span>; k &lt; <span class="st">32</span>; k++) {</span>
+<span class="line">    <span class="tp">int</span> bit = (num <span class="op">>></span> k) <span class="op">&</span> <span class="st">1</span>;</span>
+<span class="line">}</span></div>
+      <div class="note"><strong>原理：</strong><code>>>k</code> 把第 k 位移到最右，<code>&1</code> 只保留最后一位</div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">判断 n 是否是 2 的幂</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-blue">#231 Power of Two</span>
+        <span class="ptag ptag-orange">#342 Power of Four</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// 2的幂的二进制只有一个1：n & (n-1) 清掉最低位的1</span></span>
+<span class="line"><span class="c">// 8 = 1000,  7 = 0111,  8 & 7 = 0000 ✓</span></span>
+<span class="line"><span class="tp">bool</span> isPow2 = (n <span class="op">></span> <span class="st">0</span>) <span class="op">&&</span> (n <span class="op">&</span> (n <span class="op">-</span> <span class="st">1</span>)) <span class="op">==</span> <span class="st">0</span>;</span>
+<span class="line"></span>
+<span class="line"><span class="c">// n & (-n) 孤立出最低位的1</span></span>
+<span class="line"><span class="c">// 如果 n == n & (-n)，说明只有一个1</span></span>
+<span class="line"><span class="tp">bool</span> isPow2v2 = (n <span class="op">></span> <span class="st">0</span>) <span class="op">&&</span> (n <span class="op">==</span> (n <span class="op">&</span> (<span class="op">-</span>n)));</span></div>
+      <div class="note"><strong>记忆法：</strong>2 的幂只有一个 1，<code>n-1</code> 会把那个 1 以及右边全变成 1，AND 之后全消掉</div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">XOR 找唯一数</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-green">#136 Single Number</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// 出现两次的数互相消掉（A^A=0），剩下就是答案</span></span>
+<span class="line"><span class="tp">int</span> solo = <span class="st">0</span>;</span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span> x : nums)  solo <span class="op">^=</span> x;</span>
+<span class="line"><span class="kw">return</span> solo;</span>
+<span class="line"></span>
+<span class="line"><span class="c">// [4,1,2,1,2] → 0^4^1^2^1^2 = 4</span></span></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">按位计数 mod 3（出现三次的数）</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-blue">#137 Single Number II</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="tp">int</span> bits[<span class="st">32</span>] = {<span class="st">0</span>};</span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span> num : nums)           <span class="c">// 每个数字</span></span>
+<span class="line">    <span class="kw">for</span> (<span class="tp">int</span> k = <span class="st">0</span>; k &lt; <span class="st">32</span>; k++) <span class="c">// 每一位</span></span>
+<span class="line">        bits[k] <span class="op">+=</span> (num <span class="op">>></span> k) <span class="op">&</span> <span class="st">1</span>;</span>
+<span class="line"></span>
+<span class="line"><span class="tp">int</span> res = <span class="st">0</span>;</span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span> k = <span class="st">32</span>; k &gt;= <span class="st">0</span>; k--)  <span class="c">// 重新组合</span></span>
+<span class="line">    res <span class="op">|=</span> (bits[k] <span class="op">%</span> <span class="st">3</span>) <span class="op">&lt;&lt;</span> k;   <span class="c">// 用 |= 不用 +=</span></span>
+<span class="line"><span class="kw">return</span> res;</span></div>
+      <div class="note"><strong>为什么 <code>|=</code> 不用 <code>+=</code>：</strong>用加法在 bit 31 处会 overflow 进位破坏其他 bit；<code>|=</code> 直接设置那个 bit，不会影响其他位。<br>
+      <strong>32 哪来的：</strong>int 是 32-bit，<code>-2³¹ ~ 2³¹-1</code> 的范围就是 32 位的结果。</div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">设置 / 清除 / 翻转某一位</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-orange">寄存器操作必备</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// 设置第 k 位为 1</span></span>
+<span class="line">n <span class="op">|=</span> (<span class="st">1</span> <span class="op">&lt;&lt;</span> k);</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 清除第 k 位（设为 0）</span></span>
+<span class="line">n <span class="op">&=</span> <span class="op">~</span>(<span class="st">1</span> <span class="op">&lt;&lt;</span> k);</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 翻转第 k 位</span></span>
+<span class="line">n <span class="op">^=</span> (<span class="st">1</span> <span class="op">&lt;&lt;</span> k);</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 检查第 k 位是否为 1</span></span>
+<span class="line"><span class="tp">bool</span> isSet = (n <span class="op">&</span> (<span class="st">1</span> <span class="op">&lt;&lt;</span> k)) <span class="op">!=</span> <span class="st">0</span>;</span></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">位运算代替加减乘除</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-green">#371 Sum of Two Integers</span>
+        <span class="ptag ptag-green">#29 Divide Two Integers</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// 乘以 / 除以 2 的幂</span></span>
+<span class="line">n <span class="op">&lt;&lt;</span> <span class="st">1</span>   <span class="c">// n * 2</span></span>
+<span class="line">n <span class="op">&lt;&lt;</span> <span class="st">3</span>   <span class="c">// n * 8</span></span>
+<span class="line">n <span class="op">>></span> <span class="st">1</span>   <span class="c">// n / 2（整除）</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 不用 + 实现加法（XOR = 无进位加，AND<<1 = 进位）</span></span>
+<span class="line"><span class="kw">while</span> (b <span class="op">!=</span> <span class="st">0</span>) {</span>
+<span class="line">    <span class="tp">int</span> carry = a <span class="op">&</span> b;       <span class="c">// 进位</span></span>
+<span class="line">    a = a <span class="op">^</span> b;              <span class="c">// 无进位相加</span></span>
+<span class="line">    b = carry <span class="op">&lt;&lt;</span> <span class="st">1</span>;         <span class="c">// 进位左移</span></span>
+<span class="line">}</span>
+<span class="line"><span class="c">// result = a</span></span></div>
+    </div>
+  </div>
+
+</div><!-- end bit tab -->
+
+<!-- ═══════════════════ ARRAY TAB ═══════════════════ -->
+<div id="tab-arr" class="tab-panel">
+
+  <div class="section-title">创建数组 / Vector</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>vector（动态，最常用）</div>
+      <div class="code-block"><span class="line"><span class="c">// 创建</span></span>
+<span class="line"><span class="tp">vector</span>&lt;<span class="tp">int</span>&gt; v;                     <span class="c">// 空</span></span>
+<span class="line"><span class="tp">vector</span>&lt;<span class="tp">int</span>&gt; v = {<span class="st">1</span>, <span class="st">2</span>, <span class="st">3</span>};        <span class="c">// 初始化</span></span>
+<span class="line"><span class="tp">vector</span>&lt;<span class="tp">int</span>&gt; v(<span class="st">5</span>, <span class="st">0</span>);              <span class="c">// 5个0</span></span>
+<span class="line"><span class="tp">vector</span>&lt;<span class="tp">int</span>&gt; v(nums);              <span class="c">// 拷贝另一个</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 大小</span></span>
+<span class="line">v.<span class="fn">size</span>()   <span class="c">// 元素个数（返回 size_t，无符号）</span></span>
+<span class="line">v.<span class="fn">empty</span>()  <span class="c">// 是否为空</span></span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-orange"></span>原生数组（固定大小）</div>
+      <div class="code-block"><span class="line"><span class="c">// 固定大小，栈上分配，速度快</span></span>
+<span class="line"><span class="tp">int</span> arr[<span class="st">32</span>] = {<span class="st">0</span>};    <span class="c">// 32个0</span></span>
+<span class="line"><span class="tp">int</span> arr[] = {<span class="st">1</span>,<span class="st">2</span>,<span class="st">3</span>}; <span class="c">// 自动推断大小</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 大小（编译期已知才能用）</span></span>
+<span class="line"><span class="kw">sizeof</span>(arr) / <span class="kw">sizeof</span>(arr[<span class="st">0</span>])</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 嵌入式常用：原生数组，不动态分配</span></span></div>
+    </div>
+  </div>
+
+  <div class="section-title">增删改查元素</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-green"></span>增 / 删</div>
+      <div class="code-block"><span class="line"><span class="c">// 增</span></span>
+<span class="line">v.<span class="fn">push_back</span>(<span class="st">42</span>);          <span class="c">// 末尾加</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 删</span></span>
+<span class="line">v.<span class="fn">pop_back</span>();              <span class="c">// 删末尾（无返回值）</span></span>
+<span class="line">v.<span class="fn">erase</span>(v.<span class="fn">begin</span>() + i);   <span class="c">// 删第 i 个（O(n)！）</span></span>
+<span class="line">v.<span class="fn">clear</span>();                 <span class="c">// 清空</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 删特定值（需要算法头）</span></span>
+<span class="line">v.<span class="fn">erase</span>(<span class="fn">find</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), val));</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-yellow"></span>读 / 改 / 交换</div>
+      <div class="code-block"><span class="line"><span class="c">// 读</span></span>
+<span class="line">v[i]        <span class="c">// 直接访问（不检查越界）</span></span>
+<span class="line">v.<span class="fn">front</span>()  <span class="c">// 第一个元素</span></span>
+<span class="line">v.<span class="fn">back</span>()   <span class="c">// 最后一个元素</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 改</span></span>
+<span class="line">v[i] = <span class="st">99</span>;</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 交换两个元素</span></span>
+<span class="line"><span class="fn">swap</span>(v[i], v[j]);</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 内部等价于：</span></span>
+<span class="line"><span class="tp">int</span> tmp = v[i]; v[i] = v[j]; v[j] = tmp;</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">遍历方式</div>
+  <div class="card">
+    <div class="code-block"><span class="line"><span class="c">// 方式1：index（需要 index 时用）</span></span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span> i = <span class="st">0</span>; i &lt; nums.<span class="fn">size</span>(); i++)</span>
+<span class="line">    cout &lt;&lt; nums[i];</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 方式2：range-based（不需要 index，最简洁）</span></span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span> x : nums)     <span class="c">// x 是拷贝</span></span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span>&amp; x : nums)   <span class="c">// x 是引用，可以修改原数组</span></span>
+<span class="line"><span class="kw">for</span> (<span class="kw">auto</span> x : nums)   <span class="c">// auto 自动推断类型</span></span></div>
+  </div>
+
+  <div class="section-title">双指针模板</div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">左右指针（对撞型）</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-orange">#167 Two Sum II</span>
+        <span class="ptag ptag-orange">#11 Container With Water</span>
+        <span class="ptag ptag-orange">#15 3Sum</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="tp">int</span> i = <span class="st">0</span>, j = nums.<span class="fn">size</span>() - <span class="st">1</span>;  <span class="c">// 两端出发</span></span>
+<span class="line"><span class="kw">while</span> (i &lt; j) {</span>
+<span class="line">    <span class="tp">int</span> sum = nums[i] + nums[j];</span>
+<span class="line">    <span class="kw">if</span> (sum == target)  <span class="kw">return</span> {i, j};</span>
+<span class="line">    <span class="kw">else if</span> (sum &lt; target)  i++;  <span class="c">// 太小，左指针右移</span></span>
+<span class="line">    <span class="kw">else</span>                    j--;  <span class="c">// 太大，右指针左移</span></span>
+<span class="line">}</span></div>
+      <div class="note"><strong>前提：</strong>数组必须已排序。往中间夹逼，每次排除一个不可能的值。</div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">快慢指针（同向型）</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-blue">#26 Remove Duplicates</span>
+        <span class="ptag ptag-blue">#27 Remove Element</span>
+        <span class="ptag ptag-blue">#283 Move Zeroes</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// j = 慢指针（下一个写入位置）</span></span>
+<span class="line"><span class="c">// i = 快指针（扫描用）</span></span>
+<span class="line"><span class="tp">int</span> j = <span class="st">0</span>;</span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span> i = <span class="st">0</span>; i &lt; nums.<span class="fn">size</span>(); i++) {</span>
+<span class="line">    <span class="kw">if</span> (nums[i] <span class="op">!=</span> <span class="st">0</span>) {      <span class="c">// 找到目标</span></span>
+<span class="line">        <span class="fn">swap</span>(nums[i], nums[j]); <span class="c">// 放到 j 位置</span></span>
+<span class="line">        j++;                    <span class="c">// j 前进</span></span>
+<span class="line">    }</span>
+<span class="line">}</span></div>
+      <div class="note"><strong>关键：</strong><code>j</code> 始终 ≤ <code>i</code>，所以 swap 时 <code>j</code> 位置一定是"已处理完的废料"，不会破坏未读的数据。</div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">滑动窗口</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-green">#3 Longest Substring</span>
+        <span class="ptag ptag-green">#209 Min Subarray Sum</span>
+        <span class="ptag ptag-green">#438 Find Anagrams</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="tp">int</span> left = <span class="st">0</span>, right = <span class="st">0</span>;</span>
+<span class="line"><span class="kw">while</span> (right &lt; nums.<span class="fn">size</span>()) {</span>
+<span class="line">    <span class="c">// 1. 扩展右边界（加入新元素）</span></span>
+<span class="line">    window.<span class="fn">add</span>(nums[right]);</span>
+<span class="line">    right++;</span>
+<span class="line"></span>
+<span class="line">    <span class="c">// 2. 收缩左边界（窗口不合法时）</span></span>
+<span class="line">    <span class="kw">while</span> (window 不合法) {</span>
+<span class="line">        window.<span class="fn">remove</span>(nums[left]);</span>
+<span class="line">        left++;</span>
+<span class="line">    }</span>
+<span class="line">    <span class="c">// 3. 更新答案</span></span>
+<span class="line">    ans = <span class="fn">max</span>(ans, right - left);</span>
+<span class="line">}</span></div>
+      <div class="note"><strong>窗口</strong>可以是 int（求和）或 unordered_map（统计字符频率）。右进左出，维护一个动态的合法区间。</div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">从后往前合并（不需要额外空间）</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-orange">#88 Merge Sorted Array</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// nums1 末尾有空位，从后往前填，避免覆盖未读数据</span></span>
+<span class="line"><span class="tp">int</span> i = m - <span class="st">1</span>;        <span class="c">// nums1 最后一个真实元素</span></span>
+<span class="line"><span class="tp">int</span> j = n - <span class="st">1</span>;        <span class="c">// nums2 最后一个元素</span></span>
+<span class="line"><span class="tp">int</span> k = m + n - <span class="st">1</span>;    <span class="c">// 写入位置</span></span>
+<span class="line"></span>
+<span class="line"><span class="kw">while</span> (i &gt;= <span class="st">0</span> &amp;&amp; j &gt;= <span class="st">0</span>) {</span>
+<span class="line">    <span class="kw">if</span> (nums1[i] &gt; nums2[j])  nums1[k--] = nums1[i--];</span>
+<span class="line">    <span class="kw">else</span>                       nums1[k--] = nums2[j--];</span>
+<span class="line">}</span>
+<span class="line"><span class="kw">while</span> (j &gt;= <span class="st">0</span>)  nums1[k--] = nums2[j--];  <span class="c">// nums2 剩余</span></span></div>
+      <div class="note"><strong>为什么省空间：</strong>写入位置 <code>k</code> 永远在读指针 <code>i</code> 的右边，所以永远写的是已经读过或者空着的位置。</div>
+    </div>
+  </div>
+
+</div><!-- end arr tab -->
+
+<!-- ═══════════════════ MAP TAB ═══════════════════ -->
+<div id="tab-map" class="tab-panel">
+
+  <div class="section-title">unordered_map vs map</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>unordered_map（哈希表，常用）</div>
+      <div class="code-block"><span class="line"><span class="c">// 创建：key=数字，value=次数</span></span>
+<span class="line"><span class="tp">unordered_map</span>&lt;<span class="tp">int</span>, <span class="tp">int</span>&gt; m;</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 增 / 改</span></span>
+<span class="line">m[key]++;            <span class="c">// 计数（不存在时自动创建为0）</span></span>
+<span class="line">m[key] = value;      <span class="c">// 直接赋值</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 查</span></span>
+<span class="line">m[key]               <span class="c">// 直接取值（会创建！）</span></span>
+<span class="line">m.<span class="fn">count</span>(key)        <span class="c">// 1 存在 / 0 不存在（推荐）</span></span>
+<span class="line">m.<span class="fn">find</span>(key) <span class="op">!=</span> m.<span class="fn">end</span>()  <span class="c">// 同上，更明确</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 删</span></span>
+<span class="line">m.<span class="fn">erase</span>(key);</span></div>
+      <div class="note">查找/插入 O(1) 平均，但无序</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-orange"></span>map（红黑树，有序）</div>
+      <div class="code-block"><span class="line"><span class="c">// 按 key 升序排列</span></span>
+<span class="line"><span class="tp">map</span>&lt;<span class="tp">int</span>, <span class="tp">int</span>&gt; m;</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 操作和 unordered_map 完全一样</span></span>
+<span class="line">m[key]++;</span>
+<span class="line">m.<span class="fn">count</span>(key);</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 区别：有序，查找 O(log n)</span></span>
+<span class="line"><span class="c">// Java 对应：TreeMap vs HashMap</span></span></div>
+      <div class="note">查找/插入 O(log n)，但 key 自动排序</div>
+    </div>
+  </div>
+
+  <div class="section-title">遍历 Map</div>
+  <div class="card">
+    <div class="code-block"><span class="line"><span class="c">// 方式1：auto（最常用）</span></span>
+<span class="line"><span class="kw">for</span> (<span class="kw">auto</span> x : m) {</span>
+<span class="line">    x.first;   <span class="c">// key</span></span>
+<span class="line">    x.second;  <span class="c">// value</span></span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 方式2：结构化绑定（C++17，更清晰）</span></span>
+<span class="line"><span class="kw">for</span> (<span class="kw">auto</span> [key, val] : m) {</span>
+<span class="line">    <span class="c">// 直接用 key 和 val</span></span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 方式3：显式类型</span></span>
+<span class="line"><span class="kw">for</span> (<span class="tp">pair</span>&lt;<span class="tp">int</span>,<span class="tp">int</span>&gt; x : m) { ... }</span></div>
+  </div>
+
+  <div class="section-title">Map 常用题型模板</div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">计数 + 找唯一 / 频率</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-blue">#137 Single Number II（map版）</span>
+        <span class="ptag ptag-blue">#347 Top K Frequent</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="tp">unordered_map</span>&lt;<span class="tp">int</span>,<span class="tp">int</span>&gt; m;</span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span> x : nums)  m[x]++;     <span class="c">// 统计次数</span></span>
+<span class="line"></span>
+<span class="line"><span class="kw">for</span> (<span class="kw">auto</span> [k, v] : m)</span>
+<span class="line">    <span class="kw">if</span> (v == <span class="st">1</span>)  <span class="kw">return</span> k;       <span class="c">// 找出现一次的</span></span></div>
+      <div class="note">注意：这是 O(n) space，不满足 Single Number II 的 constant space 要求。用 map 是可以做但不是最优解。</div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">Two Sum 经典用法（存下标）</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-green">#1 Two Sum</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="tp">unordered_map</span>&lt;<span class="tp">int</span>,<span class="tp">int</span>&gt; seen;  <span class="c">// value → index</span></span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span> i = <span class="st">0</span>; i &lt; nums.<span class="fn">size</span>(); i++) {</span>
+<span class="line">    <span class="tp">int</span> need = target - nums[i];</span>
+<span class="line">    <span class="kw">if</span> (seen.<span class="fn">count</span>(need))           <span class="c">// 找到配对</span></span>
+<span class="line">        <span class="kw">return</span> {seen[need], i};</span>
+<span class="line">    seen[nums[i]] = i;              <span class="c">// 先存再查，避免用自己</span></span>
+<span class="line">}</span></div>
+      <div class="note"><strong>关键顺序：</strong>先查 map，再把当前元素加入 map。不然可能用同一个元素两次。</div>
+    </div>
+  </div>
+
+  <div class="section-title">常用 STL 操作速查</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-green"></span>排序</div>
+      <div class="code-block"><span class="line"><span class="c">// 升序（默认）</span></span>
+<span class="line"><span class="fn">sort</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 降序</span></span>
+<span class="line"><span class="fn">sort</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="fn">greater</span>&lt;<span class="tp">int</span>&gt;());</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 自定义比较</span></span>
+<span class="line"><span class="fn">sort</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), [](<span class="tp">int</span> a, <span class="tp">int</span> b){</span>
+<span class="line">    <span class="kw">return</span> a &lt; b;  <span class="c">// 升序</span></span>
+<span class="line">});</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-red"></span>最大 / 最小 / 边界</div>
+      <div class="code-block"><span class="line"><span class="fn">max</span>(a, b);    <span class="fn">min</span>(a, b);</span>
+<span class="line"><span class="fn">abs</span>(x);       <span class="c">// 绝对值</span></span>
+<span class="line"><span class="kw">INT_MAX</span>;  <span class="kw">INT_MIN</span>;  <span class="c">// int 最大/最小值</span></span>
+<span class="line"><span class="kw">LLONG_MAX</span>;            <span class="c">// long long 最大值</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 累积更新</span></span>
+<span class="line">res = <span class="fn">max</span>(res, curVal);   <span class="c">// 记录最大</span></span>
+<span class="line">res = <span class="fn">min</span>(res, curVal);   <span class="c">// 记录最小</span></span></div>
+    </div>
+  </div>
+
+</div><!-- end map tab -->
+
+</div><!-- content -->
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

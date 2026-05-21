@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Guide: Python ML 零成本入门（Google Colab）</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#252836;--border:#2d3148;--primary:#6c63ff;--primary-light:#8b85ff;--success:#4ade80;--warning:#fbbf24;--danger:#f87171;--text:#e2e8f0;--muted:#94a3b8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.6;}
+a{color:var(--primary-light);text-decoration:none;}a:hover{text-decoration:underline;}
+code{background:var(--surface2);padding:2px 7px;border-radius:4px;font-family:'Courier New',monospace;font-size:.85em;color:#e879f9;}
+pre{background:#0d1117;border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:8px;padding:16px 18px;overflow-x:auto;margin:10px 0 14px;}
+pre code{background:none;padding:0;color:#a3e635;font-size:.84rem;display:block;line-height:1.7;}
+.header{background:linear-gradient(135deg,#d97706,#6c63ff);padding:18px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.back-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:.82rem;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+.back-btn:hover{background:rgba(255,255,255,.25);text-decoration:none;}
+h1{font-size:1.2rem;font-weight:700;}
+.subtitle{font-size:.8rem;opacity:.8;margin-top:3px;}
+.layout{max-width:820px;margin:0 auto;padding:28px 20px;}
+.overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;margin-bottom:24px;}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.ov-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.ov-val{font-size:.88rem;font-weight:600;}
+.badge{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:10px;font-weight:600;margin-left:4px;}
+.free{background:rgba(74,222,128,.15);color:#4ade80;}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:24px;}
+.toc h3{font-size:.88rem;color:var(--primary-light);margin-bottom:10px;}
+.toc ol{padding-left:20px;columns:2;column-gap:24px;}
+.toc li{font-size:.83rem;line-height:2.1;}
+.toc a{color:var(--muted);}
+.toc a:hover{color:var(--primary-light);text-decoration:none;}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden;}
+.step-hdr{padding:14px 20px;background:var(--surface2);display:flex;align-items:center;gap:12px;}
+.step-num{background:var(--primary);color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.88rem;flex-shrink:0;}
+.step-title{font-size:.95rem;font-weight:600;flex:1;}
+.step-eta{font-size:.72rem;color:var(--muted);white-space:nowrap;}
+.step-body{padding:16px 20px 18px;}
+.step-body p{font-size:.87rem;color:var(--muted);margin-bottom:10px;line-height:1.75;}
+.step-body ul,.step-body ol{padding-left:20px;margin-bottom:10px;}
+.step-body li{font-size:.87rem;color:var(--muted);line-height:1.9;margin-bottom:3px;}
+.step-body strong{color:var(--text);}
+.tip{background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.tip-lbl{font-size:.67rem;font-weight:700;color:#4ade80;text-transform:uppercase;margin-bottom:3px;}
+.warn{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.warn-lbl{font-size:.67rem;font-weight:700;color:#fbbf24;text-transform:uppercase;margin-bottom:3px;}
+.open-btn{display:inline-block;background:var(--primary);color:#fff;padding:9px 18px;border-radius:8px;font-size:.85rem;font-weight:600;margin:8px 0;}
+.open-btn:hover{background:var(--primary-light);text-decoration:none;}
+.resources{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-top:28px;}
+.resources h3{color:var(--primary-light);font-size:.95rem;margin-bottom:12px;}
+.res-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:.86rem;}
+.res-item:last-child{border-bottom:none;}
+@media(max-width:600px){.toc ol{columns:1;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="embedded_plan.html" class="back-btn">← 返回计划</a>
+  <div>
+    <h1>🐍 Python ML 零成本入门（Google Colab）</h1>
+    <p class="subtitle">Phase 1 并行 ML 轨道 · 不需要安装任何软件 · 免费 GPU</p>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="overview">
+  <div class="ov-card"><div class="ov-label">安装要求</div><div class="ov-val"><span class="badge free">无需安装</span></div></div>
+  <div class="ov-card"><div class="ov-label">费用</div><div class="ov-val"><span class="badge free">完全免费</span></div></div>
+  <div class="ov-card"><div class="ov-label">需要</div><div class="ov-val">Google 账号 + 浏览器</div></div>
+  <div class="ov-card"><div class="ov-label">完成时间</div><div class="ov-val">2–3 周（每天 1h）</div></div>
+</div>
+
+<div class="toc">
+  <h3>目录</h3>
+  <ol>
+    <li><a href="#s1">为什么用 Google Colab</a></li>
+    <li><a href="#s2">Colab 基本操作</a></li>
+    <li><a href="#s3">NumPy 基础</a></li>
+    <li><a href="#s4">Pandas 处理传感器数据</a></li>
+    <li><a href="#s5">第一个 sklearn ML Pipeline</a></li>
+    <li><a href="#s6">PyTorch 第一个神经网络</a></li>
+    <li><a href="#s7">在 Colab 启用免费 GPU</a></li>
+    <li><a href="#s8">保存工作到 Google Drive</a></li>
+  </ol>
+</div>
+
+<!-- STEP 1 -->
+<div class="step" id="s1">
+  <div class="step-hdr">
+    <div class="step-num">1</div>
+    <div class="step-title">为什么用 Google Colab（而不是本地安装）</div>
+    <div class="step-eta">3 分钟阅读</div>
+  </div>
+  <div class="step-body">
+    <p>本地安装 Python + PyTorch + CUDA 环境需要 30–60 分钟，还经常出问题。<strong>Google Colab 浏览器里直接运行，今天就能开始。</strong></p>
+    <ul>
+      <li><strong>免费 GPU/TPU</strong>：T4 GPU 免费，训练神经网络比 CPU 快 10–50 倍</li>
+      <li><strong>预装所有库</strong>：NumPy、Pandas、PyTorch、TensorFlow、sklearn 全都已装好</li>
+      <li><strong>无需安装</strong>：有 Google 账号 + 浏览器就够了</li>
+      <li><strong>自动保存</strong>：文件存在 Google Drive 里</li>
+    </ul>
+    <a href="https://colab.research.google.com" target="_blank" class="open-btn">→ 打开 Google Colab</a>
+    <div class="warn">
+      <div class="warn-lbl">⚠️ Colab 免费版限制</div>
+      <p>免费 GPU 每天约 4–6 小时（不连续运行的话）。运行完就断开，不要把 Colab 当服务器挂着跑。对学习完全够用。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="s2">
+  <div class="step-hdr">
+    <div class="step-num">2</div>
+    <div class="step-title">Colab 基本操作</div>
+    <div class="step-eta">10 分钟上手</div>
+  </div>
+  <div class="step-body">
+    <ul>
+      <li>进入 <a href="https://colab.research.google.com" target="_blank">colab.research.google.com</a> → 点 <strong>"New notebook"</strong></li>
+      <li><strong>Cell（格子）</strong>：Colab 的基本单元，分 Code cell 和 Text cell</li>
+      <li><strong>运行 Cell</strong>：<code>Shift + Enter</code>（运行并跳到下一格）或 <code>Ctrl + Enter</code>（只运行）</li>
+      <li>点击格子左侧的 ▶ 按钮也可以运行</li>
+      <li><strong>添加 Cell</strong>：点 "+ Code" 或 "+ Text"（工具栏），或按 <code>Esc → B</code></li>
+    </ul>
+    <p>试着在第一个 Cell 里输入并运行：</p>
+    <pre><code>print("Hello, TinyML!")
+import sys
+print(f"Python {sys.version}")
+
+import torch
+print(f"PyTorch {torch.__version__}")
+print(f"GPU available: {torch.cuda.is_available()}")</code></pre>
+    <div class="tip">
+      <div class="tip-lbl">💡 Colab 快捷键</div>
+      <p><code>Ctrl+/</code> 注释/取消注释 | <code>Ctrl+M B</code> 在下方插入格 | <code>Ctrl+M D</code> 删除格 | <code>Ctrl+Shift+F10</code> 运行全部</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="s3">
+  <div class="step-hdr">
+    <div class="step-num">3</div>
+    <div class="step-title">NumPy 基础（ML 的数学地基）</div>
+    <div class="step-eta">2–3 小时练习</div>
+  </div>
+  <div class="step-body">
+    <p>NumPy 是 Python ML 的基础，所有 ML 框架底层都是 NumPy 数组（ndarray）。</p>
+    <pre><code>import numpy as np
+
+# 创建数组
+a = np.array([1, 2, 3, 4, 5])
+b = np.zeros((3, 4))      # 3行4列全0矩阵
+c = np.random.randn(100)  # 100个标准正态分布随机数
+
+# 向量化运算（不用 for 循环！）
+x = np.linspace(0, 2*np.pi, 100)   # 0到2π，100个点
+y = np.sin(x)                       # 对每个元素求 sin
+
+# 矩阵运算
+A = np.random.randn(3, 4)
+B = np.random.randn(4, 5)
+C = A @ B                  # 矩阵乘法，结果 shape (3, 5)
+print(f"C shape: {C.shape}")
+
+# Slicing（和 Python list 类似但更强）
+data = np.random.randn(1000, 3)  # 1000个样本，3个特征
+X = data[:, :2]    # 所有行，前2列
+y = data[:, 2]     # 所有行，第3列
+
+# 统计
+print(f"Mean: {X.mean(axis=0)}")   # 每列的均值
+print(f"Std:  {X.std(axis=0)}")    # 每列的标准差
+
+# 传感器数据处理示例：归一化
+def z_score_normalize(X):
+    return (X - X.mean(axis=0)) / X.std(axis=0)
+
+X_norm = z_score_normalize(X)
+print(f"After norm - mean: {X_norm.mean(axis=0):.4f}, std: {X_norm.std(axis=0):.4f}")</code></pre>
+    <p>完成后去 <a href="https://numpy.org/doc/stable/user/quickstart.html" target="_blank">NumPy 官方 Quickstart</a> 做完所有练习。</p>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="s4">
+  <div class="step-hdr">
+    <div class="step-num">4</div>
+    <div class="step-title">Pandas — 处理传感器 CSV 数据</div>
+    <div class="step-eta">2 小时</div>
+  </div>
+  <div class="step-body">
+    <p>实际项目里，传感器数据往往是 CSV 文件，Pandas 是处理它的利器：</p>
+    <pre><code>import pandas as pd
+import numpy as np
+
+# 模拟 IMU 传感器数据（实际从文件读取：pd.read_csv('sensor_data.csv')）
+np.random.seed(42)
+n = 1000
+data = pd.DataFrame({
+    'timestamp': np.arange(n) * 0.01,  # 100Hz，每隔 10ms
+    'acc_x': np.random.randn(n) * 0.5 + np.sin(np.arange(n)*0.1),
+    'acc_y': np.random.randn(n) * 0.5,
+    'acc_z': np.random.randn(n) * 0.5 + 9.8,  # 重力分量
+    'label': np.repeat(['idle', 'walking', 'running'], [400, 300, 300])
+})
+
+# 基本查看
+print(data.head())         # 前 5 行
+print(data.describe())     # 统计摘要
+print(data['label'].value_counts())  # 每类样本数
+
+# 数据清洗
+data_clean = data.dropna()           # 删除缺失值行
+data_clean = data_clean[data_clean['acc_x'].abs() < 10]  # 去掉异常值
+
+# 滑动窗口特征提取（关键！传感器 ML 必用）
+window_size = 50  # 50个采样点 = 500ms（100Hz）
+
+def extract_features(window):
+    """从一个窗口提取统计特征"""
+    features = {}
+    for col in ['acc_x', 'acc_y', 'acc_z']:
+        features[f'{col}_mean'] = window[col].mean()
+        features[f'{col}_std']  = window[col].std()
+        features[f'{col}_max']  = window[col].max()
+        features[f'{col}_min']  = window[col].min()
+    return pd.Series(features)
+
+# 对每个窗口提取特征
+feature_list = []
+labels = []
+for i in range(0, len(data_clean) - window_size, window_size // 2):  # 50% overlap
+    window = data_clean.iloc[i:i+window_size]
+    features = extract_features(window)
+    feature_list.append(features)
+    labels.append(window['label'].mode()[0])  # 该窗口的主要类别
+
+X = pd.DataFrame(feature_list)
+y = labels
+print(f"Features shape: {X.shape}")  # (n_windows, 12)</code></pre>
+    <div class="tip">
+      <div class="tip-lbl">💡 真实数据集</div>
+      <p>Kaggle 上有大量免费传感器数据集：搜索 <a href="https://www.kaggle.com/datasets?search=accelerometer" target="_blank">"accelerometer dataset"</a> 或 <a href="https://www.kaggle.com/datasets?search=imu+gesture" target="_blank">"IMU gesture"</a>，直接下载练习。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 5 -->
+<div class="step" id="s5">
+  <div class="step-hdr">
+    <div class="step-num">5</div>
+    <div class="step-title">第一个 sklearn ML Pipeline（Random Forest 分类）</div>
+    <div class="step-eta">1 小时</div>
+  </div>
+  <div class="step-body">
+    <p>用 Step 4 提取的特征，训练一个经典 ML 分类器：</p>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. 划分训练集和测试集
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y  # stratify 保证每类比例相同
+)
+
+# 2. 特征归一化（对 RF 不是必须，但对 SVM/NN 必须）
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)  # fit 只在训练集上！
+X_test_scaled  = scaler.transform(X_test)       # 测试集用训练集的参数
+
+# 3. 训练 Random Forest
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train_scaled, y_train)
+
+# 4. 评估
+y_pred = rf.predict(X_test_scaled)
+print(classification_report(y_test, y_pred))
+# 输出：precision, recall, f1-score for each class
+
+# 5. 画混淆矩阵
+cm = confusion_matrix(y_test, y_pred)
+plt.figure(figsize=(6, 5))
+sns.heatmap(cm, annot=True, fmt='d',
+            xticklabels=rf.classes_,
+            yticklabels=rf.classes_)
+plt.title('Confusion Matrix')
+plt.ylabel('True Label')
+plt.xlabel('Predicted Label')
+plt.show()
+
+# 6. 特征重要性（哪些特征最有用）
+feat_imp = pd.Series(rf.feature_importances_, index=X.columns)
+feat_imp.nlargest(8).plot(kind='barh')
+plt.title('Top 8 Important Features')
+plt.show()</code></pre>
+    <div class="tip">
+      <div class="tip-lbl">💡 为什么先学 Random Forest</div>
+      <p>RF 不需要归一化、不需要调太多超参数、天然处理非线性特征，而且能告诉你哪些特征重要（特征重要性）。非常适合传感器数据的第一个基线模型。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 6 -->
+<div class="step" id="s6">
+  <div class="step-hdr">
+    <div class="step-num">6</div>
+    <div class="step-title">PyTorch 第一个神经网络</div>
+    <div class="step-eta">2–3 小时</div>
+  </div>
+  <div class="step-body">
+    <p>先看 <a href="https://pytorch.org/tutorials/beginner/blitz/tensor_tutorial.html" target="_blank">PyTorch 官方 60-min Blitz</a>（免费），然后实现这个完整例子：</p>
+    <pre><code>import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, TensorDataset
+import numpy as np
+
+# 把 sklearn 的数据转成 PyTorch Tensor
+X_tensor = torch.FloatTensor(X_train_scaled)
+y_tensor  = torch.LongTensor([['idle','walking','running'].index(l) for l in y_train])
+
+dataset    = TensorDataset(X_tensor, y_tensor)
+dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+
+# 定义网络（2层全连接）
+class GestureNet(nn.Module):
+    def __init__(self, input_dim, num_classes):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(input_dim, 64),
+            nn.ReLU(),
+            nn.Dropout(0.3),       # Dropout 防过拟合
+            nn.Linear(64, 32),
+            nn.ReLU(),
+            nn.Linear(32, num_classes)
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+model     = GestureNet(input_dim=X_train_scaled.shape[1], num_classes=3)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+criterion = nn.CrossEntropyLoss()
+
+# 训练循环
+for epoch in range(50):
+    model.train()
+    total_loss = 0
+    for X_batch, y_batch in dataloader:
+        optimizer.zero_grad()           # 清空梯度
+        outputs = model(X_batch)        # 前向传播
+        loss = criterion(outputs, y_batch)
+        loss.backward()                 # 反向传播
+        optimizer.step()                # 更新参数
+        total_loss += loss.item()
+
+    if (epoch + 1) % 10 == 0:
+        print(f"Epoch {epoch+1}/50 | Loss: {total_loss/len(dataloader):.4f}")
+
+# 测试
+model.eval()
+with torch.no_grad():
+    X_test_tensor = torch.FloatTensor(X_test_scaled)
+    preds = model(X_test_tensor).argmax(dim=1).numpy()
+
+# 计算准确率
+acc = (preds == [['idle','walking','running'].index(l) for l in y_test]).mean()
+print(f"Test accuracy: {acc:.2%}")</code></pre>
+  </div>
+</div>
+
+<!-- STEP 7 -->
+<div class="step" id="s7">
+  <div class="step-hdr">
+    <div class="step-num">7</div>
+    <div class="step-title">在 Colab 启用免费 GPU</div>
+    <div class="step-eta">2 分钟</div>
+  </div>
+  <div class="step-body">
+    <ul>
+      <li>菜单栏 → <strong>Runtime</strong> → <strong>Change runtime type</strong></li>
+      <li>Hardware accelerator 选 <strong>T4 GPU</strong>（免费）</li>
+      <li>点击 <strong>Save</strong>，等待 notebook 重新连接</li>
+      <li>运行以下代码验证：</li>
+    </ul>
+    <pre><code>import torch
+print(torch.cuda.is_available())   # 应该输出 True
+print(torch.cuda.get_device_name(0))  # 应该看到 "Tesla T4"
+
+# 把模型和数据移到 GPU
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model = model.to(device)
+
+# 训练时也要把数据移到同一个 device
+X_batch = X_batch.to(device)
+y_batch = y_batch.to(device)</code></pre>
+    <div class="tip">
+      <div class="tip-lbl">💡 GPU 什么时候有用</div>
+      <p>对小型传感器数据（几千个样本），CPU 已经够快了。GPU 在训练 CNN/RNN 大型网络时才显著加速。先在 CPU 跑通，再切到 GPU 做更大实验。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 8 -->
+<div class="step" id="s8">
+  <div class="step-hdr">
+    <div class="step-num">8</div>
+    <div class="step-title">保存工作到 Google Drive</div>
+    <div class="step-eta">5 分钟</div>
+  </div>
+  <div class="step-body">
+    <p>Colab 运行时断开后，本地文件会丢失。把重要文件保存到 Google Drive：</p>
+    <pre><code>from google.colab import drive
+drive.mount('/content/drive')  # 会弹出授权
+
+# 保存模型到 Drive
+save_path = '/content/drive/MyDrive/ML_Projects/gesture_model.pth'
+torch.save(model.state_dict(), save_path)
+print(f"Model saved to {save_path}")
+
+# 下次加载
+model_loaded = GestureNet(input_dim=12, num_classes=3)
+model_loaded.load_state_dict(torch.load(save_path))
+model_loaded.eval()</code></pre>
+    <p>Notebook 本身自动保存在 Google Drive 的 <strong>"Colab Notebooks"</strong> 文件夹里。</p>
+    <div class="tip">
+      <div class="tip-lbl">💡 把 Notebook 放进 GitHub</div>
+      <p>File → Download → Download .ipynb，上传到 GitHub。GitHub 会直接渲染 .ipynb 文件，展示代码和输出。这是 ML portfolio 的标准展示方式。</p>
+    </div>
+  </div>
+</div>
+
+<div class="resources">
+  <h3>📚 相关资源（全部免费）</h3>
+  <div class="res-item">
+    <span>Google Colab <span class="badge free">免费 GPU</span></span>
+    <a href="https://colab.research.google.com" target="_blank">colab.research.google.com →</a>
+  </div>
+  <div class="res-item">
+    <span>PyTorch 官方 60-min Blitz <span class="badge free">免费</span></span>
+    <a href="https://pytorch.org/tutorials/beginner/blitz/tensor_tutorial.html" target="_blank">pytorch.org/tutorials →</a>
+  </div>
+  <div class="res-item">
+    <span>Andrej Karpathy: Zero to Hero 系列 <span class="badge free">免费</span></span>
+    <a href="https://www.youtube.com/@AndrejKarpathy" target="_blank">YouTube @AndrejKarpathy →</a>
+  </div>
+  <div class="res-item">
+    <span>fast.ai Practical Deep Learning <span class="badge free">免费</span></span>
+    <a href="https://course.fast.ai" target="_blank">course.fast.ai →</a>
+  </div>
+  <div class="res-item">
+    <span>Andrew Ng ML Specialization（audit 免费）<span class="badge free">免费 audit</span></span>
+    <a href="https://www.coursera.org/specializations/machine-learning-introduction" target="_blank">coursera.org →</a>
+  </div>
+  <div class="res-item">
+    <span>3Blue1Brown 线性代数系列 <span class="badge free">免费</span></span>
+    <a href="https://www.3blue1brown.com/topics/linear-algebra" target="_blank">3blue1brown.com →</a>
+  </div>
+  <div class="res-item">
+    <span>StatQuest（统计 + ML 可视化）<span class="badge free">免费</span></span>
+    <a href="https://www.youtube.com/@statquest" target="_blank">YouTube @statquest →</a>
+  </div>
+  <div class="res-item">
+    <span>Kaggle Datasets（免费传感器数据）<span class="badge free">免费</span></span>
+    <a href="https://www.kaggle.com/datasets" target="_blank">kaggle.com/datasets →</a>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

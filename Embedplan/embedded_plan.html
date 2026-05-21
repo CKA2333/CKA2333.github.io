@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Embedded + TinyML 备战计划 | Qifeng Yang</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#252836;--border:#2d3148;--primary:#6c63ff;--primary-light:#8b85ff;--success:#4ade80;--warning:#fbbf24;--danger:#f87171;--text:#e2e8f0;--muted:#94a3b8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+a{color:var(--primary-light);text-decoration:none;}a:hover{text-decoration:underline;}
+.header{background:linear-gradient(135deg,#6c63ff 0%,#a855f7 100%);padding:22px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+.header h1{font-size:1.4rem;font-weight:700;}
+.header p{font-size:.82rem;opacity:.85;margin-top:4px;}
+.stats-mini{display:flex;gap:24px;text-align:center;}
+.stat-item .num{font-size:1.7rem;font-weight:700;}
+.stat-item .label{font-size:.72rem;opacity:.8;}
+.overall-progress{background:var(--surface);padding:14px 32px;border-bottom:1px solid var(--border);}
+.prog-label{display:flex;justify-content:space-between;margin-bottom:6px;font-size:.82rem;color:var(--muted);}
+.prog-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--primary),#a855f7);border-radius:4px;transition:width .35s ease;}
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;overflow-x:auto;}
+.tab-btn{padding:13px 18px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:.88rem;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--primary-light);border-bottom-color:var(--primary);}
+.content{padding:28px 32px;max-width:1200px;margin:0 auto;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.phase-hdr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 24px;margin-bottom:20px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;}
+.phase-title{font-size:1.3rem;font-weight:700;color:var(--primary-light);}
+.phase-sub{color:var(--muted);margin-top:4px;font-size:.85rem;}
+.goal-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;}
+.goal-tag{background:rgba(108,99,255,.15);border:1px solid rgba(108,99,255,.3);color:var(--primary-light);padding:3px 11px;border-radius:20px;font-size:.77rem;}
+.goal-tag.ml{background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.3);color:#4ade80;}
+.guide-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(108,99,255,.2);border:1px solid rgba(108,99,255,.4);color:var(--primary-light);padding:4px 12px;border-radius:20px;font-size:.77rem;text-decoration:none;}
+.guide-btn:hover{background:rgba(108,99,255,.35);text-decoration:none;}
+.p-circle{text-align:center;min-width:72px;}
+.p-circle .big{font-size:1.9rem;font-weight:700;color:var(--primary-light);}
+.p-circle .sm{font-size:.68rem;color:var(--muted);}
+.week-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:18px;overflow:hidden;}
+.week-section.ml-section{border-color:rgba(74,222,128,.2);}
+.week-hdr{padding:14px 22px;background:var(--surface2);display:flex;justify-content:space-between;align-items:center;}
+.ml-section .week-hdr{background:rgba(74,222,128,.05);}
+.week-title{font-size:.95rem;font-weight:600;}
+.week-badge{font-size:.72rem;padding:3px 10px;border-radius:12px;background:rgba(108,99,255,.2);color:var(--primary-light);}
+.week-badge.ml{background:rgba(74,222,128,.15);color:#4ade80;}
+.week-body{padding:8px 22px 14px;}
+.plist{list-style:none;}
+.pitem{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.pitem:last-child{border-bottom:none;}
+.pitem input[type=checkbox]{width:17px;height:17px;cursor:pointer;accent-color:var(--primary);flex-shrink:0;}
+.pnum{color:var(--muted);font-size:.77rem;min-width:32px;font-family:monospace;}
+.pname{flex:1;font-size:.87rem;cursor:pointer;}
+.pitem.done .pname{text-decoration:line-through;color:var(--muted);}
+.diff{font-size:.7rem;padding:2px 7px;border-radius:10px;font-weight:600;}
+.easy{background:rgba(74,222,128,.15);color:#4ade80;}
+.medium{background:rgba(251,191,36,.15);color:#fbbf24;}
+.hard{background:rgba(248,113,113,.15);color:#f87171;}
+.retake-wrap{display:flex;align-items:center;gap:3px;margin-left:2px;}
+.retake-cb{accent-color:#fb923c;width:14px;height:14px;cursor:pointer;flex-shrink:0;}
+.retake-lbl{font-size:.67rem;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;}
+.pitem.retake{background:rgba(251,146,60,.06);}
+.pitem.retake .retake-lbl{color:#fb923c;}
+.hint-wrap{display:flex;align-items:center;gap:3px;margin-left:2px;}
+.hint-cb{accent-color:#60a5fa;width:14px;height:14px;cursor:pointer;flex-shrink:0;}
+.hint-lbl{font-size:.67rem;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;}
+.pitem.hinted{background:rgba(96,165,250,.06);}
+.pitem.hinted .hint-lbl{color:#60a5fa;}
+.dlist{list-style:none;}
+.ditem{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--border);}
+.ditem:last-child{border-bottom:none;}
+.ditem input{accent-color:var(--primary);margin-top:3px;flex-shrink:0;width:17px;height:17px;cursor:pointer;}
+.dname{font-size:.875rem;font-weight:500;}
+.ddesc{font-size:.78rem;color:var(--muted);margin-top:3px;}
+.ditem.done .dname{text-decoration:line-through;color:var(--muted);}
+.skills-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:18px;}
+.skills-section.ml-skills{border-color:rgba(74,222,128,.2);}
+.skills-title{font-size:.95rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.track-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.track-embed{background:var(--primary);}
+.track-ml{background:#4ade80;}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:9px;}
+.sitem{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:border-color .2s;}
+.sitem:hover{border-color:var(--primary);}
+.sitem.done{border-color:var(--success);}
+.sitem.done .sname{text-decoration:line-through;color:var(--muted);}
+.sitem input{accent-color:var(--success);flex-shrink:0;margin-top:2px;width:16px;height:16px;cursor:pointer;}
+.sname{font-size:.84rem;}
+.sdesc{font-size:.73rem;color:var(--muted);margin-top:2px;line-height:1.5;}
+.sdesc a{font-size:.73rem;}
+.concept-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.concept-hdr{padding:15px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--surface2);transition:background .15s;}
+.concept-hdr:hover{background:rgba(108,99,255,.1);}
+.concept-ttl{font-weight:600;font-size:.92rem;}
+.concept-tag{font-size:.72rem;padding:2px 9px;border-radius:10px;background:rgba(248,113,113,.15);color:var(--danger);}
+.concept-tag.high{background:rgba(251,191,36,.15);color:var(--warning);}
+.concept-tag.bonus{background:rgba(74,222,128,.15);color:var(--success);}
+.concept-body{padding:16px 20px;display:none;border-top:1px solid var(--border);}
+.concept-body.open{display:block;}
+.concept-body p{font-size:.85rem;line-height:1.75;color:var(--muted);margin-bottom:8px;}
+.concept-body ul{padding-left:18px;}
+.concept-body li{font-size:.85rem;line-height:1.75;color:var(--muted);margin-bottom:4px;}
+.concept-body code{background:var(--surface2);padding:1px 6px;border-radius:4px;font-family:'Courier New',monospace;font-size:.8rem;color:var(--primary-light);}
+.concept-body strong{color:var(--text);}
+.bonus-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;}
+.bonus-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.bonus-card-ttl{font-weight:700;font-size:.92rem;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.pbadge{font-size:.68rem;padding:2px 8px;border-radius:10px;}
+.p1{background:rgba(248,113,113,.2);color:var(--danger);}
+.p2{background:rgba(251,191,36,.2);color:var(--warning);}
+.p3{background:rgba(74,222,128,.2);color:var(--success);}
+.bonus-card p{font-size:.83rem;color:var(--muted);line-height:1.65;}
+.resource{margin-top:10px;font-size:.78rem;color:var(--primary-light);}
+.ml-divider{text-align:center;color:var(--muted);font-size:.78rem;margin:8px 0 16px;display:flex;align-items:center;gap:10px;}
+.ml-divider::before,.ml-divider::after{content:'';flex:1;border-top:1px solid var(--border);}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--surface);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:700px){.content{padding:16px;}.header{padding:16px;}.phase-hdr{grid-template-columns:1fr;}.tabs{padding:0 12px;}}
+
+/* ── AI Chat Widget ─────────────────────────────────────── */
+#ai-fab{position:fixed;bottom:24px;right:24px;z-index:9999;background:linear-gradient(135deg,#6c63ff,#a855f7);border:none;border-radius:50px;padding:12px 20px;color:#fff;font-size:.88rem;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(108,99,255,.45);display:flex;align-items:center;gap:7px;transition:transform .15s,box-shadow .15s;}
+#ai-fab:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(108,99,255,.55);}
+#ai-panel{position:fixed;bottom:80px;right:24px;z-index:9998;width:360px;max-width:calc(100vw - 48px);background:var(--surface);border:1px solid var(--border);border-radius:16px;display:none;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden;}
+#ai-panel.open{display:flex;}
+#ai-phead{background:linear-gradient(135deg,#6c63ff,#a855f7);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;}
+#ai-phead span{font-size:.9rem;font-weight:700;color:#fff;}
+#ai-phead button{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center;}
+#ai-phead button:hover{background:rgba(255,255,255,.35);}
+#ai-key-area{padding:14px 16px;border-bottom:1px solid var(--border);display:none;flex-direction:column;gap:8px;}
+#ai-key-area.show{display:flex;}
+#ai-key-area label{font-size:.75rem;color:var(--muted);}
+#ai-key-area input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.82rem;outline:none;}
+#ai-key-area input:focus{border-color:var(--primary);}
+#ai-key-area .key-row{display:flex;gap:8px;}
+#ai-key-area .key-row button{flex:1;background:var(--primary);border:none;color:#fff;border-radius:8px;padding:7px;cursor:pointer;font-size:.82rem;}
+#ai-key-area .key-row button.clear{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+#ai-msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:200px;max-height:360px;}
+.ai-msg{max-width:92%;padding:9px 13px;border-radius:12px;font-size:.82rem;line-height:1.6;word-break:break-word;}
+.ai-msg.user{align-self:flex-end;background:rgba(108,99,255,.25);border-bottom-right-radius:3px;}
+.ai-msg.bot{align-self:flex-start;background:var(--surface2);border-bottom-left-radius:3px;white-space:pre-wrap;}
+.ai-msg.bot code{background:var(--bg);padding:1px 5px;border-radius:4px;font-size:.78rem;color:var(--primary-light);}
+.ai-msg.thinking{color:var(--muted);font-style:italic;}
+#ai-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);}
+#ai-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:8px 11px;color:var(--text);font-size:.83rem;outline:none;resize:none;font-family:inherit;}
+#ai-input:focus{border-color:var(--primary);}
+#ai-send{background:var(--primary);border:none;color:#fff;border-radius:10px;padding:8px 14px;cursor:pointer;font-size:.82rem;white-space:nowrap;}
+#ai-send:disabled{opacity:.45;cursor:default;}
+#ai-model-row{padding:6px 14px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border);}
+#ai-model-row label{font-size:.7rem;color:var(--muted);}
+#ai-model-sel{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:3px 6px;font-size:.7rem;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>⚡ Embedded + TinyML 备战计划</h1>
+    <p>Qifeng Yang · UW ECE BS Jun 2026 · Target: Nordic · TI · Apple Sensing · STMicro · Medical Startups</p>
+  </div>
+  <div class="stats-mini">
+    <div class="stat-item"><div class="num" id="total-done">0</div><div class="label">已完成</div></div>
+    <div class="stat-item"><div class="num" id="total-all">101</div><div class="label">总任务</div></div>
+    <div class="stat-item"><div class="num" id="streak">0</div><div class="label">连续打卡天</div></div>
+  </div>
+</div>
+
+<div class="overall-progress">
+  <div class="prog-label"><span>总体完成度（LeetCode + ML Coding 101 道）</span><span id="prog-pct">0%</span></div>
+  <div class="prog-track"><div class="prog-fill" id="prog-bar" style="width:0%"></div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('m1',this)">📐 Phase 1</button>
+  <button class="tab-btn" onclick="switchTab('m2',this)">⚙️ Phase 2</button>
+  <button class="tab-btn" onclick="switchTab('m3',this)">🧠 Phase 3</button>
+  <button class="tab-btn" onclick="switchTab('m4',this)">🚀 Phase 4</button>
+  <button class="tab-btn" onclick="switchTab('interview',this)">🎯 Interview Prep</button>
+  <button class="tab-btn" onclick="switchTab('bonus',this)">⭐ Bonus Skills</button>
+</div>
+
+<div class="content">
+
+<!-- ========== PHASE 1 ========== -->
+<div id="tab-m1" class="tab-panel active">
+  <div class="phase-hdr">
+    <div>
+      <div class="phase-title">Phase 1 — C++ 基础 + Python ML 入门（并行）</div>
+      <div class="phase-sub">建立现代 C++ 认知 · 打通位操作直觉 · 完成工具链配置 · 每天 1h 学 Python ML</div>
+      <div class="goal-row">
+        <a href="guide_platformio.html" class="guide-btn">⚙️ PlatformIO 安装指南</a>
+        <a href="guide_python_ml.html" class="guide-btn">🤖 Python ML 入门指南</a>
+        <span class="goal-tag">learncpp.com Ch9/11/12</span>
+        <span class="goal-tag ml">Andrew Ng ML Course 1–2</span>
+        <span class="goal-tag ml">Google Colab 免费 GPU</span>
+      </div>
+    </div>
+    <div class="p-circle"><div class="big" id="m1-done">0</div><div class="sm">/ 36 完成</div></div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-hdr">
+      <span class="week-title">Week 1–2 · Bit Manipulation（位操作）— 嵌入式寄存器必备</span>
+      <span class="week-badge" id="wb1">0 / 15</span>
+    </div>
+    <div class="week-body"><ul class="plist" id="list-bit"></ul></div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-hdr">
+      <span class="week-title">Week 3–4 · 数组 & 双指针（Array & Two Pointers）</span>
+      <span class="week-badge" id="wb2">0 / 16</span>
+    </div>
+    <div class="week-body"><ul class="plist" id="list-arr"></ul></div>
+  </div>
+
+  <div class="week-section ml-section">
+    <div class="week-hdr">
+      <span class="week-title">🤖 ML Coding 0 — NumPy 基础实现（手写 = 真懂）</span>
+      <span class="week-badge ml" id="wb-ml0">0 / 5</span>
+    </div>
+    <div class="week-body"><ul class="plist" id="list-ml0"></ul></div>
+  </div>
+
+  <div class="skills-section">
+    <div class="skills-title"><span class="track-dot track-embed"></span>⚙️ Embedded 学习目标</div>
+    <div class="skills-grid" id="sg1"></div>
+  </div>
+
+  <div class="skills-section ml-skills">
+    <div class="skills-title"><span class="track-dot track-ml"></span>🤖 ML 并行学习（每天约 1 小时）</div>
+    <div class="skills-grid" id="sg-ml0"></div>
+  </div>
+</div>
+
+<!-- ========== PHASE 2 ========== -->
+<div id="tab-m2" class="tab-panel">
+  <div class="phase-hdr">
+    <div>
+      <div class="phase-title">Phase 2 — FreeRTOS 多任务 + 深度学习入门（并行）</div>
+      <div class="phase-sub">从底层理解任务调度 · 完成第一个真实多任务嵌入式项目 · PyTorch 第一个神经网络</div>
+      <div class="goal-row">
+        <a href="guide_freertos.html" class="guide-btn">⚙️ FreeRTOS 实战指南</a>
+        <a href="guide_python_ml.html" class="guide-btn">🤖 PyTorch 入门指南</a>
+        <span class="goal-tag"><a href="https://www.freertos.org/Documentation/RTOS_book.html" target="_blank" style="color:inherit">Mastering FreeRTOS 免费 PDF</a></span>
+        <span class="goal-tag ml"><a href="https://course.fast.ai" target="_blank" style="color:inherit">fast.ai Part 1</a></span>
+        <span class="goal-tag ml"><a href="https://www.youtube.com/@AndrejKarpathy" target="_blank" style="color:inherit">Karpathy Zero to Hero</a></span>
+      </div>
+    </div>
+    <div class="p-circle"><div class="big" id="m2-done">0</div><div class="sm">/ 25 完成</div></div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-hdr">
+      <span class="week-title">Week 1–2 · 链表（Linked List）</span>
+      <span class="week-badge" id="wb3">0 / 11</span>
+    </div>
+    <div class="week-body"><ul class="plist" id="list-link"></ul></div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-hdr">
+      <span class="week-title">Week 3–4 · 栈 & 队列（Stack & Queue）</span>
+      <span class="week-badge" id="wb4">0 / 9</span>
+    </div>
+    <div class="week-body"><ul class="plist" id="list-stk"></ul></div>
+  </div>
+
+  <div class="week-section ml-section">
+    <div class="week-hdr">
+      <span class="week-title">🤖 ML Coding 1 — PyTorch & 反向传播手写（面试必考）</span>
+      <span class="week-badge ml" id="wb-ml1">0 / 5</span>
+    </div>
+    <div class="week-body"><ul class="plist" id="list-ml1"></ul></div>
+  </div>
+
+  <div class="skills-section">
+    <div class="skills-title"><span class="track-dot track-embed"></span>⚙️ Embedded 学习目标</div>
+    <div class="skills-grid" id="sg2"></div>
+  </div>
+
+  <div class="skills-section ml-skills">
+    <div class="skills-title"><span class="track-dot track-ml"></span>🤖 ML 并行学习（每天约 1 小时）</div>
+    <div class="skills-grid" id="sg-ml1"></div>
+  </div>
+</div>
+
+<!-- ========== PHASE 3 ========== -->
+<div id="tab-m3" class="tab-panel">
+  <div class="phase-hdr">
+    <div>
+      <div class="phase-title">Phase 3 — TinyML 专项 + BLE 开发（Embedded & ML 正式合并）</div>
+      <div class="phase-sub">进入 TinyML 核心 · 掌握 BLE 开发生态 · 训练→压缩→MCU部署完整闭环</div>
+      <div class="goal-row">
+        <a href="guide_tinyml.html" class="guide-btn">🧠 TinyML 完整指南</a>
+        <span class="goal-tag"><a href="https://studio.edgeimpulse.com/signup" target="_blank" style="color:inherit">Edge Impulse 免费账户</a></span>
+        <span class="goal-tag"><a href="https://academy.nordicsemi.com" target="_blank" style="color:inherit">Nordic DevAcademy</a></span>
+        <span class="goal-tag ml"><a href="https://www.edx.org/professional-certificate/harvardx-tiny-machine-learning" target="_blank" style="color:inherit">HarvardX TinyML edX</a></span>
+        <span class="goal-tag ml">int8 量化实操</span>
+      </div>
+    </div>
+    <div class="p-circle"><div class="big" id="m3-done">0</div><div class="sm">/ 25 完成</div></div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-hdr">
+      <span class="week-title">Week 1–2 · 二分查找 & 哈希表</span>
+      <span class="week-badge" id="wb5">0 / 11</span>
+    </div>
+    <div class="week-body"><ul class="plist" id="list-bin"></ul></div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-hdr">
+      <span class="week-title">Week 3–4 · 树（Tree）</span>
+      <span class="week-badge" id="wb6">0 / 9</span>
+    </div>
+    <div class="week-body"><ul class="plist" id="list-tree"></ul></div>
+  </div>
+
+  <div class="week-section ml-section">
+    <div class="week-hdr">
+      <span class="week-title">🧠 TinyML Coding — int8 量化 + MCU 推理实现（核心差异化）</span>
+      <span class="week-badge ml" id="wb-ml2">0 / 5</span>
+    </div>
+    <div class="week-body"><ul class="plist" id="list-ml2"></ul></div>
+  </div>
+
+  <div class="skills-section">
+    <div class="skills-title"><span class="track-dot track-embed"></span>⚙️ Embedded 学习目标</div>
+    <div class="skills-grid" id="sg3"></div>
+  </div>
+
+  <div class="skills-section ml-skills">
+    <div class="skills-title"><span class="track-dot track-ml"></span>🧠 TinyML 技能（Phase 3 Embedded + ML 合并）</div>
+    <div class="skills-grid" id="sg-ml2"></div>
+  </div>
+</div>
+
+<!-- ========== PHASE 4 ========== -->
+<div id="tab-m4" class="tab-panel">
+  <div class="phase-hdr">
+    <div>
+      <div class="phase-title">Phase 4 — PCB + GitHub Portfolio + 开始投递</div>
+      <div class="phase-sub">打磨作品集 · 更新简历关键词 · 冲刺面试 · 开始系统投递</div>
+      <div class="goal-row">
+        <span class="goal-tag"><a href="https://www.kicad.org" target="_blank" style="color:inherit">KiCad 免费 PCB 软件</a></span>
+        <span class="goal-tag"><a href="https://easyeda.com" target="_blank" style="color:inherit">EasyEDA（在线，免费）</a></span>
+        <span class="goal-tag ml"><a href="https://wandb.ai" target="_blank" style="color:inherit">W&B 实验跟踪（免费）</a></span>
+        <span class="goal-tag ml"><a href="https://www.kaggle.com" target="_blank" style="color:inherit">Kaggle 比赛</a></span>
+      </div>
+    </div>
+    <div class="p-circle"><div class="big" id="m4-done">0</div><div class="sm">/ 15 完成</div></div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-hdr">
+      <span class="week-title">综合 & 嵌入式特色题</span>
+      <span class="week-badge" id="wb7">0 / 10</span>
+    </div>
+    <div class="week-body"><ul class="plist" id="list-misc"></ul></div>
+  </div>
+
+  <div class="week-section">
+    <div class="week-hdr">
+      <span class="week-title">Bonus: 口头系统设计题</span>
+      <span class="week-badge" id="wb8">0 / 5</span>
+    </div>
+    <div class="week-body"><ul class="dlist" id="list-design"></ul></div>
+  </div>
+
+  <div class="skills-section">
+    <div class="skills-title"><span class="track-dot track-embed"></span>⚙️ Phase 4 冲刺目标</div>
+    <div class="skills-grid" id="sg4"></div>
+  </div>
+
+  <div class="skills-section ml-skills">
+    <div class="skills-title"><span class="track-dot track-ml"></span>🤖 MLE Portfolio 冲刺</div>
+    <div class="skills-grid" id="sg-ml3"></div>
+  </div>
+</div>
+
+<!-- ========== INTERVIEW PREP ========== -->
+<div id="tab-interview" class="tab-panel">
+  <h2 style="font-size:1.25rem;margin-bottom:6px;color:var(--primary-light)">🎯 嵌入式面试必考概念</h2>
+  <p style="color:var(--muted);font-size:.83rem;margin-bottom:20px">点击展开每道题的答案要点 · 能流利口述即为掌握</p>
+  <div id="interview-concepts"></div>
+  <h2 style="font-size:1.1rem;margin:28px 0 6px;color:#a3e635">🤖 ML / TinyML 面试必考概念</h2>
+  <p style="color:var(--muted);font-size:.83rem;margin-bottom:20px">MLE + Embedded ML 岗位专项 · 结合你的 wearable 背景作答</p>
+  <div id="ml-interview-concepts"></div>
+</div>
+
+<!-- ========== BONUS SKILLS ========== -->
+<div id="tab-bonus" class="tab-panel">
+  <h2 style="font-size:1.25rem;margin-bottom:6px;color:var(--primary-light)">⭐ 原计划未提及的加分技能</h2>
+  <p style="color:var(--muted);font-size:.83rem;margin-bottom:22px">对 Nordic / TI / Apple Sensing 等岗位有显著差异化竞争力 · 按优先级排列</p>
+  <div class="bonus-grid" id="bonus-grid"></div>
+</div>
+
+</div><!-- content -->
+
+<script>
+// ================================================================
+// PROBLEMS DATA
+// ================================================================
+const problems = {
+  bit:[
+    {id:231,n:"Power of Two",d:"easy"},{id:191,n:"Number of 1 Bits (Hamming Weight)",d:"easy"},
+    {id:190,n:"Reverse Bits",d:"easy"},{id:461,n:"Hamming Distance",d:"easy"},
+    {id:136,n:"Single Number",d:"easy"},{id:338,n:"Counting Bits",d:"easy"},
+    {id:342,n:"Power of Four",d:"easy"},{id:67,n:"Add Binary",d:"easy"},
+    {id:371,n:"Sum of Two Integers (no + operator)",d:"medium"},{id:137,n:"Single Number II",d:"medium"},
+    {id:260,n:"Single Number III",d:"medium"},{id:201,n:"Bitwise AND of Numbers Range",d:"medium"},
+    {id:89,n:"Gray Code",d:"medium"},{id:78,n:"Subsets (bitmask 做法)",d:"medium"},
+    {id:393,n:"UTF-8 Validation",d:"medium"},
+  ],
+  arr:[
+    {id:1,n:"Two Sum",d:"easy"},{id:26,n:"Remove Duplicates from Sorted Array",d:"easy"},
+    {id:27,n:"Remove Element",d:"easy"},{id:283,n:"Move Zeroes",d:"easy"},
+    {id:485,n:"Max Consecutive Ones",d:"easy"},{id:88,n:"Merge Sorted Array",d:"easy"},
+    {id:121,n:"Best Time to Buy and Sell Stock",d:"easy"},{id:189,n:"Rotate Array",d:"medium"},
+    {id:53,n:"Maximum Subarray",d:"medium"},{id:238,n:"Product of Array Except Self",d:"medium"},
+    {id:167,n:"Two Sum II",d:"medium"},{id:11,n:"Container With Most Water",d:"medium"},
+    {id:15,n:"3Sum",d:"medium"},{id:209,n:"Minimum Size Subarray Sum",d:"medium"},
+    {id:3,n:"Longest Substring Without Repeating Characters",d:"medium"},
+    {id:438,n:"Find All Anagrams in a String",d:"medium"},
+  ],
+  link:[
+    {id:206,n:"Reverse Linked List",d:"easy"},{id:21,n:"Merge Two Sorted Lists",d:"easy"},
+    {id:83,n:"Remove Duplicates from Sorted List",d:"easy"},{id:203,n:"Remove Linked List Elements",d:"easy"},
+    {id:876,n:"Middle of the Linked List",d:"easy"},{id:141,n:"Linked List Cycle",d:"easy"},
+    {id:160,n:"Intersection of Two Linked Lists",d:"easy"},{id:234,n:"Palindrome Linked List",d:"easy"},
+    {id:142,n:"Linked List Cycle II",d:"medium"},{id:92,n:"Reverse Linked List II",d:"medium"},
+    {id:19,n:"Remove Nth Node From End of List",d:"medium"},
+  ],
+  stk:[
+    {id:20,n:"Valid Parentheses",d:"easy"},{id:232,n:"Implement Queue using Stacks",d:"easy"},
+    {id:225,n:"Implement Stack using Queues",d:"easy"},{id:496,n:"Next Greater Element I",d:"easy"},
+    {id:155,n:"Min Stack",d:"medium"},{id:739,n:"Daily Temperatures",d:"medium"},
+    {id:503,n:"Next Greater Element II",d:"medium"},{id:150,n:"Evaluate Reverse Polish Notation",d:"medium"},
+    {id:394,n:"Decode String",d:"medium"},
+  ],
+  bin:[
+    {id:704,n:"Binary Search",d:"easy"},{id:35,n:"Search Insert Position",d:"easy"},
+    {id:217,n:"Contains Duplicate",d:"easy"},{id:242,n:"Valid Anagram",d:"easy"},
+    {id:383,n:"Ransom Note",d:"easy"},{id:34,n:"Find First and Last Position in Sorted Array",d:"medium"},
+    {id:162,n:"Find Peak Element",d:"medium"},{id:33,n:"Search in Rotated Sorted Array",d:"medium"},
+    {id:153,n:"Find Minimum in Rotated Sorted Array",d:"medium"},
+    {id:347,n:"Top K Frequent Elements",d:"medium"},{id:49,n:"Group Anagrams",d:"medium"},
+  ],
+  tree:[
+    {id:104,n:"Maximum Depth of Binary Tree",d:"easy"},{id:226,n:"Invert Binary Tree",d:"easy"},
+    {id:112,n:"Path Sum",d:"easy"},{id:94,n:"Binary Tree Inorder Traversal",d:"easy"},
+    {id:144,n:"Binary Tree Preorder Traversal",d:"easy"},{id:543,n:"Diameter of Binary Tree",d:"easy"},
+    {id:102,n:"Binary Tree Level Order Traversal",d:"medium"},
+    {id:235,n:"Lowest Common Ancestor of a BST",d:"medium"},
+    {id:98,n:"Validate Binary Search Tree",d:"medium"},
+  ],
+  misc:[
+    {id:7,n:"Reverse Integer",d:"medium"},{id:9,n:"Palindrome Number",d:"easy"},
+    {id:69,n:"Sqrt(x)",d:"easy"},{id:50,n:"Pow(x, n)",d:"medium"},
+    {id:29,n:"Divide Two Integers",d:"medium"},{id:289,n:"Game of Life",d:"medium"},
+    {id:54,n:"Spiral Matrix",d:"medium"},{id:56,n:"Merge Intervals",d:"medium"},
+    {id:57,n:"Insert Interval",d:"medium"},{id:435,n:"Non-overlapping Intervals",d:"medium"},
+  ],
+};
+
+const designs=[
+  {id:"d1",n:"线程安全的环形缓冲区（Ring Buffer）",desc:"volatile、内存屏障、mutex 保护临界区，ISR 生产者 + Task 消费者"},
+  {id:"d2",n:"简单任务调度器（Task Scheduler）",desc:"轮转调度、优先级调度、时间片实现，能画状态机图"},
+  {id:"d3",n:"BLE 数据发送协议（带 ACK 和超时重传）",desc:"状态机设计、序列号管理、超时重传机制"},
+  {id:"d4",n:"多传感器数据融合管线",desc:"采样率不同时如何同步、时间戳对齐、缓冲区设计"},
+  {id:"d5",n:"OTA 固件更新流程",desc:"断点续传、双 bank 设计、CRC 校验、防砖机制（fallback）"},
+];
+
+// ================================================================
+// ML CODING PROBLEMS
+// ================================================================
+const mlProbs = {
+  ml0:[
+    {id:1,n:"实现 sigmoid / ReLU / Leaky ReLU（纯 NumPy）",d:"easy"},
+    {id:2,n:"矩阵乘法 A@B — 理解 broadcasting 规则",d:"easy"},
+    {id:3,n:"Z-score 归一化 + Min-Max 归一化 from scratch",d:"easy"},
+    {id:4,n:"1D 滑动窗口特征提取（mean / std / max / FFT 峰值）",d:"medium"},
+    {id:5,n:"DataFrame 数据清洗：缺失值 / 异常值 / 类别编码",d:"medium"},
+  ],
+  ml1:[
+    {id:1,n:"纯 NumPy 实现 2层 MLP 前向 + 反向传播",d:"hard"},
+    {id:2,n:"Cross-Entropy Loss + 梯度推导（手算验证）",d:"medium"},
+    {id:3,n:"K-Means 聚类 from scratch（随机初始化 + 迭代）",d:"medium"},
+    {id:4,n:"混淆矩阵 + Precision / Recall / F1 计算函数",d:"easy"},
+    {id:5,n:"K-Fold 交叉验证 + 分层 Train/Val/Test 切分",d:"medium"},
+  ],
+  ml2:[
+    {id:1,n:"INT8 量化：scale + zero_point 计算 + 反量化误差分析",d:"hard"},
+    {id:2,n:"1D 卷积 from scratch（不用 PyTorch，手写循环）",d:"medium"},
+    {id:3,n:"Softmax + Temperature Scaling 实现与可视化",d:"easy"},
+    {id:4,n:"模型内存估算：参数量 × 字节数 → MCU 能否放下",d:"medium"},
+    {id:5,n:"Depthwise Separable Conv — 手算参数量对比标准 Conv",d:"medium"},
+  ],
+};
+
+// ================================================================
+// SKILLS DATA (with links)
+// ================================================================
+const skills = {
+  // Phase 1 — Embedded
+  s1:[
+    {id:"s1a",n:"安装 VS Code + PlatformIO 扩展",desc:'替代 Arduino IDE，项目结构更专业 · <a href="guide_platformio.html">→ 详细安装指南</a>'},
+    {id:"s1b",n:"learncpp.com Ch9: 错误处理与调试",desc:'assert, static_assert, exception basics · <a href="https://www.learncpp.com/cpp-tutorial/the-exception-hierarchy/" target="_blank">learncpp.com →</a>'},
+    {id:"s1c",n:"learncpp.com Ch11: 函数模板基础",desc:'template&lt;typename T&gt; · <a href="https://www.learncpp.com/cpp-tutorial/function-templates/" target="_blank">learncpp.com →</a>'},
+    {id:"s1d",n:"learncpp.com Ch12: 引用与 move 语义",desc:'const ref vs value pass · <a href="https://www.learncpp.com/cpp-tutorial/references/" target="_blank">learncpp.com →</a>'},
+    {id:"s1e",n:"理解 const / volatile / constexpr 区别",desc:'volatile 在 ISR 和 memory-mapped 寄存器中是必须的'},
+    {id:"s1f",n:"RAII 模式 + std::array vs std::vector",desc:'嵌入式避免动态内存分配，用 std::array 代替'},
+    {id:"s1g",n:"编译第一个 PlatformIO ESP32 项目",desc:'串口 Hello World + LED 闪烁 · <a href="guide_platformio.html">→ 查看指南 Step 7</a>'},
+    {id:"s1h",n:"阅读自动生成的 CMakeLists.txt",desc:'理解 include_directories, target_link_libraries 含义'},
+  ],
+  // Phase 1 — ML Parallel
+  s1m:[
+    {id:"s1ma",n:"Google Colab 快速上手（无需安装）",desc:'<a href="guide_python_ml.html">→ 完整入门指南</a> · <a href="https://colab.research.google.com" target="_blank">打开 Colab →</a>'},
+    {id:"s1mb",n:"NumPy + Pandas + Matplotlib 入门",desc:'<a href="https://numpy.org/doc/stable/user/quickstart.html" target="_blank">NumPy Quickstart →</a> · <a href="guide_python_ml.html">本地指南 →</a>'},
+    {id:"s1mc",n:"3Blue1Brown《线性代数的本质》全系列",desc:'15集，重点：矩阵变换、特征值、点积几何意义 · <a href="https://www.3blue1brown.com/topics/linear-algebra" target="_blank">3blue1brown.com →</a>'},
+    {id:"s1md",n:"StatQuest ML Fundamentals 系列",desc:'覆盖统计 + ML 基础，讲解极清晰 · <a href="https://www.youtube.com/@statquest" target="_blank">YouTube @statquest →</a>'},
+    {id:"s1me",n:"Andrew Ng ML Specialization Course 1–2（audit 免费）",desc:'线性回归→神经网络→决策树 · <a href="https://www.coursera.org/specializations/machine-learning-introduction" target="_blank">Coursera →</a>'},
+  ],
+  // Phase 2 — Embedded
+  s2:[
+    {id:"s2a",n:"《Mastering FreeRTOS》Ch1-3: Heap 管理（免费 PDF）",desc:'heap_1~heap_5 区别 · <a href="https://www.freertos.org/Documentation/RTOS_book.html" target="_blank">免费下载 PDF →</a> · <a href="guide_freertos.html">→ 实战指南</a>'},
+    {id:"s2b",n:"FreeRTOS Ch4-6: Task 生命周期与优先级",desc:'xTaskCreate, vTaskDelete, 优先级数字越大越高 · <a href="guide_freertos.html">→ Step 3</a>'},
+    {id:"s2c",n:"FreeRTOS Ch7-8: Queue 跨任务通信",desc:'xQueueCreate, xQueueSend, xQueueReceive · <a href="guide_freertos.html">→ Step 4</a>'},
+    {id:"s2d",n:"FreeRTOS Ch9: Interrupt — FromISR 系列",desc:'ISR 中只能用 FromISR 函数，portYIELD_FROM_ISR · <a href="guide_freertos.html">→ Step 6</a>'},
+    {id:"s2e",n:"FreeRTOS Ch10: Mutex vs Binary Semaphore",desc:'Mutex 有所有权+优先级继承，Semaphore 没有 · <a href="guide_freertos.html">→ Step 5</a>'},
+    {id:"s2f",n:"Shawn Hymel FreeRTOS 视频系列（约 10 集）",desc:'配合书看效果极好 · <a href="https://www.youtube.com/playlist?list=PLEBQazB0HUyQ4hAPU1cJED6t3DU0h34bz" target="_blank">YouTube Playlist →</a>'},
+    {id:"s2g",n:"完成 ESP32 多任务项目（ADC→Queue→Print）",desc:'Task A 读 ADC，Queue 传给 Task B 打印 · <a href="guide_freertos.html">→ Step 7</a>'},
+    {id:"s2h",n:"理解 Stack Overflow 检测与 watermark",desc:'uxTaskGetStackHighWaterMark() 用法 · <a href="guide_freertos.html">→ Step 8</a>'},
+  ],
+  // Phase 2 — ML Parallel
+  s2m:[
+    {id:"s2ma",n:"PyTorch 官方 60-min Blitz",desc:'Tensor → autograd → nn.Module → training loop · <a href="https://pytorch.org/tutorials/beginner/blitz/tensor_tutorial.html" target="_blank">pytorch.org →</a>'},
+    {id:"s2mb",n:"Karpathy《Neural Networks: Zero to Hero》系列",desc:'从 micrograd 到 GPT，最佳 DL 入门 · <a href="https://www.youtube.com/@AndrejKarpathy" target="_blank">YouTube →</a>'},
+    {id:"s2mc",n:"fast.ai Practical Deep Learning Part 1（8课，免费）",desc:'侧重实战，2 周刷完；CNN/ResNet/Transfer Learning · <a href="https://course.fast.ai" target="_blank">course.fast.ai →</a>'},
+    {id:"s2md",n:"手写 LeNet-5 on MNIST（纯 PyTorch）",desc:'独立写出 Conv→Pool→FC→Softmax + 训练循环 + 评估 · <a href="guide_python_ml.html">→ 参考指南</a>'},
+    {id:"s2me",n:"传感器数据端到端项目（ECG / 加速度计）",desc:'特征提取→分类→评估→放上 GitHub · <a href="guide_python_ml.html">→ Step 4-5</a>'},
+  ],
+  // Phase 3 — Embedded (TinyML merged)
+  s3:[
+    {id:"s3a",n:"注册 Edge Impulse 免费账户",desc:'导入传感器数据，完成一个分类项目（1天出结果） · <a href="https://studio.edgeimpulse.com/signup" target="_blank">立即注册 →</a> · <a href="guide_tinyml.html">→ 详细指南</a>'},
+    {id:"s3b",n:"Edge Impulse: 数据采集→DSP特征→模型→部署",desc:'理解 DSP block vs ML block，导出 C++ library · <a href="guide_tinyml.html">→ Step 3-8</a>'},
+    {id:"s3c",n:"Nordic DevAcademy: nRF Connect Fundamentals（免费）",desc:'在线课程，BLE GATT/GAP/ATT 体系必备 · <a href="https://academy.nordicsemi.com" target="_blank">academy.nordicsemi.com →</a>'},
+    {id:"s3d",n:"Zephyr RTOS 入门（任意官方 BLE 例子）",desc:'devicetree, Kconfig, west build 构建系统 · <a href="https://docs.zephyrproject.org/latest/develop/getting_started/index.html" target="_blank">Zephyr Docs →</a>'},
+    {id:"s3e",n:"TFLite Micro: 在 MCU 上跑 Hello World 模型",desc:'interpreter, tensor arena 静态内存分配 · <a href="https://www.tensorflow.org/lite/microcontrollers/get_started_low_level" target="_blank">TF Docs →</a> · <a href="guide_tinyml.html">→ Step 9</a>'},
+    {id:"s3f",n:"理解 CMSIS-NN 与 CMSIS-DSP",desc:'ARM Cortex-M 推理/DSP加速库 · <a href="https://github.com/ARM-software/CMSIS-NN" target="_blank">GitHub →</a>'},
+    {id:"s3g",n:"能口头解释 BLE GATT/GAP/ATT 关系",desc:'Service, Characteristic, Notification/Indication'},
+    {id:"s3h",n:"GDB + OpenOCD 实际调试一次",desc:'设断点、查寄存器、看内存（ESP32 JTAG 也可）'},
+  ],
+  // Phase 3 — TinyML Skills
+  s3m:[
+    {id:"s3ma",n:"HarvardX TinyML 系列课程（edX，audit 免费）",desc:'Pete Warden 主讲，系统讲解 TinyML · <a href="https://www.edx.org/professional-certificate/harvardx-tiny-machine-learning" target="_blank">edX →</a>'},
+    {id:"s3mb",n:"TF Model Optimization Toolkit — 量化实操",desc:'训练后量化 vs QAT，int8 vs float32 精度对比 · <a href="guide_tinyml.html">→ Step 10</a>'},
+    {id:"s3mc",n:"PyTorch → ONNX → TFLite 完整转换链路",desc:'导出 .tflite 并用 TFLite runtime 验证精度 · <a href="guide_tinyml.html">→ Step 10</a>'},
+    {id:"s3md",n:"理解 MobileNetV2 / SqueezeNet 轻量化设计",desc:'Depthwise separable conv，手算参数量对比标准 Conv · <a href="guide_tinyml.html">→ Step 1</a>'},
+    {id:"s3me",n:"阅读 CMSIS-NN 文档 + 1 个 kernel 源码",desc:'int8 矩阵乘在 Cortex-M4 SIMD 上的加速原理 · <a href="https://github.com/ARM-software/CMSIS-NN" target="_blank">GitHub →</a>'},
+    {id:"s3mf",n:"Edge Impulse 完整项目（真实传感器数据）",desc:'硬件采集→DSP→模型→MCU 部署→GitHub README · <a href="guide_tinyml.html">→ 完整指南</a>'},
+  ],
+  // Phase 4 — Mixed
+  s4:[
+    {id:"s4a",n:"KiCad / EasyEDA: 完成一块原理图+布线（免费）",desc:'放到 GitHub，体现 PCB 能力 · <a href="https://www.kicad.org" target="_blank">KiCad →</a> · <a href="https://easyeda.com" target="_blank">EasyEDA →</a>'},
+    {id:"s4b",n:"GitHub 3 个核心项目 README 标准化",desc:'每个项目：背景/硬件框图/关键代码片段/演示 GIF'},
+    {id:"s4c",n:"简历嵌入式关键词优化",desc:'FreeRTOS, BLE, SPI/I2C/UART, DMA, low-power, TinyML'},
+    {id:"s4d",n:"准备 5 个 Behavioral Questions（STAR 格式）",desc:'debug故事 / 团队合作 / tradeoff决策 / 时间压力'},
+    {id:"s4e",n:"每周投递 ≥ 5 份（LinkedIn + 官网双渠道）",desc:'Nordic / TI / STMicro / Apple Sensing / 医疗设备 startup'},
+    {id:"s4f",n:"完成至少 1 次 mock interview（Pramp 免费）",desc:'<a href="https://www.pramp.com" target="_blank">pramp.com →</a> · <a href="https://interviewing.io" target="_blank">interviewing.io →</a>'},
+    {id:"s4g",n:"整理所有面试题答案成文档",desc:'volatile/mutex/priority inversion/DMA/low-power/量化 等'},
+    {id:"s4h",n:"LinkedIn profile 更新 + 开启 Open to Work",desc:'headline 写 Embedded Systems + TinyML Engineer'},
+  ],
+  // Phase 4 — MLE Portfolio
+  s4m:[
+    {id:"s4ma",n:"Weights & Biases 实验跟踪入门（免费 tier）",desc:'给任意 PyTorch 项目加 wandb.init + wandb.log · <a href="https://wandb.ai" target="_blank">wandb.ai →</a>'},
+    {id:"s4mb",n:"《Designing Machine Learning Systems》前 4 章",desc:'Chip Huyen 著；feature store / serving / data pipeline · <a href="https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/" target="_blank">O\'Reilly →</a>'},
+    {id:"s4mc",n:"Kaggle Getting Started 比赛 — 提交基线 + 1 次改进",desc:'选 tabular 类型；EDA + 基线模型 + 特征工程 · <a href="https://www.kaggle.com/competitions?sortBy=grouped&group=entered&page=1&pageSize=20&category=gettingStarted" target="_blank">Kaggle →</a>'},
+    {id:"s4md",n:"《Machine Learning Interviews》系统刷题",desc:'Susan Shu Chang 著，免费 PDF；MLE 面试题分类梳理'},
+    {id:"s4me",n:"完成 MLE Portfolio 项目：wearable + AI pipeline",desc:'采集→训练→压缩→MCU部署→GitHub README + GIF 演示'},
+  ],
+};
+
+// ================================================================
+// INTERVIEW CONCEPTS — EMBEDDED
+// ================================================================
+const concepts=[
+  {t:"volatile 关键字 — 为什么嵌入式必须懂",tag:"必考",tagClass:"",body:`<p><code>volatile</code> 告诉编译器：这个变量可能被"看不见的地方"修改，<strong>禁止缓存到寄存器，每次都要从内存读</strong>。</p><p><strong>两大使用场景：</strong></p><ul><li><strong>ISR 修改的全局变量：</strong>主循环用 <code>volatile uint8_t flag</code>，ISR 改它。不加 volatile，编译器以为 flag 永远不变，优化掉读操作，死循环。</li><li><strong>Memory-Mapped 寄存器：</strong><code>volatile uint32_t* const GPIO = (uint32_t*)0x40020000;</code> 每次写必须真正访问硬件，不能被优化掉。</li></ul><p><strong>注意：</strong>volatile ≠ 线程安全！多任务访问共享变量还是需要 mutex。</p>`},
+  {t:"Mutex vs Semaphore vs Critical Section",tag:"必考",tagClass:"",body:`<ul><li><strong>Mutex（互斥锁）：</strong>有"所有权"——只有加锁的任务才能解锁。FreeRTOS Mutex 自带优先级继承，防止 Priority Inversion。用于保护共享资源（如 SPI 总线）。</li><li><strong>Binary Semaphore：</strong>没有所有权，任意任务/ISR 可以 give/take。最常用于 <strong>ISR → Task 通知</strong>（ISR give，Task take 后处理）。</li><li><strong>Counting Semaphore：</strong>有计数值。适合资源池场景（如 3 个 UART，同时允许 3 个任务使用）。</li><li><strong>Critical Section：</strong><code>taskENTER_CRITICAL()</code> 关中断。保护极短片段，不能嵌套，会影响实时性，慎用。</li></ul>`},
+  {t:"Priority Inversion + Priority Inheritance 解决方案",tag:"必考",tagClass:"",body:`<p><strong>Priority Inversion（优先级反转）：</strong></p><p>高优先级任务 H 等低优先级任务 L 释放 mutex；中优先级任务 M 抢占 L → H 被 M 间接阻塞。</p><p><strong>Priority Inheritance（FreeRTOS Mutex 自动支持）：</strong></p><p>H 等待 L 持有的 mutex 时，L 的优先级临时提升到 H 的级别，防止 M 抢占 L。</p><p><strong>历史案例：</strong>1997 年火星探路者（Mars Pathfinder）真实发生，导致系统反复重启。</p>`},
+  {t:"Stack Overflow 检测 — uxTaskGetStackHighWaterMark",tag:"高频",tagClass:"high",body:`<p>FreeRTOS 提供两种检测方式（<code>configCHECK_FOR_STACK_OVERFLOW</code>）：</p><ul><li><strong>方式 1：</strong>创建任务时在栈底填入已知值（0xA5A5A5A5），切换时检查末尾是否被覆盖。</li><li><strong>方式 2：</strong>每次切换检查整个栈最后 16 字节。更可靠但开销稍大。</li></ul><p>运行时诊断：<code>uxTaskGetStackHighWaterMark(NULL)</code> 返回历史最小剩余栈（word）。在压力测试后调用，&lt; 50 则需增大栈大小。</p>`},
+  {t:"Memory-Mapped I/O — 举例说明",tag:"高频",tagClass:"high",body:`<p>MCU 将外设寄存器映射到地址空间，CPU 用普通读写指令操作硬件。</p><p>例（STM32 GPIOA ODR 寄存器，地址 0x40020014）：</p><p><code>#define GPIOA_ODR (*((volatile uint32_t*)0x40020014))</code></p><p>写 <code>GPIOA_ODR |= (1 &lt;&lt; 5);</code> 直接点亮 PA5 引脚。</p><p><strong>为什么必须加 volatile：</strong>编译器不知道读写有硬件副作用，不加会缓存值或优化掉写操作，导致硬件不响应。</p>`},
+  {t:"I2C vs SPI vs UART — 选型与使用场景",tag:"高频",tagClass:"high",body:`<ul><li><strong>UART：</strong>2线（TX/RX），异步，点对点，速度慢（115200 bps 典型）。调试首选，配置最简单。</li><li><strong>I2C：</strong>2线（SDA/SCL），同步，多主多从，7-bit 地址，速度 100k/400k/1MHz。适合低速传感器（IMU、温湿度、OLED）。</li><li><strong>SPI：</strong>4线（MOSI/MISO/CLK/CS），同步，全双工，速度最快（几十 MHz）。适合高速外设（Flash、ADC、显示屏）。</li></ul><p><strong>Wearable 场景：</strong>IMU/温度传感器用 I2C，高速 ADC/Flash 用 SPI，与主机通信用 UART 或 BLE。</p>`},
+  {t:"DMA（直接内存访问）— 高吞吐量场景必备",tag:"加分",tagClass:"bonus",body:`<p>DMA 允许外设直接与内存交换数据，<strong>完全不经过 CPU</strong>，大幅降低中断频率和 CPU 占用。</p><p><strong>典型场景：</strong></p><ul><li>UART + DMA Circular 接收不定长帧（配合 Idle Line Interrupt）</li><li>ADC + DMA 双缓冲：CPU 处理 Buffer A，DMA 同时填 Buffer B</li><li>SPI + DMA 发送大数据块（如传感器数据上传）</li></ul><p><strong>面试加分：</strong>能解释 DMA circular mode 和 half-transfer interrupt。</p>`},
+  {t:"低功耗设计要点 — Wearable/IoT 核心",tag:"加分",tagClass:"bonus",body:`<p>对 wearable 和 IoT 设备，低功耗直接决定产品可用性。</p><ul><li><strong>Sleep Modes：</strong>理解 Light Sleep / Deep Sleep / Hibernate 的唤醒延迟和电流差异</li><li><strong>时钟门控：</strong>未使用外设关掉 clock（<code>HAL_RCC_DisableClock</code>）</li><li><strong>BLE 广播间隔：</strong>间隔越长越省电，权衡连接响应延迟</li><li><strong>按需采样：</strong>不要轮询 ADC，用 timer trigger + DMA</li></ul><p><strong>ESP32 加分：</strong>能解释 deep sleep 唤醒流程（RTC 内存保留、ext0/ext1 唤醒源）。</p>`},
+];
+
+// ================================================================
+// ML INTERVIEW CONCEPTS
+// ================================================================
+const mlConcepts=[
+  {t:"Bias-Variance Tradeoff + 正则化（L1/L2）",tag:"必考",tagClass:"",body:`<p><strong>Bias（偏差）：</strong>模型过简单，欠拟合，训练集和测试集表现均差。</p><p><strong>Variance（方差）：</strong>模型过复杂，过拟合，训练集好但测试集差。</p><p><strong>权衡：</strong>增大模型容量 → bias↓ variance↑；正则化/Dropout → variance↓ bias↑。</p><p><strong>L1（Lasso）：</strong>添加 |w| 惩罚，产生稀疏权重，适合特征选择。<strong>L2（Ridge）：</strong>添加 w² 惩罚，权重趋近小值但不为零。</p><p><strong>面试加分：</strong>能说出"Early Stopping 是隐式 L2 正则化"的原因。</p>`},
+  {t:"梯度消失 / 爆炸 — BatchNorm 与 ResNet 的解法",tag:"必考",tagClass:"",body:`<p><strong>梯度消失：</strong>深层网络反向传播时，连乘 &lt;1 的激活函数导数（如 sigmoid 饱和区），梯度指数衰减，底层参数几乎不更新。</p><p><strong>解决方案：</strong></p><ul><li><strong>ReLU：</strong>正区间梯度恒为 1，缓解消失（但有 Dying ReLU 问题）</li><li><strong>BatchNorm：</strong>每层归一化激活值，保持梯度信号稳定</li><li><strong>ResNet Skip Connection：</strong>梯度可绕过层直接传回，相当于梯度高速公路</li><li><strong>Gradient Clipping：</strong>针对爆炸问题，直接截断梯度范数</li></ul>`},
+  {t:"INT8 量化原理 — Post-Training vs QAT",tag:"必考",tagClass:"",body:`<p>量化：将 float32 权重/激活值映射到 int8，减少 4× 存储和计算开销，MCU 推理必需。</p><p><strong>核心公式：</strong><code>q = round(x / scale + zero_point)</code></p><p><strong>PTQ（Post-Training Quantization）：</strong>训练后直接量化，用校准集统计激活值范围。简单快速，精度损失可能较大。</p><p><strong>QAT（Quantization-Aware Training）：</strong>训练时模拟量化误差，模型学会适应低精度，精度损失极小，TFLite 推荐方案。</p><p><strong>面试加分：</strong>能解释 per-tensor vs per-channel 量化的精度差异。</p>`},
+  {t:"MobileNetV2 轻量化设计 — 为什么适合 MCU",tag:"高频",tagClass:"high",body:`<p><strong>核心：Depthwise Separable Convolution</strong></p><p>标准 Conv 参数量：k×k×C_in×C_out；Depthwise（k×k×C_in）+ Pointwise（C_in×C_out）≈ 减少 8–9×（k=3）。</p><p><strong>MobileNetV2 额外：</strong>Inverted Residuals（先扩展再压缩）+ Linear Bottleneck。</p><p><strong>实际数字：</strong>MobileNetV2 ImageNet top-1 72%，模型 3.4MB，适合 RAM ≥ 512KB 的 MCU。</p>`},
+  {t:"ML 系统设计 — Wearable 手势识别 Pipeline",tag:"高频",tagClass:"high",body:`<p>面试官可能问：<em>"设计一个在智能手表上识别 5 种手势的 ML pipeline"</em></p><ul><li><strong>数据采集：</strong>IMU @ 100Hz，sliding window 200ms，50% overlap</li><li><strong>特征提取：</strong>时域（mean/std/RMS/峰值）+ 频域（FFT前5主频）→ 约30维特征</li><li><strong>模型选型：</strong>1D CNN 约 10K 参数可放 nRF52；RAM budget 64KB，latency &lt; 50ms</li><li><strong>评估：</strong>per-class precision/recall，混淆矩阵找易混类别</li></ul><p><strong>你的加分点：</strong>结合 FreeRTOS 调度，说明推理任务优先级和 DMA 采样如何配合。</p>`},
+  {t:"模型评估指标选择 — Accuracy vs F1 vs AUC",tag:"高频",tagClass:"high",body:`<ul><li><strong>Accuracy：</strong>类别不平衡时失效（99% negative → accuracy 99%，但模型没用）。</li><li><strong>Precision：</strong>预测为正中真正为正的比例。高 Precision = 少误报。</li><li><strong>Recall：</strong>真实正例中被检测出的比例。高 Recall = 少漏报（医疗检测首选）。</li><li><strong>F1：</strong>Precision 和 Recall 的调和均值。</li><li><strong>AUC-ROC：</strong>衡量模型排序能力，对不平衡数据更鲁棒。</li></ul><p><strong>Wearable 场景：</strong>心率异常检测 → 高 Recall 优先；手势识别 → F1 macro 均衡各类。</p>`},
+];
+
+// ================================================================
+// BONUS DATA
+// ================================================================
+const bonusData=[
+  {t:"单元测试 for Embedded — Unity / Ceedling",pri:"p1",label:"强烈推荐",desc:'大公司（Nordic、TI）越来越看重 TDD。Unity 是 C 语言单元测试框架，能给 HAL 层写 mock，让业务逻辑脱离硬件独立测试，直接体现软件工程素养。配合 GitHub Actions CI 自动跑，简历差异化极强。',res:'<a href="https://throwtheswitch.org" target="_blank">ThrowTheSwitch.org — Unity 免费文档 →</a>'},
+  {t:"Zephyr RTOS 入门项目",pri:"p1",label:"强烈推荐",desc:'Nordic nRF52/nRF53 官方推荐 Zephyr，不是 FreeRTOS。理解 devicetree + Kconfig + west 构建系统，完成一个 BLE LED Toggle 例子就能写进简历，含金量远高于 Arduino 项目。',res:'<a href="https://docs.zephyrproject.org/latest/develop/getting_started/index.html" target="_blank">docs.zephyrproject.org — Getting Started →</a>'},
+  {t:"UART + DMA 环形缓冲区实战",pri:"p1",label:"强烈推荐",desc:'最经典的嵌入式底层模式：UART 接收用 DMA circular mode，配合 idle line interrupt 实现不定长帧接收，完全不占用 CPU。能在 ESP32 或 STM32 实现并解释，是高频面试题。',res:'STM32 HAL UART + DMA 官方 Example（STM32CubeIDE）'},
+  {t:"Linker Script 基础理解",pri:"p2",label:"推荐",desc:'理解 .text / .data / .bss / .heap / .stack 各段含义，以及 MCU 启动时如何从 Flash 复制 .data 到 RAM。面试被问"全局变量在哪里？""为什么 const 变量省 RAM？"时能回答清楚。',res:'OSDev Wiki: Linker Scripts + ARM 官方参考'},
+  {t:"MISRA C 基础认知",pri:"p2",label:"推荐",desc:'医疗/汽车嵌入式行业强制要求的 C 编码规范。能说出"为什么嵌入式要避免 malloc""禁止 goto""强制类型转换规则"等 2-3 条，在医疗设备 startup 面试中加分。',res:'MISRA C:2012 摘要版（网上可找到）'},
+  {t:"CMake 嵌入式项目构建",pri:"p2",label:"推荐",desc:'几乎所有现代嵌入式框架（Zephyr、ESP-IDF、STM32CubeMX 新版）都用 CMake。能写 CMakeLists.txt、添加子目录、链接库、设置 cross-compile toolchain，是职业嵌入式工程师基本功。',res:'<a href="https://cmake.org/cmake/help/latest/guide/tutorial/index.html" target="_blank">cmake.org Tutorial →</a>'},
+  {t:"逻辑分析仪 & 示波器操作技巧",pri:"p2",label:"推荐",desc:'真实工作中 90% 的硬件 bug 靠仪器定位，不是 printf。能用 Saleae Logic 分析 I2C/SPI 时序，在面试中描述具体 debug 经历极有说服力。',res:'<a href="https://www.saleae.com/downloads/" target="_blank">Saleae Logic 2 软件（免费下载）→</a>'},
+  {t:"GitHub Actions CI — Embedded 自动化构建",pri:"p3",label:"加分",desc:'为 PlatformIO 项目配置 GitHub Actions，每次 push 自动编译固件并运行单元测试。在 GitHub profile 展示绿色 CI 徽章，与只有代码的项目形成明显差异化。',res:'<a href="https://docs.platformio.org/en/latest/integration/ci/github-actions.html" target="_blank">PlatformIO 官方 GitHub Actions 文档 →</a>'},
+  {t:"Bootloader 概念 & Dual-Bank OTA",pri:"p3",label:"加分",desc:'理解 MCU 启动流程（Reset vector → SystemInit → main），以及 dual-bank OTA 设计（Bank A 运行，Bank B 接收新固件，CRC 校验后切换，失败自动回滚）。医疗设备/IoT startup 面试必考。',res:'STM32 Bootloader AN + <a href="https://github.com/mcu-tools/mcuboot" target="_blank">MCUBoot 开源项目 →</a>'},
+];
+
+// ================================================================
+// RENDER HELPERS
+// ================================================================
+function renderProbs(listId, data, group) {
+  const ul = document.getElementById(listId);
+  if (!ul) return;
+  ul.innerHTML = '';
+  data.forEach(p => {
+    const key  = `p_${group}_${p.id}`;
+    const rkey = `r_${group}_${p.id}`;
+    const hkey = `h_${group}_${p.id}`;
+    const done   = ls(key);
+    const retake = ls(rkey);
+    const hinted = ls(hkey);
+    const li = document.createElement('li');
+    li.className = 'pitem' + (done ? ' done' : '') + (retake ? ' retake' : '') + (hinted ? ' hinted' : '');
+    li.innerHTML = `
+      <input type="checkbox" id="${key}" ${done?'checked':''} onchange="chkProb(this,'${key}','${group}')">
+      <span class="pnum">#${p.id}</span>
+      <label class="pname" for="${key}">${p.n}</label>
+      <span class="diff ${p.d}">${p.d}</span>
+      <span class="retake-wrap">
+        <input type="checkbox" class="retake-cb" id="${rkey}" ${retake?'checked':''} onchange="chkRetake(this,'${rkey}',this.closest('.pitem'))">
+        <label class="retake-lbl" for="${rkey}" title="做了很久 / 用了提示，需要重刷">重刷</label>
+      </span>
+      <span class="hint-wrap">
+        <input type="checkbox" class="hint-cb" id="${hkey}" ${hinted?'checked':''} onchange="chkHint(this,'${hkey}',this.closest('.pitem'))">
+        <label class="hint-lbl" for="${hkey}" title="用了 Hint / 看了参考答案">看答案</label>
+      </span>`;
+    ul.appendChild(li);
+  });
+}
+
+function renderDesigns(listId) {
+  const ul = document.getElementById(listId);
+  ul.innerHTML = '';
+  designs.forEach(d => {
+    const key  = `d_${d.id}`;
+    const done = ls(key);
+    const li   = document.createElement('li');
+    li.className = 'ditem' + (done ? ' done' : '');
+    li.innerHTML = `
+      <input type="checkbox" id="${key}" ${done?'checked':''} onchange="chkDesign(this,'${key}',this.closest('.ditem'))">
+      <div><div class="dname">${d.n}</div><div class="ddesc">${d.desc}</div></div>`;
+    ul.appendChild(li);
+  });
+}
+
+function renderSkills(gridId, arr) {
+  const g = document.getElementById(gridId);
+  if (!g) return;
+  g.innerHTML = '';
+  arr.forEach(s => {
+    const key  = `sk_${s.id}`;
+    const done = ls(key);
+    const div  = document.createElement('div');
+    div.className = 'sitem' + (done ? ' done' : '');
+    div.innerHTML = `
+      <input type="checkbox" id="${key}" ${done?'checked':''} onchange="chkSkill(this,'${key}',this.closest('.sitem'))">
+      <div><div class="sname">${s.n}</div><div class="sdesc">${s.desc}</div></div>`;
+    g.appendChild(div);
+  });
+}
+
+function renderConcepts() {
+  const c = document.getElementById('interview-concepts');
+  c.innerHTML = '';
+  concepts.forEach((x, i) => {
+    const div = document.createElement('div');
+    div.className = 'concept-card';
+    div.innerHTML = `
+      <div class="concept-hdr" onclick="togConcept(${i})">
+        <span class="concept-ttl">${x.t}</span>
+        <span class="concept-tag ${x.tagClass}">${x.tag}</span>
+      </div>
+      <div class="concept-body" id="cb${i}">${x.body}</div>`;
+    c.appendChild(div);
+  });
+}
+
+function renderMLConcepts() {
+  const c = document.getElementById('ml-interview-concepts');
+  c.innerHTML = '';
+  mlConcepts.forEach((x, i) => {
+    const div = document.createElement('div');
+    div.className = 'concept-card';
+    div.innerHTML = `
+      <div class="concept-hdr" onclick="togMLConcept(${i})">
+        <span class="concept-ttl">${x.t}</span>
+        <span class="concept-tag ${x.tagClass}">${x.tag}</span>
+      </div>
+      <div class="concept-body" id="mlcb${i}">${x.body}</div>`;
+    c.appendChild(div);
+  });
+}
+
+function renderBonus() {
+  const g = document.getElementById('bonus-grid');
+  g.innerHTML = '';
+  bonusData.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'bonus-card';
+    div.innerHTML = `
+      <div class="bonus-card-ttl">${b.t}<span class="pbadge ${b.pri}">${b.label}</span></div>
+      <p>${b.desc}</p>
+      <div class="resource">📚 ${b.res}</div>`;
+    g.appendChild(div);
+  });
+}
+
+// ================================================================
+// INTERACTIONS
+// ================================================================
+function ls(key)           { return localStorage.getItem(key) === '1'; }
+function lsSet(key, val)   { localStorage.setItem(key, val ? '1' : '0'); }
+
+function chkProb(cb, key, group) {
+  lsSet(key, cb.checked);
+  cb.closest('.pitem').classList.toggle('done', cb.checked);
+  updateStats();
+}
+function chkRetake(cb, key, li) {
+  lsSet(key, cb.checked);
+  li.classList.toggle('retake', cb.checked);
+}
+function chkHint(cb, key, li) {
+  lsSet(key, cb.checked);
+  li.classList.toggle('hinted', cb.checked);
+}
+function chkDesign(cb, key, li) {
+  lsSet(key, cb.checked);
+  li.classList.toggle('done', cb.checked);
+  updateStats();
+}
+function chkSkill(cb, key, div) {
+  lsSet(key, cb.checked);
+  div.classList.toggle('done', cb.checked);
+}
+function togConcept(i)   { document.getElementById('cb'   + i).classList.toggle('open'); }
+function togMLConcept(i) { document.getElementById('mlcb' + i).classList.toggle('open'); }
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ================================================================
+// STATS
+// ================================================================
+function countGroup(group, data) {
+  return data.filter(p => ls(`p_${group}_${p.id}`)).length;
+}
+
+function updateStats() {
+  const c = {
+    bit:  countGroup('bit',  problems.bit),
+    arr:  countGroup('arr',  problems.arr),
+    link: countGroup('link', problems.link),
+    stk:  countGroup('stk',  problems.stk),
+    bin:  countGroup('bin',  problems.bin),
+    tree: countGroup('tree', problems.tree),
+    misc: countGroup('misc', problems.misc),
+    des:  designs.filter(d => ls(`d_${d.id}`)).length,
+    ml0:  countGroup('ml0',  mlProbs.ml0),
+    ml1:  countGroup('ml1',  mlProbs.ml1),
+    ml2:  countGroup('ml2',  mlProbs.ml2),
+  };
+
+  const setEl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+
+  setEl('wb1',    `${c.bit}  / ${problems.bit.length}`);
+  setEl('wb2',    `${c.arr}  / ${problems.arr.length}`);
+  setEl('wb3',    `${c.link} / ${problems.link.length}`);
+  setEl('wb4',    `${c.stk}  / ${problems.stk.length}`);
+  setEl('wb5',    `${c.bin}  / ${problems.bin.length}`);
+  setEl('wb6',    `${c.tree} / ${problems.tree.length}`);
+  setEl('wb7',    `${c.misc} / ${problems.misc.length}`);
+  setEl('wb8',    `${c.des}  / ${designs.length}`);
+  setEl('wb-ml0', `${c.ml0} / ${mlProbs.ml0.length}`);
+  setEl('wb-ml1', `${c.ml1} / ${mlProbs.ml1.length}`);
+  setEl('wb-ml2', `${c.ml2} / ${mlProbs.ml2.length}`);
+
+  const m1 = c.bit + c.arr + c.ml0;
+  const m2 = c.link + c.stk + c.ml1;
+  const m3 = c.bin + c.tree + c.ml2;
+  const m4 = c.misc + c.des;
+
+  setEl('m1-done', m1);
+  setEl('m2-done', m2);
+  setEl('m3-done', m3);
+  setEl('m4-done', m4);
+
+  const total    = m1 + m2 + m3 + m4;
+  const allCount = problems.bit.length + problems.arr.length + problems.link.length +
+                   problems.stk.length + problems.bin.length + problems.tree.length +
+                   problems.misc.length + designs.length +
+                   mlProbs.ml0.length + mlProbs.ml1.length + mlProbs.ml2.length;
+
+  setEl('total-done', total);
+  setEl('total-all',  allCount);
+  const pct = Math.round(total / allCount * 100);
+  setEl('prog-pct', pct + '%');
+  const bar = document.getElementById('prog-bar');
+  if (bar) bar.style.width = pct + '%';
+}
+
+// ================================================================
+// STREAK
+// ================================================================
+function updateStreak() {
+  const today  = new Date().toDateString();
+  const last   = localStorage.getItem('last_visit');
+  let streak   = parseInt(localStorage.getItem('streak') || '0');
+  if (last && last !== today) {
+    const diff = (new Date(today) - new Date(last)) / 86400000;
+    streak = diff <= 1.5 ? streak + 1 : 1;
+  } else if (!last) {
+    streak = 1;
+  }
+  localStorage.setItem('last_visit', today);
+  localStorage.setItem('streak', streak);
+  const el = document.getElementById('streak');
+  if (el) el.textContent = streak;
+}
+
+// ================================================================
+// INIT
+// ================================================================
+renderProbs('list-bit',  problems.bit,  'bit');
+renderProbs('list-arr',  problems.arr,  'arr');
+renderProbs('list-link', problems.link, 'link');
+renderProbs('list-stk',  problems.stk,  'stk');
+renderProbs('list-bin',  problems.bin,  'bin');
+renderProbs('list-tree', problems.tree, 'tree');
+renderProbs('list-misc', problems.misc, 'misc');
+renderProbs('list-ml0',  mlProbs.ml0,   'ml0');
+renderProbs('list-ml1',  mlProbs.ml1,   'ml1');
+renderProbs('list-ml2',  mlProbs.ml2,   'ml2');
+renderDesigns('list-design');
+renderSkills('sg1',    skills.s1);
+renderSkills('sg-ml0', skills.s1m);
+renderSkills('sg2',    skills.s2);
+renderSkills('sg-ml1', skills.s2m);
+renderSkills('sg3',    skills.s3);
+renderSkills('sg-ml2', skills.s3m);
+renderSkills('sg4',    skills.s4);
+renderSkills('sg-ml3', skills.s4m);
+renderConcepts();
+renderMLConcepts();
+renderBonus();
+updateStats();
+updateStreak();
+</script>
+
+<!-- ════════════════════════════════════════════════════════
+     AI CHAT WIDGET
+════════════════════════════════════════════════════════ -->
+<button id="ai-fab" onclick="aiToggle()">💬 AI 助手</button>
+
+<div id="ai-panel">
+  <div id="ai-phead">
+    <span>🤖 Claude 嵌入式助手</span>
+    <button onclick="aiToggle()">✕</button>
+  </div>
+  <div id="ai-key-area">
+    <label>Anthropic API Key（仅存在本地 localStorage，不上传）</label>
+    <input type="password" id="ai-key-input" placeholder="sk-ant-api03-...">
+    <div class="key-row">
+      <button onclick="aiSaveKey()">保存 Key</button>
+      <button class="clear" onclick="aiClearKey()">清除</button>
+    </div>
+  </div>
+  <div id="ai-msgs"></div>
+  <div id="ai-model-row">
+    <label>模型：</label>
+    <select id="ai-model-sel">
+      <option value="claude-haiku-4-5-20251001">Haiku 4.5（快）</option>
+      <option value="claude-sonnet-4-6" selected>Sonnet 4.6（推荐）</option>
+    </select>
+  </div>
+  <div id="ai-input-row">
+    <textarea id="ai-input" rows="1" placeholder="问任何嵌入式 / TinyML 问题…" onkeydown="aiKey(event)"></textarea>
+    <button id="ai-send" onclick="aiSend()">发送</button>
+  </div>
+</div>
+
+<script>
+// ── AI Widget ────────────────────────────────────────────
+const AI_SYSTEM = `你是 Qifeng Yang 的专属嵌入式系统 + TinyML 学习助手。
+Qifeng 是 UW ECE 本科生（2026届），正在备战 Nordic、TI、Apple Sensing、STMicro、医疗设备 startup 的嵌入式工程师岗位。
+
+他的学习计划分四个 Phase：
+- Phase 1: C++17 基础、位操作、数组双指针、Python ML 入门（NumPy/Colab）
+- Phase 2: FreeRTOS 多任务（Task/Queue/Mutex/Semaphore/ISR）、链表/栈、PyTorch 基础
+- Phase 3: TinyML（Edge Impulse / TFLite Micro / int8量化）、BLE/GATT/GAP、Nordic DevAcademy、二分查找/树
+- Phase 4: PCB 设计（KiCad/EasyEDA）、GitHub 作品集、简历优化、面试冲刺
+
+硬件：ESP32（PlatformIO + Arduino framework）
+参考指南：guide_platformio.html, guide_freertos.html, guide_tinyml.html, guide_python_ml.html
+
+回答要求：
+1. 简洁实用，优先给可运行代码（C++/Python）
+2. 代码示例针对 ESP32 或 Google Colab
+3. 遇到概念问题，用面试视角解释（"面试官会怎么问"）
+4. 中文回答，专有名词保留英文`;
+
+let aiHistory = [];
+
+function aiToggle() {
+  const panel = document.getElementById('ai-panel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    aiCheckKey();
+    document.getElementById('ai-input').focus();
+  }
+}
+
+function aiCheckKey() {
+  const key = localStorage.getItem('ai_api_key');
+  const area = document.getElementById('ai-key-area');
+  if (!key) {
+    area.classList.add('show');
+  } else {
+    area.classList.remove('show');
+    if (aiHistory.length === 0) aiAddBot('你好！我是你的嵌入式 + TinyML 专属助手 👋\n\n可以问我：\n• FreeRTOS 概念（volatile、mutex、ISR）\n• TinyML 量化、Edge Impulse 操作\n• LeetCode 题思路\n• 面试准备技巧\n\n有什么问题？');
+  }
+}
+
+function aiSaveKey() {
+  const val = document.getElementById('ai-key-input').value.trim();
+  if (!val.startsWith('sk-')) { alert('请输入正确的 Anthropic API Key（以 sk- 开头）'); return; }
+  localStorage.setItem('ai_api_key', val);
+  document.getElementById('ai-key-input').value = '';
+  aiCheckKey();
+}
+
+function aiClearKey() {
+  localStorage.removeItem('ai_api_key');
+  aiHistory = [];
+  document.getElementById('ai-msgs').innerHTML = '';
+  document.getElementById('ai-key-area').classList.add('show');
+}
+
+function aiAddUser(text) {
+  const el = document.createElement('div');
+  el.className = 'ai-msg user';
+  el.textContent = text;
+  document.getElementById('ai-msgs').appendChild(el);
+  aiScroll();
+  return el;
+}
+
+function aiAddBot(text) {
+  const el = document.createElement('div');
+  el.className = 'ai-msg bot';
+  el.textContent = text;
+  document.getElementById('ai-msgs').appendChild(el);
+  aiScroll();
+  return el;
+}
+
+function aiScroll() {
+  const msgs = document.getElementById('ai-msgs');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function aiKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); aiSend(); }
+}
+
+async function aiSend() {
+  const input = document.getElementById('ai-input');
+  const text  = input.value.trim();
+  if (!text) return;
+
+  const key = localStorage.getItem('ai_api_key');
+  if (!key) { document.getElementById('ai-key-area').classList.add('show'); return; }
+
+  input.value = '';
+  input.style.height = 'auto';
+  aiAddUser(text);
+  aiHistory.push({ role: 'user', content: text });
+
+  const sendBtn = document.getElementById('ai-send');
+  sendBtn.disabled = true;
+
+  const thinkEl = document.createElement('div');
+  thinkEl.className = 'ai-msg thinking';
+  thinkEl.textContent = '思考中…';
+  document.getElementById('ai-msgs').appendChild(thinkEl);
+  aiScroll();
+
+  const model = document.getElementById('ai-model-sel').value;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-allow-browser': 'true'
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 1500,
+        system: AI_SYSTEM,
+        messages: aiHistory
+      })
+    });
+
+    thinkEl.remove();
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      const msg = err.error?.message || `HTTP ${res.status}`;
+      if (res.status === 401) aiAddBot('❌ API Key 无效，请重新输入。');
+      else aiAddBot(`❌ 请求失败：${msg}`);
+      aiHistory.pop();
+      return;
+    }
+
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || '（空回复）';
+    aiHistory.push({ role: 'assistant', content: reply });
+    aiAddBot(reply);
+
+    // keep history to last 20 messages to avoid token overflow
+    if (aiHistory.length > 20) aiHistory = aiHistory.slice(-20);
+
+  } catch (e) {
+    thinkEl.remove();
+    aiAddBot('❌ 网络错误：' + e.message + '\n\n提示：如果是 CORS 错误，请用本地服务器打开此文件（例如 VS Code Live Server 扩展）。');
+    aiHistory.pop();
+  } finally {
+    sendBtn.disabled = false;
+    document.getElementById('ai-input').focus();
+  }
+}
+
+// auto-resize textarea
+document.getElementById('ai-input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+</script>
+</body>
+</html>
