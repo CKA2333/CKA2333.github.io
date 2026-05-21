@@ -11,7 +11,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 <style>
-  /* —— 全局重置 —— */
+  /* —— Global Reset —— */
   *, *::before, *::after {
     margin: 0;
     padding: 0;
@@ -23,7 +23,7 @@
     padding: 0;
   }
 
-  /* —— 页面进场/退场 —— */
+  /* —— Page Entrance/Exit —— */
   body {
     opacity: 0;
     transition: opacity 0.4s ease-in-out;
@@ -35,7 +35,7 @@
     opacity: 0 !important;
   }
 
-  /* —— 侧边栏 & 布局 —— */
+  /* —— Sidebar & Layout —— */
 
 
 
@@ -50,7 +50,7 @@
     height: auto;
   }
 
-  /* —— Projects 列表 —— */
+  /* —— Projects List —— */
   #three .features article {
     display: flex;
     align-items: flex-start;
@@ -90,7 +90,7 @@
     justify-content: flex-start;
   }
 
-  /* —— 自定义移动端菜单按钮 —— */
+  /* —— Custom Mobile Menu Button —— */
   .mobile-menu-toggle {
     display: none;
     position: fixed;
@@ -123,7 +123,7 @@
     transform: rotate(-45deg) translate(7px, -6px);
   }
 
-  /* —— 移动端全屏菜单覆盖层 —— */
+  /* —— Mobile Fullscreen Menu Overlay —— */
   .mobile-header {
     display: none;
     position: fixed;
@@ -196,36 +196,36 @@
     opacity: 0.7;
   }
 
-  /* —— 响应式 —— */
+  /* —— Responsive Design —— */
   @media screen and (max-width: 768px) {
-    /* 桌面 header 隐藏 */
+    /* Hide desktop header */
     #header {
       display: none !important;
     }
-    /* 原生 toggle 隐藏（如果有） */
+    /* Hide native toggle (if exists) */
     .toggle,
     #navPanel {
       display: none !important;
     }
-    /* 显示自定义按钮 */
+    /* Show custom button */
     .mobile-menu-toggle {
       display: block;
     }
-    /* 全宽内容 */
+    /* Full-width content */
     #wrapper {
       margin-left: 0 !important;
       width: 100%;
       padding: 0;
     }
-    /* About Me 顶部留白避开按钮 */
+    /* Add top padding to About Me to avoid button */
     #one {
       padding-top: 60px;
     }
-    /* 隐藏 banner 图 */
+    /* Hide banner image */
     #one .image.main {
       display: none;
     }
-    /* 容器内边距 */
+    /* Container padding */
     .container {
       padding: 20px;
     }
@@ -235,7 +235,7 @@
       color: #57BAA8;
       margin-bottom: 1em;
     }
-    /* 项目列表改为竖排 */
+    /* Project list changed to vertical layout */
     #three .features article {
       flex-direction: column;
     }
@@ -246,11 +246,11 @@
   }
 
   @media screen and (min-width: 769px) {
-    /* 桌面隐藏自定义按钮 */
+    /* Hide custom button on desktop */
     .mobile-menu-toggle {
       display: none !important;
     }
-    /* 恢复原生 header */
+    /* Restore native header */
     #header {
       display: block !important;
     }
@@ -407,7 +407,7 @@ with Integrated Functional Modules</strong><br>
 									<p></p>
 									<div class="features">
 										<article>
-											<a href="/projects/biogem/" class="image"><img src="images/bio/BioF.jpg" alt="" /></a>
+											<a href="https://sustainableactuator.ece.uw.edu" class="image"><img src="images/bio/BioF.jpg" alt="" /></a>
 											<div class="inner">
 												<h4>BIOGEM: A Fully Biodegradable Gelatin-Based McKibben Actuator with Embedded Sensing</h4>
 												
@@ -425,12 +425,19 @@ with Integrated Functional Modules</strong><br>
 												<h4>Multimodal Sensing Sleeve for Rehabilitation</h4>
 											</div>
 										</article> -->
-										<!-- <article>
+										<article>
 											<a href="/projects/SwarmRobot/" class="image"><img src="images/Robot/cube.jpg" alt="" /></a>
 											<div class="inner">
-												<h4>Rapid Fabrication of Self-Folding Polyhedral Swarm Robots</h4>
+												<h4>3D Printing of Passively Actuated Self-Folding Robots with Integrated Functional Modules</h4>
 											</div>
-										</article> -->
+										</article>
+
+										<article>
+											<a href="#" class="image"><img src="images/CPR/cpr.png" alt="" /></a>
+											<div class="inner">
+												<h4>A Closed-Loop CPR Training Glove with Integrated Tactile Sensing and Haptic Feedback</h4>
+											</div>
+										</article>
 									</div>
 								</div>
 							</section>
@@ -506,10 +513,10 @@ with Integrated Functional Modules</strong><br>
 				});
 			}
 
-			// 只拦截非纯锚点、同域名的链接
+			// Only intercept same-domain links (not pure anchors)
 			document.querySelectorAll('a[href]').forEach(link => {
 				const href = link.getAttribute('href');
-				// 跳过以 "#" 开头的锚点链接
+				// Skip anchor links starting with "#"
 				if (!href.startsWith('#') && link.hostname === location.hostname) {
 					link.addEventListener('click', function(e) {
 						e.preventDefault();
@@ -520,7 +527,7 @@ with Integrated Functional Modules</strong><br>
 				}
 			});
 
-			// 同理，如果有表单需要淡出再提交，也可以加上
+			// Similarly, if there's a form that needs fade-out before submitting, you can add it here
 			document.querySelectorAll('form').forEach(form => {
 				form.addEventListener('submit', function(e) {
 					e.preventDefault();

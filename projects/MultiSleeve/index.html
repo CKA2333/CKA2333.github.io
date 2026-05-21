@@ -20,7 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
   <style>
-    /* —— 全局 & 重置 —— */
+    /* —— Global & Reset —— */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
     body {
@@ -30,7 +30,7 @@
       overflow-x: hidden;
     }
 
-    /* —— 顶栏 —— */
+    /* —— Header Bar —— */
     #header {
       position: fixed;
       top: 0; left: 0; width: 100%;
@@ -66,7 +66,7 @@
       text-decoration: underline;
     }
 
-    /* —— 主体 & 布局 —— */
+    /* —— Body & Layout —— */
     #wrapper {
         display: flex;
         flex-direction: column;
@@ -78,7 +78,7 @@
         background: #fff;
     }
     
-    /* 顶部标题区域 */
+    /* Header Title Section */
     .header-section {
       width: 98%;
       max-width: 1600px;
@@ -100,34 +100,34 @@
       font-weight: 600;
     }
     
-    /* 主内容区域 */
+    /* Main Content Area */
     #main {
       display: flex;
       width: 98%;
       max-width: 1600px;
       gap: clamp(3rem, 5vw, 5rem);
       padding: clamp(1rem, 3vw, 2rem);
-      align-items: center; /* 改为居中对齐 */
+      align-items: center; /* Changed to center alignment */
     }
 
-    /* —— 左侧文字 —— */
+    /* —— Left Text Pane —— */
     .text-pane {
       flex: 0 0 45%;
       display: flex;
       flex-direction: column;
-      justify-content: center; /* 文字也居中 */
+      justify-content: center; /* Text also centered */
     }
     .text-pane h2 {
-      display: none; /* 隐藏原标题，已移到顶部 */
+      display: none; /* Hide original title, moved to top */
     }
     .text-pane p {
       font-size: clamp(1rem, 2vw, 1.4rem);
       color: #666;
       line-height: 1.65;
-      margin-bottom: 0; /* 移除底部边距，让最后一行贴底 */
+      margin-bottom: 0; /* Remove bottom margin, let last line stick to bottom */
     }
 
-    /* —— 右侧走马灯 —— */
+    /* —— Right Carousel —— */
     .carousel {
       flex: 0 0 50%;
       position: relative;
@@ -135,7 +135,7 @@
       border-radius: 16px;
       box-shadow: 0 12px 32px rgba(0,0,0,0.2);
       
-      /* 改为4:3比例，更适合展示细节 */
+      /* Changed to 4:3 ratio, better for showing details */
       aspect-ratio: 4 / 3;
       width: 100%;
     }
@@ -174,7 +174,7 @@
       background: #3FC08E;
     }
 
-    /* —— 响应式 —— */
+    /* —— Responsive Design —— */
     @media (max-width: 900px) {
       .header-section {
         margin-bottom: clamp(1.5rem, 3vw, 2rem);
@@ -190,7 +190,7 @@
       .text-pane {
         flex: 1 1 auto;
         order: 2;
-        justify-content: flex-start; /* 移动端正常显示 */
+        justify-content: flex-start; /* Mobile normal display */
       }
       .carousel {
         flex: 0 0 auto;
@@ -227,7 +227,7 @@
 
   <!-- Wrapper -->
   <div id="wrapper">
-    <!-- 顶部标题区域 -->
+    <!-- Header Title Section -->
     <div class="header-section">
       <h2>Multimodal Sensing Sleeve for Rehabilitation</h2>
       <div class="authors">
@@ -235,16 +235,16 @@
       </div>
     </div>
     
-    <!-- 主内容区域 -->
+    <!-- Main Content Area -->
     <div id="main">
-      <!-- 左侧文字 -->
+      <!-- Left Text Pane -->
       <div class="text-pane">
         <p>
         Physical rehabilitation sensing technologies play a critical role in enhancing patients' recovery through real-time monitoring and help doctors evaluate the effectiveness of rehabilitation treatment. However, traditional sensing devices are bulky which may not only limit the patients' movement and reduce the accuracy of doctors' evaluation but also add additional burden to the patients. Thus, we want to develop a unified multimodal sensing wearable, capturing multimodal data in a more compact and efficient form factor, allowing the patients to perform rehab tasks in a more natural way. While a multimodal wearables strategy does exist, their sensors usually stack on top of each other for multimodality, which sacrifices flexibility, and compactness, making patients inconvenient to wear. To address these limitations, we developed a novel multifunctional smart oversleeve, integrating a customized portable sensing circuit that can perform joint deformation monitoring and measure muscle activities through electrical impedance tomography (EIT) and electromyography (EMG). The sensors of the circuits are highly unified as well as the readout circuit. Compared with traditional bulky sensors with multiple layers, patients can easily wear them as regular sleeves, which combines the function of reading all of the signals that are mentioned above (EMG, EIT, etc.). From the perspective of the circuit, it can effectively calculate the bending angles of the elbow and track the activities of the bicep, triceps, and forearm muscles, reflecting the patients' recovery performance. These capabilities provide valuable insights into patient recovery performance and highlight the potential of this device as a versatile tool for physical rehabilitation monitoring.
         </p>
       </div>
 
-      <!-- 右侧走马灯 -->
+      <!-- Right Carousel -->
       <div class="carousel">
         <div class="carousel-track">
           <div class="carousel-slide"><img src="/images/mul/sch.png" alt="Demo 1" /></div>
@@ -260,7 +260,7 @@
     </div>
   </div>
 
-  <!-- Carousel 控制脚本 -->
+  <!-- Carousel Control Script -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const track = document.querySelector(".carousel-track");
@@ -286,7 +286,7 @@
   </script>
 
   <script>
-  // 只拦截所有指向 .html 的内部链接
+  // Only intercept internal links pointing to .html files
   document.querySelectorAll('a[href$=".html"], a[href*=".html#"]').forEach(link => {
     link.addEventListener("click", e => {
       e.preventDefault();

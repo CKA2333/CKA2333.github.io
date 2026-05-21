@@ -20,7 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
   <style>
-    /* —— 全局 & 重置 —— */
+    /* —— Global & Reset —— */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
     body {
@@ -30,7 +30,7 @@
       overflow-x: hidden;
     }
 
-    /* —— 顶栏 —— */
+    /* —— Header Bar —— */
     #header {
       position: fixed;
       top: 0; left: 0; width: 100%;
@@ -66,7 +66,7 @@
       text-decoration: underline;
     }
 
-    /* —— 主体 & 布局 —— */
+    /* —— Body & Layout —— */
     #wrapper {
         display: flex;
         flex-direction: column;
@@ -78,7 +78,7 @@
         background: #fff;
     }
     
-    /* 顶部标题区域 */
+    /* Header Title Section */
     .header-section {
       width: 98%;
       max-width: 1600px;
@@ -100,34 +100,34 @@
       font-weight: 600;
     }
     
-    /* 主内容区域 */
+    /* Main Content Area */
     #main {
       display: flex;
       width: 98%;
       max-width: 1600px;
       gap: clamp(3rem, 5vw, 5rem);
       padding: clamp(1rem, 3vw, 2rem);
-      align-items: center; /* 改为居中对齐 */
+      align-items: center; /* Changed to center alignment */
     }
 
-    /* —— 左侧文字 —— */
+    /* —— Left Text Pane —— */
     .text-pane {
       flex: 0 0 45%;
       display: flex;
       flex-direction: column;
-      justify-content: center; /* 文字也居中 */
+      justify-content: center; /* Text also centered */
     }
     .text-pane h2 {
-      display: none; /* 隐藏原标题，已移到顶部 */
+      display: none; /* Hide original title, moved to top */
     }
     .text-pane p {
       font-size: clamp(1rem, 2vw, 1.4rem);
       color: #666;
       line-height: 1.65;
-      margin-bottom: 0; /* 移除底部边距，让最后一行贴底 */
+      margin-bottom: 0; /* Remove bottom margin, let last line stick to bottom */
     }
 
-    /* —— 右侧走马灯 —— */
+    /* —— Right Carousel —— */
     .carousel {
       flex: 0 0 50%;
       position: relative;
@@ -135,7 +135,7 @@
       border-radius: 16px;
       box-shadow: 0 12px 32px rgba(0,0,0,0.2);
       
-      /* 改为4:3比例，更适合展示细节 */
+      /* Changed to 4:3 ratio, better for showing details */
       aspect-ratio: 4 / 3;
       width: 100%;
     }
@@ -174,7 +174,7 @@
       background: #3FC08E;
     }
 
-    /* —— 响应式 —— */
+    /* —— Responsive Design —— */
     @media (max-width: 900px) {
       .header-section {
         margin-bottom: clamp(1.5rem, 3vw, 2rem);
@@ -190,7 +190,7 @@
       .text-pane {
         flex: 1 1 auto;
         order: 2;
-        justify-content: flex-start; /* 移动端正常显示 */
+        justify-content: flex-start; /* Mobile normal display */
       }
       .carousel {
         flex: 0 0 auto;
@@ -227,7 +227,7 @@
 
   <!-- Wrapper -->
   <div id="wrapper">
-    <!-- 顶部标题区域 -->
+    <!-- Header Title Section -->
     <div class="header-section">
       <h2>BIOGEM: A Fully Biodegradable Gelatin-Based McKibben Actuator with Embedded Sensing.</h2>
       <div class="authors">
@@ -235,9 +235,9 @@
       </div>
     </div>
     
-    <!-- 主内容区域 -->
+    <!-- Main Content Area -->
     <div id="main">
-      <!-- 左侧文字 -->
+      <!-- Left Text Pane -->
       <div class="text-pane">
         <p>
          We present BIOGEM, a fully biodegradable McKibben actuator with integrated sensing, made from gelatin-based composites. By tailoring the material compositions, we customize the mechanical and electrical properties of the biodegradable composites, creating an integrated biodegradable system that combines both actuation and sensing functionalities.
@@ -246,7 +246,7 @@ BIOGEM integrates a McKibben actuating structure by using stiff gelatin as outer
         </p>
       </div>
 
-      <!-- 右侧走马灯 -->
+      <!-- Right Carousel -->
       <div class="carousel">
         <div class="carousel-track">
           <div class="carousel-slide"><img src="/images/bio/soils.jpg" alt="Demo 1" /></div>
@@ -264,7 +264,7 @@ BIOGEM integrates a McKibben actuating structure by using stiff gelatin as outer
     </div>
   </div>
 
-  <!-- Carousel 控制脚本 -->
+  <!-- Carousel Control Script -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const track = document.querySelector(".carousel-track");
@@ -290,7 +290,7 @@ BIOGEM integrates a McKibben actuating structure by using stiff gelatin as outer
   </script>
 
   <script>
-  // 只拦截所有指向 .html 的内部链接
+  // Only intercept internal links pointing to .html files
   document.querySelectorAll('a[href$=".html"], a[href*=".html#"]').forEach(link => {
     link.addEventListener("click", e => {
       e.preventDefault();
