@@ -336,6 +336,41 @@ code {
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── AI Widget ──────────────────────────────────────────── */
+#aiw{position:fixed;z-index:9999;touch-action:none;user-select:none;bottom:24px;right:24px;}
+#aiw.circle{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#6c63ff,#a855f7);box-shadow:0 4px 22px rgba(108,99,255,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.45rem;color:#fff;transition:transform .2s;}
+#aiw.circle:hover{transform:scale(1.1);}
+#aiw.panel{width:360px;max-width:calc(100vw - 32px);background:var(--surface,#1a1d27);border:1px solid var(--border,#2d3148);border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.5);display:flex;flex-direction:column;overflow:hidden;max-height:calc(100vh - 48px);}
+#aiw.circle #aiw-panel{display:none;}
+#aiw.panel #aiw-icon{display:none;}
+#aiw-head{background:linear-gradient(135deg,#6c63ff,#a855f7);padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:grab;flex-shrink:0;}
+#aiw-head:active{cursor:grabbing;}
+.aiw-ht{flex:1;}.aiw-htitle{font-size:.9rem;font-weight:700;color:#fff;}.aiw-hsub{font-size:.66rem;color:rgba(255,255,255,.75);margin-top:1px;}
+.aiw-hbtns{display:flex;gap:5px;}
+.aiw-hbtn{width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.14);color:#fff;cursor:pointer;font-size:.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.aiw-hbtn:hover{background:rgba(255,255,255,.28);}
+#aiw-pbar{padding:10px 14px;border-bottom:1px solid var(--border,#2d3148);display:flex;align-items:center;gap:7px;flex-shrink:0;}
+.aiw-bl{font-size:.7rem;color:var(--muted,#94a3b8);white-space:nowrap;}
+.aiw-sel{background:var(--surface2,#252836);border:1px solid var(--border,#2d3148);color:var(--text,#e2e8f0);border-radius:6px;padding:4px 6px;font-size:.72rem;outline:none;cursor:pointer;flex:1;}
+#aiw-key{padding:10px 14px;border-bottom:1px solid var(--border,#2d3148);display:flex;flex-direction:column;gap:7px;flex-shrink:0;}
+#aiw-key.hidden{display:none;}
+#aiw-key label{font-size:.72rem;color:var(--muted,#94a3b8);}
+#aiw-ki{background:var(--surface2,#252836);border:1px solid var(--border,#2d3148);border-radius:8px;padding:7px 10px;color:var(--text,#e2e8f0);font-size:.82rem;outline:none;width:100%;}
+#aiw-ki:focus{border-color:#6c63ff;}
+.aiw-kbtns{display:flex;gap:7px;}
+.aiw-kbtns button{flex:1;background:#6c63ff;border:none;color:#fff;border-radius:7px;padding:6px;cursor:pointer;font-size:.78rem;font-weight:600;}
+.aiw-kbtns button.sec{background:var(--surface2,#252836);color:var(--muted,#94a3b8);border:1px solid var(--border,#2d3148);}
+#aiw-msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:9px;min-height:160px;max-height:300px;}
+.aiw-m{max-width:92%;padding:8px 12px;border-radius:12px;font-size:.82rem;line-height:1.6;word-break:break-word;white-space:pre-wrap;}
+.aiw-m.user{align-self:flex-end;background:rgba(108,99,255,.25);border-bottom-right-radius:3px;}
+.aiw-m.bot{align-self:flex-start;background:var(--surface2,#252836);border-bottom-left-radius:3px;}
+.aiw-m.think{align-self:flex-start;color:var(--muted,#94a3b8);font-style:italic;background:transparent;padding-left:2px;}
+#aiw-ir{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border,#2d3148);flex-shrink:0;}
+#aiw-ta{flex:1;background:var(--surface2,#252836);border:1px solid var(--border,#2d3148);border-radius:10px;padding:8px 10px;color:var(--text,#e2e8f0);font-size:.82rem;outline:none;resize:none;font-family:inherit;min-height:36px;max-height:100px;}
+#aiw-ta:focus{border-color:#6c63ff;}
+#aiw-sb{background:#6c63ff;border:none;color:#fff;border-radius:10px;padding:8px 14px;cursor:pointer;font-size:.82rem;white-space:nowrap;align-self:flex-end;}
+#aiw-sb:disabled{opacity:.45;cursor:default;}
 </style>
 </head>
 <body>
@@ -892,6 +927,79 @@ function switchTab(id, btn) {
   document.getElementById('tab-' + id).classList.add('active');
   btn.classList.add('active');
 }
+</script>
+
+<div id="aiw" class="panel">
+  <span id="aiw-icon" onclick="aiwExpand()">🤖</span>
+  <div id="aiw-panel">
+    <div id="aiw-head">
+      <div class="aiw-ht">
+        <div class="aiw-htitle">AI Assistant</div>
+        <div class="aiw-hsub" id="aiw-status">Embedplan copilot · 已自动读取页面内容</div>
+      </div>
+      <div class="aiw-hbtns">
+        <button class="aiw-hbtn" onclick="aiwToggleKey()" title="API Key">🔑</button>
+        <button class="aiw-hbtn" onclick="aiwCollapse()" title="收起为小圆圈">⬤</button>
+      </div>
+    </div>
+    <div id="aiw-pbar">
+      <span class="aiw-bl">Provider</span>
+      <select class="aiw-sel" id="aiw-prov" onchange="aiwProvChange()">
+        <option value="openai">OpenAI / Codex</option>
+        <option value="claude">Claude (Anthropic)</option>
+      </select>
+      <span class="aiw-bl">Model</span>
+      <select class="aiw-sel" id="aiw-mdl"></select>
+    </div>
+    <div id="aiw-key" class="hidden">
+      <label id="aiw-klbl">API Key (仅存于本地 localStorage)</label>
+      <input id="aiw-ki" type="password" placeholder="sk-...">
+      <div class="aiw-kbtns">
+        <button onclick="aiwSaveKey()">保存</button>
+        <button class="sec" onclick="aiwClearKey()">清除</button>
+      </div>
+    </div>
+    <div id="aiw-msgs"></div>
+    <div id="aiw-ir">
+      <textarea id="aiw-ta" rows="1" placeholder="问我这个页面的内容..." onkeydown="aiwKey(event)"></textarea>
+      <button id="aiw-sb" onclick="aiwSend()">发送</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+const MODELS={openai:[{v:'gpt-5.2-codex',l:'gpt-5.2-codex (Codex Core)'},{v:'gpt-5.1-codex',l:'gpt-5.1-codex'},{v:'gpt-5.2',l:'gpt-5.2'},{v:'gpt-5-mini',l:'gpt-5-mini'},{v:'gpt-4o',l:'gpt-4o'},{v:'gpt-4o-mini',l:'gpt-4o-mini'}],claude:[{v:'claude-opus-4-7',l:'Claude Opus 4.7（最强）'},{v:'claude-sonnet-4-6',l:'Claude Sonnet 4.6（推荐）'},{v:'claude-haiku-4-5-20251001',l:'Claude Haiku 4.5（快）'}]};
+let cHist=[],oPrevId=null,drag=false,dx=0,dy=0,il=0,it=0;
+const $=id=>document.getElementById(id);
+const lsG=k=>localStorage.getItem(k);
+const lsS=(k,v)=>localStorage.setItem(k,v);
+function prov(){return $('aiw-prov').value;}
+function mdl(){return $('aiw-mdl').value;}
+function getKey(){return lsG(prov()==='claude'?'aiw_ckey':'aiw_okey')||'';}
+function pageCtx(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode(n){return n.parentElement.closest('#aiw')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;}});const p=[];let n;while((n=w.nextNode())){const t=n.textContent.trim();if(t)p.push(t);}return p.join(' ').replace(/\s+/g,' ').slice(0,6000);}
+function sys(){return 'You are an AI learning assistant embedded in Qifeng Yang\'s Embedplan study tool.\n\nCurrent page content (auto-extracted):\n---\n'+pageCtx()+'\n---\n\nAnswer in Chinese by default, keep technical terms in English. Be concise and practical—include runnable code when helpful, highlight interview angles and common traps.';}
+function addMsg(text,cls){const el=document.createElement('div');el.className='aiw-m '+cls;el.textContent=text;$('aiw-msgs').appendChild(el);$('aiw-msgs').scrollTop=$('aiw-msgs').scrollHeight;return el;}
+function updateStatus(){const k=getKey(),p=prov();$('aiw-status').textContent=(p==='claude'?'Claude (Anthropic)':'OpenAI / Codex')+(k?' · 已连接，页面上下文已加载':' · 需要配置 API Key');}
+function updateModels(){const sel=$('aiw-mdl'),p=prov();sel.innerHTML='';MODELS[p].forEach(m=>{const o=document.createElement('option');o.value=m.v;o.textContent=m.l;sel.appendChild(o);});const saved=lsG('aiw_mdl_'+p);if(saved&&[...sel.options].some(o=>o.value===saved))sel.value=saved;}
+window.aiwProvChange=function(){lsS('aiw_prov',prov());updateModels();$('aiw-klbl').textContent=prov()==='claude'?'Anthropic API Key (sk-ant-...) — 仅存于本地':'OpenAI API Key (sk-...) — 仅存于本地';$('aiw-ki').placeholder=prov()==='claude'?'sk-ant-...':'sk-...';updateStatus();};
+$('aiw-mdl').addEventListener('change',()=>lsS('aiw_mdl_'+prov(),mdl()));
+window.aiwToggleKey=function(){$('aiw-key').classList.toggle('hidden');};
+window.aiwSaveKey=function(){const v=$('aiw-ki').value.trim();if(!v.startsWith('sk-')){alert('API Key 需以 sk- 开头');return;}lsS(prov()==='claude'?'aiw_ckey':'aiw_okey',v);$('aiw-key').classList.add('hidden');$('aiw-ki').value='';updateStatus();};
+window.aiwClearKey=function(){localStorage.removeItem(prov()==='claude'?'aiw_ckey':'aiw_okey');localStorage.removeItem('aiw_opid');oPrevId=null;cHist=[];$('aiw-ki').value='';updateStatus();};
+window.aiwCollapse=function(){$('aiw').className='circle';lsS('aiw_mode','circle');};
+window.aiwExpand=function(){$('aiw').className='panel';lsS('aiw_mode','panel');};
+function startDrag(e){if(e.target.closest('button,input,select,textarea'))return;drag=true;const r=$('aiw').getBoundingClientRect();dx=e.clientX;dy=e.clientY;il=r.left;it=r.top;e.preventDefault();}
+document.addEventListener('pointermove',e=>{if(!drag)return;const w=$('aiw'),ml=window.innerWidth-w.offsetWidth,mt=window.innerHeight-w.offsetHeight;w.style.left=Math.max(0,Math.min(ml,il+(e.clientX-dx)))+'px';w.style.top=Math.max(0,Math.min(mt,it+(e.clientY-dy)))+'px';w.style.right='auto';w.style.bottom='auto';});
+document.addEventListener('pointerup',()=>{drag=false;});
+$('aiw-head').addEventListener('pointerdown',startDrag);
+$('aiw').addEventListener('pointerdown',e=>{if($('aiw').classList.contains('circle'))startDrag(e);});
+window.aiwKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();aiwSend();}};
+window.aiwSend=async function(){const ta=$('aiw-ta'),text=ta.value.trim();if(!text)return;const k=getKey();if(!k){$('aiw-key').classList.remove('hidden');aiwProvChange();return;}ta.value='';ta.style.height='auto';addMsg(text,'user');$('aiw-sb').disabled=true;const th=addMsg('Thinking...','think');try{let reply;if(prov()==='claude'){reply=await callClaude(text,k,mdl());}else{const r=await callOpenAI(text,k,mdl());reply=r.text;oPrevId=r.id;if(oPrevId)lsS('aiw_opid',oPrevId);}th.remove();addMsg(reply,'bot');}catch(err){th.remove();addMsg('Error: '+err.message,'bot');}finally{$('aiw-sb').disabled=false;ta.focus();}};
+async function callClaude(text,k,m){cHist.push({role:'user',content:text});const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'x-api-key':k,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:m,max_tokens:1200,system:sys(),messages:cHist})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error?.message||'HTTP '+r.status);const rep=d.content?.[0]?.text||'(empty)';cHist.push({role:'assistant',content:rep});return rep;}
+async function callOpenAI(text,k,m){const b={model:m,instructions:sys(),input:text,max_output_tokens:1200};if(oPrevId)b.previous_response_id=oPrevId;const r=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'},body:JSON.stringify(b)});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error?.message||'HTTP '+r.status);const txt=(d.output||[]).flatMap(i=>(i.content||[])).filter(c=>c.text).map(c=>c.text).join('\n')||d.output_text||'(empty)';return{text:txt,id:d.id||null};}
+(function init(){const sp=lsG('aiw_prov')||'openai';$('aiw-prov').value=sp;aiwProvChange();oPrevId=lsG('aiw_opid')||null;if(lsG('aiw_mode')==='circle')$('aiw').className='circle';updateStatus();if(!$('aiw-msgs').children.length)addMsg('你好！我已自动读取本页内容，可以直接问我页面上的概念、代码或练习题，无需手动提供上下文。','bot');$('aiw-ta').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';});})();
+})();
 </script>
 </body>
 </html>
