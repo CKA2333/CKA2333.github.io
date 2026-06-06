@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Embedded C++ 深度指南</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#252836;--border:#2d3148;--primary:#6c63ff;--primary-light:#8b85ff;--success:#4ade80;--warning:#fbbf24;--danger:#f87171;--text:#e2e8f0;--muted:#94a3b8;--embed:#0284c7;--embed-light:#38bdf8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.6;}
+a{color:var(--primary-light);text-decoration:none;}a:hover{text-decoration:underline;}
+code{background:var(--surface2);padding:2px 7px;border-radius:4px;font-family:'Courier New',monospace;font-size:.85em;color:#e879f9;}
+pre{background:#0d1117;border:1px solid var(--border);border-left:3px solid var(--embed);border-radius:8px;padding:16px 18px;overflow-x:auto;margin:10px 0 14px;}
+pre code{background:none;padding:0;color:#cdd6f4;font-size:.84rem;display:block;line-height:1.8;}
+.cm{color:#636e7b;}
+.kw{color:#ff79c6;}
+.fn{color:#8be9fd;}
+.st{color:#f1fa8c;}
+.nm{color:#bd93f9;}
+.tp{color:#ffb86c;}
+.site-nav{background:#08090f;border-bottom:1px solid #2d3148;padding:7px 20px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;position:sticky;top:0;z-index:200;}
+.nav-logo{font-weight:800;font-size:.78rem;text-decoration:none;padding:4px 10px;background:linear-gradient(135deg,#6c63ff,#a855f7);border-radius:6px;color:#fff;white-space:nowrap;flex-shrink:0;}
+.nav-links{display:flex;gap:2px;flex-wrap:wrap;}
+.nav-links a{color:#64748b;font-size:.73rem;padding:4px 9px;border-radius:6px;text-decoration:none;white-space:nowrap;transition:all .15s;}
+.nav-links a:hover{color:#e2e8f0;background:rgba(108,99,255,.12);}
+.nav-links a.nav-active{color:#a78bfa;background:rgba(108,99,255,.2);}
+.header{background:linear-gradient(135deg,#0284c7 0%,#6c63ff 100%);padding:22px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.header-text h1{font-size:1.25rem;font-weight:700;color:#fff;}
+.header-text p{font-size:.8rem;color:rgba(255,255,255,.8);margin-top:4px;}
+.layout{max-width:860px;margin:0 auto;padding:28px 20px;}
+.overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:24px;}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.ov-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.ov-val{font-size:.88rem;font-weight:600;}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:28px;}
+.toc h3{font-size:.88rem;color:var(--primary-light);margin-bottom:10px;}
+.toc ol{padding-left:20px;}
+.toc li{font-size:.84rem;line-height:2.0;color:var(--muted);}
+.toc a{color:var(--muted);}
+.toc a:hover{color:var(--primary-light);text-decoration:none;}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;}
+.step-hdr{padding:14px 20px;background:var(--surface2);display:flex;align-items:center;gap:12px;}
+.step-num{background:var(--embed);color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.88rem;flex-shrink:0;}
+.step-title{font-size:.95rem;font-weight:600;flex:1;}
+.step-eta{font-size:.72rem;color:var(--muted);white-space:nowrap;}
+.step-body{padding:16px 20px 20px;}
+.step-body p{font-size:.87rem;color:var(--muted);margin-bottom:10px;line-height:1.8;}
+.step-body ul,.step-body ol{padding-left:20px;margin-bottom:12px;}
+.step-body li{font-size:.87rem;color:var(--muted);line-height:1.9;margin-bottom:4px;}
+.step-body strong{color:var(--text);}
+.step-body h4{font-size:.9rem;font-weight:700;color:var(--text);margin:16px 0 8px;}
+.tip{background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.tip-lbl{font-size:.67rem;font-weight:700;color:#4ade80;text-transform:uppercase;margin-bottom:4px;}
+.tip p{font-size:.84rem;color:var(--muted);margin:0;}
+.warn{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.warn-lbl{font-size:.67rem;font-weight:700;color:#fbbf24;text-transform:uppercase;margin-bottom:4px;}
+.warn p{font-size:.84rem;color:var(--muted);margin:0;}
+.danger{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.danger-lbl{font-size:.67rem;font-weight:700;color:#f87171;text-transform:uppercase;margin-bottom:4px;}
+.danger p{font-size:.84rem;color:var(--muted);margin:0;}
+.hl{background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.25);border-radius:8px;padding:12px 16px;margin:10px 0;}
+.hl-lbl{font-size:.67rem;font-weight:700;color:var(--primary-light);text-transform:uppercase;margin-bottom:4px;}
+.hl p{font-size:.84rem;color:var(--muted);margin:0;}
+.compare-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+.compare-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+.compare-title{font-size:.8rem;font-weight:700;margin-bottom:8px;}
+.compare-title.bad{color:var(--danger);}
+.compare-title.good{color:var(--success);}
+.compare-card ul{padding-left:16px;margin:0;}
+.compare-card li{font-size:.78rem;color:var(--muted);line-height:1.8;}
+.resources{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-top:28px;}
+.resources h3{color:var(--primary-light);font-size:.95rem;margin-bottom:14px;}
+.res-group{margin-bottom:16px;}
+.res-group-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px;}
+.res-item{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);font-size:.85rem;gap:12px;}
+.res-item:last-child{border-bottom:none;}
+.res-desc{color:var(--muted);font-size:.78rem;margin-top:2px;}
+.badge{display:inline-block;font-size:.68rem;padding:2px 7px;border-radius:10px;font-weight:600;flex-shrink:0;}
+.free{background:rgba(74,222,128,.15);color:#4ade80;}
+/* AI Widget */
+#aiw{position:fixed;z-index:9999;touch-action:none;user-select:none;bottom:24px;right:24px;}
+#aiw.circle{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#6c63ff,#a855f7);box-shadow:0 4px 22px rgba(108,99,255,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.45rem;color:#fff;transition:transform .2s;}
+#aiw.circle:hover{transform:scale(1.1);}
+#aiw.panel{width:360px;max-width:calc(100vw - 32px);background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.5);display:flex;flex-direction:column;overflow:hidden;max-height:calc(100vh - 48px);}
+#aiw.circle #aiw-panel{display:none;}
+#aiw.panel #aiw-icon{display:none;}
+#aiw-head{background:linear-gradient(135deg,#6c63ff,#a855f7);padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:grab;flex-shrink:0;}
+.aiw-ht{flex:1;}.aiw-htitle{font-size:.9rem;font-weight:700;color:#fff;}.aiw-hsub{font-size:.66rem;color:rgba(255,255,255,.75);margin-top:1px;}
+.aiw-hbtns{display:flex;gap:5px;}
+.aiw-hbtn{width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.14);color:#fff;cursor:pointer;font-size:.82rem;display:flex;align-items:center;justify-content:center;}
+#aiw-pbar{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;flex-shrink:0;}
+.aiw-bl{font-size:.7rem;color:var(--muted);white-space:nowrap;}
+.aiw-sel{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 6px;font-size:.72rem;outline:none;cursor:pointer;flex:1;}
+#aiw-key{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:7px;flex-shrink:0;}
+#aiw-key.hidden{display:none;}
+#aiw-key label{font-size:.72rem;color:var(--muted);}
+#aiw-ki{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:.82rem;outline:none;width:100%;}
+#aiw-ki:focus{border-color:#6c63ff;}
+.aiw-kbtns{display:flex;gap:7px;}
+.aiw-kbtns button{flex:1;background:#6c63ff;border:none;color:#fff;border-radius:7px;padding:6px;cursor:pointer;font-size:.78rem;font-weight:600;}
+.aiw-kbtns button.sec{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+#aiw-msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:9px;min-height:160px;max-height:300px;}
+.aiw-m{max-width:92%;padding:8px 12px;border-radius:12px;font-size:.82rem;line-height:1.6;word-break:break-word;white-space:pre-wrap;}
+.aiw-m.user{align-self:flex-end;background:rgba(108,99,255,.25);border-bottom-right-radius:3px;}
+.aiw-m.bot{align-self:flex-start;background:var(--surface2);border-bottom-left-radius:3px;}
+.aiw-m.think{align-self:flex-start;color:var(--muted);font-style:italic;background:transparent;padding-left:2px;}
+#aiw-ir{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0;}
+#aiw-ta{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;color:var(--text);font-size:.82rem;outline:none;resize:none;font-family:inherit;min-height:36px;max-height:100px;}
+#aiw-ta:focus{border-color:#6c63ff;}
+#aiw-sb{background:#6c63ff;border:none;color:#fff;border-radius:10px;padding:8px 14px;cursor:pointer;font-size:.82rem;white-space:nowrap;align-self:flex-end;}
+#aiw-sb:disabled{opacity:.45;cursor:default;}
+@media(max-width:600px){.compare-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="embedded_plan.html" class="nav-logo">Embedplan</a>
+  <div class="nav-links">
+    <a href="embedded_plan.html">🗺 计划</a>
+    <a href="cpp_cheatsheet.html">⚡ C++ Cheat</a>
+    <a href="guide_platformio.html">🛠 PlatformIO</a>
+    <a href="guide_freertos.html">🔧 FreeRTOS</a>
+    <a href="guide_tinyml.html">🤖 TinyML</a>
+    <a href="guide_python_ml.html">🐍 Python ML</a>
+    <a href="guide_ml_fundamentals.html">📐 ML入门</a>
+    <a href="guide_embedded_cpp.html" class="nav-active">⚙️ Embedded C++</a>
+  </div>
+</nav>
+
+<div class="header">
+  <div class="header-text">
+    <h1>⚙️ Embedded C++ 深度指南</h1>
+    <p>嵌入式 C++ 核心模式 · volatile / ISR / 状态机 / 环形缓冲区 / 定点数</p>
+  </div>
+</div>
+
+<div class="layout">
+
+  <div class="overview">
+    <div class="ov-card"><div class="ov-label">预计时间</div><div class="ov-val">6–10 小时</div></div>
+    <div class="ov-card"><div class="ov-label">前置知识</div><div class="ov-val">C++ 基础 + LeetCode C++</div></div>
+    <div class="ov-card"><div class="ov-label">难度</div><div class="ov-val">中等 → 进阶</div></div>
+    <div class="ov-card"><div class="ov-label">目标</div><div class="ov-val">Nordic / TI / Apple Sensing</div></div>
+  </div>
+
+  <div class="toc">
+    <h3>📋 目录</h3>
+    <ol>
+      <li><a href="#s1">嵌入式 C++ vs 桌面 C++：哪些不能用</a></li>
+      <li><a href="#s2">内存模型：Stack / Heap / Static / Flash</a></li>
+      <li><a href="#s3">volatile 与中断处理（ISR）</a></li>
+      <li><a href="#s4">状态机模式（enum + switch）</a></li>
+      <li><a href="#s5">环形缓冲区（Circular Buffer）完整实现</a></li>
+      <li><a href="#s6">定点数算术（Fixed-Point）</a></li>
+      <li><a href="#s7">RAII 在嵌入式的正确使用</a></li>
+      <li><a href="#s8">面试题精选 + 答题框架</a></li>
+    </ol>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step" id="s1">
+    <div class="step-hdr">
+      <div class="step-num">1</div>
+      <div class="step-title">嵌入式 C++ vs 桌面 C++：哪些不能用</div>
+      <div class="step-eta">20 分钟</div>
+    </div>
+    <div class="step-body">
+      <p>MCU 上的 C++ 是"受限 C++"。理解限制的原因，比背规则更重要。</p>
+
+      <div class="compare-row">
+        <div class="compare-card">
+          <div class="compare-title bad">❌ 通常不用 / 禁用</div>
+          <ul>
+            <li><strong>异常处理</strong>（try/catch/throw）：异常表占 Flash，展开逻辑占 RAM，RT 不可预测</li>
+            <li><strong>RTTI</strong>（dynamic_cast, typeid）：运行时类型信息，同样占空间</li>
+            <li><strong>new / delete</strong>（堆动态分配）：碎片化，非确定性延迟，MCU RAM 本来就小</li>
+            <li><strong>std::thread / std::mutex</strong>：桌面线程库，MCU 用 FreeRTOS 任务代替</li>
+            <li><strong>std::string</strong>（频繁拼接）：内部有动态分配</li>
+            <li><strong>虚函数（在热路径中）</strong>：vtable 间接跳转，影响 icache</li>
+          </ul>
+        </div>
+        <div class="compare-card">
+          <div class="compare-title good">✅ 安全使用</div>
+          <ul>
+            <li><strong>constexpr / const</strong>：编译期计算，放入 Flash</li>
+            <li><strong>模板</strong>（无虚函数的静态多态）：零运行时开销</li>
+            <li><strong>RAII</strong>（构造/析构管理资源）：栈上对象，生命周期确定</li>
+            <li><strong>std::array</strong>：固定大小，无动态分配</li>
+            <li><strong>std::optional / std::span</strong>（C++17）：现代 MCU SDK 已支持</li>
+            <li><strong>Lambda / 函数对象</strong>：不捕获或只捕获值</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="hl">
+        <div class="hl-lbl">🎯 面试常见问题</div>
+        <p>"为什么嵌入式不用异常处理？" → 两个理由：①代码体积膨胀（异常表），②中断/实时路径上延迟不确定。嵌入式用错误码（<code>enum ErrorCode</code>）或 <code>std::optional</code> 来处理错误。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step" id="s2">
+    <div class="step-hdr">
+      <div class="step-num">2</div>
+      <div class="step-title">内存模型：Stack / Heap / Static / Flash</div>
+      <div class="step-eta">30 分钟</div>
+    </div>
+    <div class="step-body">
+      <p>MCU 的 RAM 通常 <strong>64 KB – 512 KB</strong>，Flash 通常 <strong>512 KB – 2 MB</strong>。知道每个变量在哪里，是嵌入式开发的基本功。</p>
+
+<pre><code><span class="cm">// ── 各内存区域示例 ─────────────────────────────────────────────</span>
+
+<span class="cm">// 1. Flash（只读，断电不丢失）</span>
+<span class="kw">const</span> <span class="tp">uint8_t</span> font_table[] = { <span class="nm">0x00</span>, <span class="nm">0x7E</span>, ... };  <span class="cm">// const 数组 → Flash</span>
+<span class="kw">constexpr</span> <span class="tp">float</span> PI = <span class="nm">3.14159f</span>;                      <span class="cm">// constexpr → Flash</span>
+
+<span class="cm">// 2. .bss（初始化为0的全局变量，上电自动清零）</span>
+<span class="tp">uint32_t</span> event_count;                                <span class="cm">// 全局 → .bss</span>
+<span class="kw">static</span> <span class="tp">uint8_t</span> uart_buffer[<span class="nm">256</span>];                    <span class="cm">// static → .bss</span>
+
+<span class="cm">// 3. .data（有初始值的全局变量，从 Flash 复制到 RAM）</span>
+<span class="tp">uint32_t</span> device_id = <span class="nm">0xDEADBEEF</span>;                   <span class="cm">// .data</span>
+
+<span class="cm">// 4. Stack（函数内局部变量，自动管理，向下增长）</span>
+<span class="kw">void</span> <span class="fn">process_sample</span>() {
+    <span class="tp">float</span> filtered[<span class="nm">32</span>];   <span class="cm">// ← 128 字节占用栈空间！</span>
+    <span class="tp">uint8_t</span> temp_buf[<span class="nm">64</span>]; <span class="cm">// ← 再多 64 字节</span>
+    <span class="cm">// 函数返回时自动释放</span>
+}
+
+<span class="cm">// 5. Heap（new/malloc，嵌入式尽量避免）</span>
+<span class="tp">uint8_t</span>* dma_buf = <span class="kw">new</span> <span class="tp">uint8_t</span>[<span class="nm">512</span>];  <span class="cm">// ← 嵌入式通常不这么做</span>
+<span class="cm">// 改为静态分配：</span>
+<span class="kw">static</span> <span class="tp">uint8_t</span> dma_buf[<span class="nm">512</span>];            <span class="cm">// 编译期确定大小</span>
+</code></pre>
+
+      <div class="warn">
+        <div class="warn-lbl">⚠️ 栈溢出（Stack Overflow）</div>
+        <p>嵌入式最常见的 crash 原因之一。MCU 上栈溢出不会报错，会直接<strong>静默地覆盖其他内存，导致随机 bug</strong>。FreeRTOS 提供 <code>uxTaskGetStackHighWaterMark()</code> 检测剩余栈空间。大数组用 <code>static</code> 放到 .bss，不要在函数内声明。</p>
+      </div>
+
+<pre><code><span class="cm">// ── 嵌入式内存使用规范 ─────────────────────────────────────────</span>
+
+<span class="cm">// ❌ 危险：大局部数组</span>
+<span class="kw">void</span> <span class="fn">bad_fft</span>() {
+    <span class="tp">float</span> buf[<span class="nm">1024</span>];  <span class="cm">// 4KB 占栈！FreeRTOS 默认栈 512B-2KB</span>
+}
+
+<span class="cm">// ✅ 正确：用 static 或全局</span>
+<span class="kw">static</span> <span class="tp">float</span> fft_buf[<span class="nm">1024</span>];  <span class="cm">// 放 .bss，编译期分配</span>
+<span class="kw">void</span> <span class="fn">good_fft</span>() {
+    <span class="cm">// 使用 fft_buf...</span>
+}
+
+<span class="cm">// ── 检查内存布局（GCC 链接后运行）─────────────────────────────</span>
+<span class="cm">// arm-none-eabi-size build/firmware.elf</span>
+<span class="cm">// 输出：text(Flash)  data(RAM初始值)  bss(RAM清零区)</span>
+<span class="cm">//        48244         1024            8192</span>
+</code></pre>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step" id="s3">
+    <div class="step-hdr">
+      <div class="step-num">3</div>
+      <div class="step-title">volatile 与中断处理（ISR）</div>
+      <div class="step-eta">40 分钟 · 面试高频！</div>
+    </div>
+    <div class="step-body">
+      <p><code>volatile</code> 告诉编译器："这个变量可能在你不知道的时候被改变，<strong>每次都要从内存读，不要缓存到寄存器</strong>。"</p>
+
+      <h4>为什么 ISR 中需要 volatile</h4>
+<pre><code><span class="cm">// ❌ 没有 volatile — 编译器可能把循环优化掉！</span>
+<span class="tp">bool</span> data_ready = <span class="kw">false</span>;
+
+<span class="kw">void</span> <span class="fn">UART_IRQHandler</span>() {    <span class="cm">// 中断处理函数</span>
+    data_ready = <span class="kw">true</span>;
+}
+
+<span class="kw">void</span> <span class="fn">main_loop</span>() {
+    <span class="kw">while</span> (!data_ready) {}  <span class="cm">// 编译器看到 data_ready 没被修改</span>
+    <span class="cm">// → 可能优化为 while(true){}，永远等待！</span>
+}
+
+<span class="cm">// ✅ 加 volatile — 每次循环都从内存重新读取</span>
+<span class="kw">volatile</span> <span class="tp">bool</span> data_ready = <span class="kw">false</span>;
+
+<span class="kw">void</span> <span class="fn">UART_IRQHandler</span>() {
+    data_ready = <span class="kw">true</span>;    <span class="cm">// ISR 写入</span>
+}
+
+<span class="kw">void</span> <span class="fn">main_loop</span>() {
+    <span class="kw">while</span> (!data_ready) {}  <span class="cm">// 每次循环重新从 RAM 读取</span>
+    <span class="fn">process_data</span>();
+}
+</code></pre>
+
+      <h4>完整的 ISR + 主循环通信模式</h4>
+<pre><code><span class="cm">// ── UART 接收中断 → 环形缓冲区 → 主任务处理 ─────────────────────</span>
+
+<span class="kw">constexpr</span> <span class="tp">size_t</span> RX_BUF_SIZE = <span class="nm">256</span>;
+
+<span class="kw">struct</span> <span class="tp">UartRxState</span> {
+    <span class="kw">volatile</span> <span class="tp">uint8_t</span> buf[RX_BUF_SIZE];
+    <span class="kw">volatile</span> <span class="tp">uint16_t</span> head = <span class="nm">0</span>;   <span class="cm">// ISR 写入，主循环读取</span>
+    <span class="tp">uint16_t</span> tail = <span class="nm">0</span>;            <span class="cm">// 只有主循环写，不需要 volatile</span>
+} uart_rx;
+
+<span class="cm">// ISR：只做最少的工作！</span>
+<span class="kw">extern</span> <span class="st">"C"</span> <span class="kw">void</span> <span class="fn">USART1_IRQHandler</span>() {
+    <span class="kw">if</span> (USART1-&gt;SR &amp; USART_SR_RXNE) {             <span class="cm">// 接收寄存器非空</span>
+        uart_rx.buf[uart_rx.head] = USART1-&gt;DR;  <span class="cm">// 读取数据</span>
+        uart_rx.head = (uart_rx.head + <span class="nm">1</span>) % RX_BUF_SIZE;
+    }
+}
+
+<span class="cm">// 主循环：读取并处理</span>
+<span class="kw">void</span> <span class="fn">uart_process</span>() {
+    <span class="kw">while</span> (uart_rx.tail != uart_rx.head) {   <span class="cm">// 有新数据</span>
+        <span class="tp">uint8_t</span> byte = uart_rx.buf[uart_rx.tail];
+        uart_rx.tail = (uart_rx.tail + <span class="nm">1</span>) % RX_BUF_SIZE;
+        <span class="fn">handle_byte</span>(byte);
+    }
+}
+</code></pre>
+
+      <div class="danger">
+        <div class="danger-lbl">🚨 ISR 铁律</div>
+        <p>① ISR 必须尽量短（微秒级），只写 flag/buffer，不做复杂逻辑。②ISR 中不能调用 <code>printf</code>、<code>malloc</code>、或任何可能阻塞的函数。③ 访问 ISR 和主循环共享的多字节变量时，需要关中断或用原子操作（<code>__atomic</code>），否则读到中间状态。</p>
+      </div>
+
+      <h4>原子访问（防止读到中间状态）</h4>
+<pre><code><span class="cm">// 共享一个 32-bit 计数器（ISR 写，主循环读）</span>
+<span class="kw">volatile</span> <span class="tp">uint32_t</span> tick_count = <span class="nm">0</span>;
+
+<span class="kw">void</span> <span class="fn">SysTick_Handler</span>() {
+    tick_count++;   <span class="cm">// Cortex-M 上 32-bit 写是原子的，OK</span>
+}
+
+<span class="cm">// 但是 64-bit 不是原子的，需要保护：</span>
+<span class="kw">volatile</span> <span class="tp">uint64_t</span> timestamp_us = <span class="nm">0</span>;
+
+<span class="tp">uint64_t</span> <span class="fn">get_timestamp_safe</span>() {
+    <span class="tp">uint32_t</span> primask = __<span class="fn">get_PRIMASK</span>();
+    <span class="fn">__disable_irq</span>();            <span class="cm">// 临时关中断</span>
+    <span class="tp">uint64_t</span> val = timestamp_us;  <span class="cm">// 原子读取</span>
+    <span class="kw">if</span> (!primask) <span class="fn">__enable_irq</span>();  <span class="cm">// 恢复</span>
+    <span class="kw">return</span> val;
+}
+</code></pre>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step" id="s4">
+    <div class="step-hdr">
+      <div class="step-num">4</div>
+      <div class="step-title">状态机模式（State Machine）</div>
+      <div class="step-eta">30 分钟</div>
+    </div>
+    <div class="step-body">
+      <p>嵌入式固件几乎所有逻辑都是状态机。LED 控制、通信协议解析、电池管理、设备连接流程 —— 全都用状态机来组织。</p>
+
+      <h4>示例：BLE 连接状态机</h4>
+<pre><code><span class="cm">// ── 状态定义 ────────────────────────────────────────────────</span>
+<span class="kw">enum class</span> <span class="tp">BleState</span> : <span class="tp">uint8_t</span> {    <span class="cm">// 用 enum class + uint8_t，省内存</span>
+    IDLE,
+    ADVERTISING,
+    CONNECTING,
+    CONNECTED,
+    DISCONNECTING,
+    ERROR
+};
+
+<span class="cm">// ── 事件定义 ────────────────────────────────────────────────</span>
+<span class="kw">enum class</span> <span class="tp">BleEvent</span> : <span class="tp">uint8_t</span> {
+    START_ADV,
+    CONN_REQUEST,
+    CONN_TIMEOUT,
+    DISCONNECTED,
+    ERROR_OCCURRED
+};
+
+<span class="cm">// ── 状态机结构体 ─────────────────────────────────────────────</span>
+<span class="kw">struct</span> <span class="tp">BleFsm</span> {
+    <span class="tp">BleState</span> state = BleState::IDLE;
+    <span class="tp">uint32_t</span> state_enter_ms = <span class="nm">0</span>;  <span class="cm">// 进入当前状态的时间戳</span>
+
+    <span class="kw">void</span> <span class="fn">handle</span>(<span class="tp">BleEvent</span> ev) {
+        <span class="kw">switch</span> (state) {
+        <span class="kw">case</span> BleState::IDLE:
+            <span class="kw">if</span> (ev == BleEvent::START_ADV)
+                <span class="fn">transition</span>(BleState::ADVERTISING);
+            <span class="kw">break</span>;
+
+        <span class="kw">case</span> BleState::ADVERTISING:
+            <span class="kw">if</span> (ev == BleEvent::CONN_REQUEST)
+                <span class="fn">transition</span>(BleState::CONNECTING);
+            <span class="kw">else if</span> (ev == BleEvent::CONN_TIMEOUT)
+                <span class="fn">transition</span>(BleState::IDLE);
+            <span class="kw">break</span>;
+
+        <span class="kw">case</span> BleState::CONNECTING:
+            <span class="kw">if</span> (ev == BleEvent::CONN_REQUEST)  <span class="cm">// 连接成功</span>
+                <span class="fn">transition</span>(BleState::CONNECTED);
+            <span class="kw">else if</span> (ev == BleEvent::CONN_TIMEOUT)
+                <span class="fn">transition</span>(BleState::ADVERTISING);
+            <span class="kw">break</span>;
+
+        <span class="kw">case</span> BleState::CONNECTED:
+            <span class="kw">if</span> (ev == BleEvent::DISCONNECTED)
+                <span class="fn">transition</span>(BleState::IDLE);
+            <span class="kw">else if</span> (ev == BleEvent::ERROR_OCCURRED)
+                <span class="fn">transition</span>(BleState::ERROR);
+            <span class="kw">break</span>;
+
+        <span class="kw">default</span>: <span class="kw">break</span>;
+        }
+    }
+
+    <span class="kw">void</span> <span class="fn">transition</span>(<span class="tp">BleState</span> next) {
+        <span class="fn">on_exit</span>(state);           <span class="cm">// 退出动作</span>
+        state = next;
+        state_enter_ms = <span class="fn">get_tick_ms</span>();
+        <span class="fn">on_enter</span>(next);           <span class="cm">// 进入动作</span>
+    }
+
+    <span class="kw">void</span> <span class="fn">on_enter</span>(<span class="tp">BleState</span> s) {
+        <span class="kw">switch</span> (s) {
+        <span class="kw">case</span> BleState::ADVERTISING: <span class="fn">ble_start_adv</span>(); <span class="kw">break</span>;
+        <span class="kw">case</span> BleState::CONNECTED:   <span class="fn">led_set_color</span>(LED_BLUE); <span class="kw">break</span>;
+        <span class="kw">default</span>: <span class="kw">break</span>;
+        }
+    }
+
+    <span class="kw">void</span> <span class="fn">on_exit</span>(<span class="tp">BleState</span> s) {
+        <span class="kw">switch</span> (s) {
+        <span class="kw">case</span> BleState::ADVERTISING: <span class="fn">ble_stop_adv</span>(); <span class="kw">break</span>;
+        <span class="kw">default</span>: <span class="kw">break</span>;
+        }
+    }
+
+    <span class="cm">// 超时检测（在主循环周期调用）</span>
+    <span class="kw">void</span> <span class="fn">tick</span>() {
+        <span class="kw">if</span> (state == BleState::ADVERTISING) {
+            <span class="kw">if</span> (<span class="fn">get_tick_ms</span>() - state_enter_ms &gt; <span class="nm">5000</span>)  <span class="cm">// 5s 超时</span>
+                <span class="fn">handle</span>(BleEvent::CONN_TIMEOUT);
+        }
+    }
+};
+</code></pre>
+
+      <div class="tip">
+        <div class="tip-lbl">💡 为什么用 enum class 而不是 enum</div>
+        <p><code>enum class</code>（C++11）不会隐式转换为整数，不会污染命名空间。<code>BleState::IDLE</code> 而不是 <code>IDLE</code>，避免与其他枚举值冲突。加上 <code>: uint8_t</code> 限制底层类型，节省内存（1字节 vs 默认4字节）。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step" id="s5">
+    <div class="step-hdr">
+      <div class="step-num">5</div>
+      <div class="step-title">环形缓冲区（Circular Buffer）完整实现</div>
+      <div class="step-eta">45 分钟 · 面试必考！</div>
+    </div>
+    <div class="step-body">
+      <p>环形缓冲区（Ring Buffer / FIFO）是嵌入式中最常用的数据结构，用于 ISR → 主循环的数据传递，无需动态内存分配。</p>
+
+<pre><code><span class="cm">/**
+ * 模板化环形缓冲区
+ * 线程安全版本（一个写者 + 一个读者，无锁）
+ */</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T, <span class="tp">size_t</span> N&gt;
+<span class="kw">class</span> <span class="tp">RingBuffer</span> {
+    <span class="kw">static_assert</span>((N &amp; (N-<span class="nm">1</span>)) == <span class="nm">0</span>, <span class="st">"N 必须是 2 的幂，让取模变位运算"</span>);
+<span class="kw">public</span>:
+    <span class="cm">// 写入（ISR 或写者线程调用）</span>
+    <span class="tp">bool</span> <span class="fn">push</span>(<span class="kw">const</span> T&amp; val) {
+        <span class="tp">size_t</span> next = (head_ + <span class="nm">1</span>) &amp; (N - <span class="nm">1</span>);  <span class="cm">// 位运算取模（N是2的幂）</span>
+        <span class="kw">if</span> (next == tail_) <span class="kw">return</span> <span class="kw">false</span>;       <span class="cm">// 满了，返回失败</span>
+        buf_[head_] = val;
+        head_ = next;                           <span class="cm">// 最后才更新 head（原子性）</span>
+        <span class="kw">return</span> <span class="kw">true</span>;
+    }
+
+    <span class="cm">// 读取（主循环或读者线程调用）</span>
+    <span class="tp">bool</span> <span class="fn">pop</span>(T&amp; out) {
+        <span class="kw">if</span> (tail_ == head_) <span class="kw">return</span> <span class="kw">false</span>;      <span class="cm">// 空的</span>
+        out = buf_[tail_];
+        tail_ = (tail_ + <span class="nm">1</span>) &amp; (N - <span class="nm">1</span>);
+        <span class="kw">return</span> <span class="kw">true</span>;
+    }
+
+    <span class="tp">bool</span> <span class="fn">empty</span>() <span class="kw">const</span> { <span class="kw">return</span> tail_ == head_; }
+    <span class="tp">bool</span> <span class="fn">full</span>()  <span class="kw">const</span> { <span class="kw">return</span> ((head_ + <span class="nm">1</span>) &amp; (N-<span class="nm">1</span>)) == tail_; }
+    <span class="tp">size_t</span> <span class="fn">size</span>() <span class="kw">const</span> { <span class="kw">return</span> (head_ - tail_) &amp; (N-<span class="nm">1</span>); }
+
+<span class="kw">private</span>:
+    T buf_[N];
+    <span class="kw">volatile</span> <span class="tp">size_t</span> head_ = <span class="nm">0</span>;  <span class="cm">// ISR 写，volatile!</span>
+    <span class="kw">volatile</span> <span class="tp">size_t</span> tail_ = <span class="nm">0</span>;  <span class="cm">// 主循环写</span>
+};
+
+<span class="cm">// ── 使用示例 ─────────────────────────────────────────────────</span>
+RingBuffer&lt;<span class="tp">uint8_t</span>, <span class="nm">256</span>&gt; uart_rx_fifo;  <span class="cm">// 256字节 UART 接收 FIFO</span>
+
+<span class="kw">void</span> <span class="fn">USART1_IRQHandler</span>() {
+    uart_rx_fifo.<span class="fn">push</span>(USART1-&gt;DR);      <span class="cm">// ISR 写入</span>
+}
+
+<span class="kw">void</span> <span class="fn">main_task</span>() {
+    <span class="tp">uint8_t</span> byte;
+    <span class="kw">while</span> (uart_rx_fifo.<span class="fn">pop</span>(byte)) {
+        <span class="fn">protocol_parse</span>(byte);            <span class="cm">// 主循环处理</span>
+    }
+}
+</code></pre>
+
+      <div class="hl">
+        <div class="hl-lbl">🔍 为什么 N 必须是 2 的幂</div>
+        <p><code>index % N</code> → <code>index &amp; (N-1)</code>：位运算替代取模，在没有硬件除法的 MCU 上速度快 10–100 倍。N=256 时，<code>& 0xFF</code> 比 <code>% 256</code> 在 Cortex-M0 上快约 20 倍。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step" id="s6">
+    <div class="step-hdr">
+      <div class="step-num">6</div>
+      <div class="step-title">定点数算术（Fixed-Point）</div>
+      <div class="step-eta">30 分钟</div>
+    </div>
+    <div class="step-body">
+      <p>Cortex-M0/M0+ 没有 FPU（浮点运算单元）。一次 float 加法 = 软件模拟 = 约 50–100 个时钟周期 vs. 整数加法 1 个周期。<strong>定点数用整数表示小数</strong>，在无 FPU 的 MCU 上速度快 50–100 倍。</p>
+
+<pre><code><span class="cm">/**
+ * Q15 定点数格式：1位符号 + 0位整数 + 15位小数
+ * 范围：-1.0 ~ +0.99997，精度：1/32768 ≈ 0.00003
+ * 表示方式：value_int16 / 32768.0 = 实际值
+ */</span>
+<span class="kw">using</span> <span class="tp">q15_t</span> = <span class="tp">int16_t</span>;
+<span class="kw">constexpr</span> <span class="tp">int32_t</span> Q15_SCALE = <span class="nm">32768</span>;  <span class="cm">// = 1 << 15</span>
+
+<span class="cm">// float → Q15 转换（离线做，或在初始化时做一次）</span>
+<span class="kw">constexpr</span> <span class="tp">q15_t</span> <span class="fn">f2q15</span>(<span class="tp">float</span> f) {
+    <span class="kw">return</span> (<span class="tp">q15_t</span>)(f * Q15_SCALE);
+}
+
+<span class="cm">// Q15 加法（和普通整数加法一样，O(1)）</span>
+<span class="tp">q15_t</span> <span class="fn">q15_add</span>(<span class="tp">q15_t</span> a, <span class="tp">q15_t</span> b) {
+    <span class="tp">int32_t</span> result = (<span class="tp">int32_t</span>)a + b;
+    <span class="cm">// 饱和截断（防止 overflow 绕回）</span>
+    <span class="kw">if</span> (result &gt;  <span class="nm">32767</span>) <span class="kw">return</span>  <span class="nm">32767</span>;
+    <span class="kw">if</span> (result &lt; -<span class="nm">32768</span>) <span class="kw">return</span> -<span class="nm">32768</span>;
+    <span class="kw">return</span> (<span class="tp">q15_t</span>)result;
+}
+
+<span class="cm">// Q15 乘法（结果是 Q30，需要右移 15 位才回到 Q15）</span>
+<span class="tp">q15_t</span> <span class="fn">q15_mul</span>(<span class="tp">q15_t</span> a, <span class="tp">q15_t</span> b) {
+    <span class="tp">int32_t</span> product = (<span class="tp">int32_t</span>)a * b;
+    <span class="kw">return</span> (<span class="tp">q15_t</span>)(product &gt;&gt; <span class="nm">15</span>);  <span class="cm">// 右移 15 = 除以 32768</span>
+}
+
+<span class="cm">// ── 实际应用：一阶低通滤波器（IIR）─────────────────────────</span>
+<span class="cm">// float 版：out = alpha * in + (1-alpha) * out_prev</span>
+<span class="cm">// Q15 版：完全用整数运算</span>
+
+<span class="kw">struct</span> <span class="tp">LpfQ15</span> {
+    <span class="tp">q15_t</span> alpha;      <span class="cm">// 滤波系数，如 0.1 → f2q15(0.1f)</span>
+    <span class="tp">q15_t</span> alpha_inv;  <span class="cm">// 1 - alpha</span>
+    <span class="tp">q15_t</span> state;
+
+    <span class="tp">LpfQ15</span>(<span class="tp">float</span> a) : alpha(<span class="fn">f2q15</span>(a)), alpha_inv(<span class="fn">f2q15</span>(<span class="nm">1.0f</span> - a)), state(<span class="nm">0</span>) {}
+
+    <span class="tp">q15_t</span> <span class="fn">update</span>(<span class="tp">q15_t</span> input) {
+        <span class="cm">// out = alpha * in + alpha_inv * state</span>
+        state = <span class="fn">q15_add</span>(<span class="fn">q15_mul</span>(alpha, input),
+                         <span class="fn">q15_mul</span>(alpha_inv, state));
+        <span class="kw">return</span> state;
+    }
+};
+
+<span class="cm">// 使用：</span>
+LpfQ15 filter(<span class="nm">0.1f</span>);  <span class="cm">// α = 0.1（截止频率由采样率决定）</span>
+<span class="tp">q15_t</span> raw = <span class="fn">f2q15</span>(<span class="nm">0.75f</span>);  <span class="cm">// ADC 读值（已归一化到 -1~1）</span>
+<span class="tp">q15_t</span> filtered = filter.<span class="fn">update</span>(raw);
+</code></pre>
+
+      <div class="tip">
+        <div class="tip-lbl">💡 CMSIS-DSP 库</div>
+        <p>ARM 提供了 CMSIS-DSP 库，包含优化好的 Q15/Q31 运算函数（FFT、FIR 滤波器、矩阵运算）。Nordic nRF5 SDK 和 STM32 HAL 都包含这个库。实际工作中直接用，不用手写。但面试时能说明白定点数原理，会加分。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="step" id="s7">
+    <div class="step-hdr">
+      <div class="step-num">7</div>
+      <div class="step-title">RAII 在嵌入式的正确使用</div>
+      <div class="step-eta">20 分钟</div>
+    </div>
+    <div class="step-body">
+      <p>RAII（Resource Acquisition Is Initialization）= <strong>构造时获取资源，析构时释放</strong>。嵌入式里最常用于：关中断区间、SPI/I2C 总线锁、GPIO 操作。</p>
+
+<pre><code><span class="cm">// ── 示例 1：关中断保护区（RAII）────────────────────────────</span>
+<span class="kw">class</span> <span class="tp">CriticalSection</span> {
+<span class="kw">public</span>:
+    <span class="tp">CriticalSection</span>()  { primask_ = __<span class="fn">get_PRIMASK</span>(); <span class="fn">__disable_irq</span>(); }
+    ~<span class="tp">CriticalSection</span>() { <span class="kw">if</span> (!primask_) <span class="fn">__enable_irq</span>(); }
+    CriticalSection(<span class="kw">const</span> CriticalSection&amp;) = <span class="kw">delete</span>;  <span class="cm">// 不允许拷贝</span>
+<span class="kw">private</span>:
+    <span class="tp">uint32_t</span> primask_;
+};
+
+<span class="kw">void</span> <span class="fn">update_shared_data</span>(<span class="tp">uint32_t</span> val) {
+    CriticalSection cs;      <span class="cm">// 构造时关中断</span>
+    shared_counter += val;   <span class="cm">// 安全操作</span>
+}                            <span class="cm">// 析构时自动恢复中断，即使提前 return 也安全</span>
+
+<span class="cm">// ── 示例 2：SPI 片选（RAII）───────────────────────────────</span>
+<span class="kw">class</span> <span class="tp">SpiSelect</span> {
+<span class="kw">public</span>:
+    <span class="tp">SpiSelect</span>(<span class="tp">GPIO_TypeDef</span>* port, <span class="tp">uint16_t</span> pin)
+        : port_(port), pin_(pin) {
+        port_-&gt;BSRR = pin_ &lt;&lt; <span class="nm">16</span>;  <span class="cm">// CS 低（片选激活）</span>
+    }
+    ~<span class="tp">SpiSelect</span>() {
+        port_-&gt;BSRR = pin_;          <span class="cm">// CS 高（片选释放）</span>
+    }
+    SpiSelect(<span class="kw">const</span> SpiSelect&amp;) = <span class="kw">delete</span>;
+<span class="kw">private</span>:
+    <span class="tp">GPIO_TypeDef</span>* port_;
+    <span class="tp">uint16_t</span> pin_;
+};
+
+<span class="kw">void</span> <span class="fn">spi_read_sensor</span>(<span class="tp">uint8_t</span>* buf, <span class="tp">size_t</span> len) {
+    SpiSelect sel(GPIOA, GPIO_PIN_4);  <span class="cm">// 拉低 CS</span>
+    <span class="fn">spi_transfer</span>(buf, len);
+}  <span class="cm">// sel 析构，自动拉高 CS，即使 spi_transfer 抛出错误也安全</span>
+</code></pre>
+
+      <div class="tip">
+        <div class="tip-lbl">💡 为什么 RAII 在嵌入式比 try/finally 更好</div>
+        <p>C++ 没有 finally（Java 才有）。RAII 用析构函数实现了同样的"无论如何都执行清理"的效果，而且完全在编译期确定，零运行时开销，不依赖异常机制。Nordic SDK 的 nrfx 驱动层大量使用这个模式。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 8 -->
+  <div class="step" id="s8">
+    <div class="step-hdr">
+      <div class="step-num">8</div>
+      <div class="step-title">面试题精选 + 答题框架</div>
+      <div class="step-eta">随时复习</div>
+    </div>
+    <div class="step-body">
+
+      <h4>高频面试题</h4>
+
+      <div class="warn">
+        <div class="warn-lbl">Q1 · 什么时候用 volatile？</div>
+        <p><strong>答：</strong>三种场景：① ISR 和主循环共享的变量；② 内存映射硬件寄存器（<code>volatile uint32_t* const REG = (uint32_t*)0x40000000</code>）；③ 等待硬件操作完成的 busy-wait 标志位。<br>
+        <strong>不是银弹：</strong>volatile 只防止编译器优化读写，不保证多核原子性（多核要用 <code>std::atomic</code> 或内存屏障）。</p>
+      </div>
+
+      <div class="warn">
+        <div class="warn-lbl">Q2 · 什么是内存对齐？为什么重要？</div>
+        <p><strong>答：</strong>32-bit MCU 访问 4 字节对齐的地址最高效；访问未对齐地址（如奇数地址的 uint32_t）在 Cortex-M0 上会 HardFault。编译器默认会对结构体做对齐填充，可以用 <code>__attribute__((packed))</code> 禁用（但会影响性能，只在协议包解析时用）。</p>
+      </div>
+
+      <div class="warn">
+        <div class="warn-lbl">Q3 · 解释 DMA 是什么以及为什么嵌入式要用它</div>
+        <p><strong>答：</strong>DMA（Direct Memory Access）允许外设直接向 RAM 写数据，不经过 CPU。比如 ADC 采样 1kHz，如果每次都用 CPU 读，CPU 就没时间做其他事了。用 DMA：ADC 把数据自动搬到 buf[]，传输完成后才产生中断通知 CPU 处理，CPU 利用率大幅提升。关键：DMA 源/目的地址必须 4 字节对齐，buffer 不能用栈变量（栈上地址不稳定，且 DMA 用物理地址）。</p>
+      </div>
+
+      <div class="warn">
+        <div class="warn-lbl">Q4 · 如何调试栈溢出？</div>
+        <p><strong>答：</strong>① FreeRTOS 的 <code>uxTaskGetStackHighWaterMark()</code> 可查各任务最小剩余栈空间。② 在 linker script 里用 canary pattern 填充栈底，溢出时触发 HardFault 并在 handler 里打印状态。③ ARM Cortex-M4 有 MPU，可设置栈保护区，访问时自动触发 fault。</p>
+      </div>
+
+      <div class="hl">
+        <div class="hl-lbl">🚀 加分点：能讲清楚的话</div>
+        <p>在 Nordic 面试提到 <code>nrfx_twi</code> 的 RAII wrapper，在 TI 面试提到 TI-RTOS 的 Semaphore API，在 Apple 面试提到 CoreBluetooth 和底层 HCI 的关系。说明你不只会写 C++ 语法，还理解 SDK 设计选择。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESOURCES -->
+  <div class="resources">
+    <h3>📚 推荐资源</h3>
+    <div class="res-group">
+      <div class="res-group-title">Embedded C++ 学习</div>
+      <div class="res-item">
+        <div>
+          <div><a href="https://www.learncpp.com" target="_blank">LearnCPP.com</a></div>
+          <div class="res-desc">最好的免费 C++ 教程，覆盖 RAII、模板、constexpr</div>
+        </div>
+        <span class="badge free">免费</span>
+      </div>
+      <div class="res-item">
+        <div>
+          <div><a href="https://interrupt.memfault.com/blog" target="_blank">Interrupt Blog (Memfault)</a></div>
+          <div class="res-desc">嵌入式工程师写的技术博客，volatile/栈溢出/调试技巧深度好文</div>
+        </div>
+        <span class="badge free">免费</span>
+      </div>
+      <div class="res-item">
+        <div>
+          <div><a href="https://github.com/cpq/bare-metal-programming-guide" target="_blank">Bare Metal Programming Guide (GitHub)</a></div>
+          <div class="res-desc">从零写 STM32 固件，包含内存模型、中断、DMA，配套代码可运行</div>
+        </div>
+        <span class="badge free">免费</span>
+      </div>
+      <div class="res-item">
+        <div>
+          <div><a href="https://developer.arm.com/documentation/dui0553/latest/" target="_blank">ARM Cortex-M4 Technical Reference</a></div>
+          <div class="res-desc">权威参考，查 MPU / 异常处理 / 内存屏障</div>
+        </div>
+        <span class="badge free">免费</span>
+      </div>
+    </div>
+    <div class="res-group">
+      <div class="res-group-title">TinyML 在嵌入式 C++ 中</div>
+      <div class="res-item">
+        <div>
+          <div><a href="https://github.com/tensorflow/tflite-micro" target="_blank">TFLite Micro (GitHub)</a></div>
+          <div class="res-desc">阅读 micro_interpreter.h，理解 arena 内存管理模式</div>
+        </div>
+        <span class="badge free">免费</span>
+      </div>
+      <div class="res-item">
+        <div>
+          <div><a href="https://docs.edgeimpulse.com/docs/deployment/running-your-impulse-arduino" target="_blank">Edge Impulse C++ SDK</a></div>
+          <div class="res-desc">生成的 C++ 推理代码是学习嵌入式 ML C++ 的好范本</div>
+        </div>
+        <span class="badge free">免费</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- layout -->
+
+<div id="aiw" class="panel">
+  <span id="aiw-icon" onclick="aiwExpand()">🤖</span>
+  <div id="aiw-panel">
+    <div id="aiw-head">
+      <div class="aiw-ht">
+        <div class="aiw-htitle">AI Assistant</div>
+        <div class="aiw-hsub" id="aiw-status">Embedplan copilot</div>
+      </div>
+      <div class="aiw-hbtns">
+        <button class="aiw-hbtn" onclick="aiwToggleKey()" title="API Key">🔑</button>
+        <button class="aiw-hbtn" onclick="aiwCollapse()" title="收起">⬤</button>
+      </div>
+    </div>
+    <div id="aiw-pbar">
+      <span class="aiw-bl">Provider</span>
+      <select class="aiw-sel" id="aiw-prov" onchange="aiwProvChange()">
+        <option value="openai">OpenAI / Codex</option>
+        <option value="claude">Claude (Anthropic)</option>
+      </select>
+      <span class="aiw-bl">Model</span>
+      <select class="aiw-sel" id="aiw-mdl"></select>
+    </div>
+    <div id="aiw-key" class="hidden">
+      <label id="aiw-klbl">API Key</label>
+      <input id="aiw-ki" type="password" placeholder="sk-...">
+      <div class="aiw-kbtns">
+        <button onclick="aiwSaveKey()">保存</button>
+        <button class="sec" onclick="aiwClearKey()">清除</button>
+      </div>
+    </div>
+    <div id="aiw-msgs"></div>
+    <div id="aiw-ir">
+      <textarea id="aiw-ta" rows="1" placeholder="问我 C++ 或嵌入式问题..." onkeydown="aiwKey(event)"></textarea>
+      <button id="aiw-sb" onclick="aiwSend()">发送</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+const MODELS={openai:[{v:'gpt-5.2-codex',l:'gpt-5.2-codex'},{v:'gpt-4o',l:'gpt-4o'},{v:'gpt-4o-mini',l:'gpt-4o-mini'}],claude:[{v:'claude-opus-4-7',l:'Claude Opus 4.7'},{v:'claude-sonnet-4-6',l:'Claude Sonnet 4.6（推荐）'},{v:'claude-haiku-4-5-20251001',l:'Claude Haiku 4.5'}]};
+let cHist=[],oPrevId=null,drag=false,dx=0,dy=0,il=0,it=0;
+const $=id=>document.getElementById(id);
+const lsG=k=>localStorage.getItem(k);
+const lsS=(k,v)=>localStorage.setItem(k,v);
+function prov(){return $('aiw-prov').value;}
+function mdl(){return $('aiw-mdl').value;}
+function getKey(){return lsG(prov()==='claude'?'aiw_ckey':'aiw_okey')||'';}
+function pageCtx(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode(n){return n.parentElement.closest('#aiw')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;}});const p=[];let n;while((n=w.nextNode())){const t=n.textContent.trim();if(t)p.push(t);}return p.join(' ').replace(/\s+/g,' ').slice(0,6000);}
+function sys(){return 'You are an AI learning assistant in Qifeng Yang\'s Embedplan.\nPage: Embedded C++ guide.\n---\n'+pageCtx()+'\n---\nAnswer in Chinese, keep technical terms in English.';}
+function addMsg(text,cls){const el=document.createElement('div');el.className='aiw-m '+cls;el.textContent=text;$('aiw-msgs').appendChild(el);$('aiw-msgs').scrollTop=$('aiw-msgs').scrollHeight;return el;}
+function updateStatus(){const k=getKey(),p=prov();$('aiw-status').textContent=(p==='claude'?'Claude':'OpenAI')+(k?' · 已连接':' · 需要 API Key');}
+function updateModels(){const sel=$('aiw-mdl'),p=prov();sel.innerHTML='';MODELS[p].forEach(m=>{const o=document.createElement('option');o.value=m.v;o.textContent=m.l;sel.appendChild(o);});const saved=lsG('aiw_mdl_'+p);if(saved&&[...sel.options].some(o=>o.value===saved))sel.value=saved;}
+window.aiwProvChange=function(){lsS('aiw_prov',prov());updateModels();$('aiw-klbl').textContent=prov()==='claude'?'Anthropic API Key':'OpenAI API Key';$('aiw-ki').placeholder=prov()==='claude'?'sk-ant-...':'sk-...';updateStatus();};
+$('aiw-mdl').addEventListener('change',()=>lsS('aiw_mdl_'+prov(),mdl()));
+window.aiwToggleKey=function(){$('aiw-key').classList.toggle('hidden');};
+window.aiwSaveKey=function(){const v=$('aiw-ki').value.trim();if(!v.startsWith('sk-')){alert('API Key 需以 sk- 开头');return;}lsS(prov()==='claude'?'aiw_ckey':'aiw_okey',v);$('aiw-key').classList.add('hidden');$('aiw-ki').value='';updateStatus();};
+window.aiwClearKey=function(){localStorage.removeItem(prov()==='claude'?'aiw_ckey':'aiw_okey');oPrevId=null;cHist=[];$('aiw-ki').value='';updateStatus();};
+window.aiwCollapse=function(){$('aiw').className='circle';};
+window.aiwExpand=function(){$('aiw').className='panel';};
+function startDrag(e){if(e.target.closest('button,input,select,textarea'))return;drag=true;const r=$('aiw').getBoundingClientRect();dx=e.clientX;dy=e.clientY;il=r.left;it=r.top;e.preventDefault();}
+document.addEventListener('pointermove',e=>{if(!drag)return;const w=$('aiw'),ml=window.innerWidth-w.offsetWidth,mt=window.innerHeight-w.offsetHeight;w.style.left=Math.max(0,Math.min(ml,il+(e.clientX-dx)))+'px';w.style.top=Math.max(0,Math.min(mt,it+(e.clientY-dy)))+'px';w.style.right='auto';w.style.bottom='auto';});
+document.addEventListener('pointerup',()=>{drag=false;});
+$('aiw-head').addEventListener('pointerdown',startDrag);
+window.aiwKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();aiwSend();}};
+window.aiwSend=async function(){const ta=$('aiw-ta'),text=ta.value.trim();if(!text)return;const k=getKey();if(!k){$('aiw-key').classList.remove('hidden');aiwProvChange();return;}ta.value='';ta.style.height='auto';addMsg(text,'user');$('aiw-sb').disabled=true;const th=addMsg('Thinking...','think');try{let reply;if(prov()==='claude'){reply=await callClaude(text,k,mdl());}else{const r=await callOpenAI(text,k,mdl());reply=r.text;oPrevId=r.id;}th.remove();addMsg(reply,'bot');}catch(err){th.remove();addMsg('Error: '+err.message,'bot');}finally{$('aiw-sb').disabled=false;ta.focus();}};
+async function callClaude(text,k,m){cHist.push({role:'user',content:text});const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'x-api-key':k,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:m,max_tokens:1200,system:sys(),messages:cHist})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error?.message||'HTTP '+r.status);const rep=d.content?.[0]?.text||'(empty)';cHist.push({role:'assistant',content:rep});return rep;}
+async function callOpenAI(text,k,m){const b={model:m,instructions:sys(),input:text,max_output_tokens:1200};if(oPrevId)b.previous_response_id=oPrevId;const r=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'},body:JSON.stringify(b)});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error?.message||'HTTP '+r.status);const txt=(d.output||[]).flatMap(i=>(i.content||[])).filter(c=>c.text).map(c=>c.text).join('\n')||'(empty)';return{text:txt,id:d.id||null};}
+(function init(){const sp=lsG('aiw_prov')||'openai';$('aiw-prov').value=sp;aiwProvChange();oPrevId=lsG('aiw_opid')||null;updateStatus();if(!$('aiw-msgs').children.length)addMsg('你好！我已读取本页内容，可以问我 volatile、ISR、状态机、定点数等任何 Embedded C++ 问题。','bot');$('aiw-ta').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';});})();
+})();
+</script>
+</body>
+</html>

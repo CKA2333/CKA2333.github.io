@@ -337,6 +337,14 @@ code {
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
+/* ── SITE NAV ── */
+.site-nav{background:#07090f;border-bottom:1px solid var(--border);padding:7px 20px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;position:sticky;top:0;z-index:200;}
+.nav-logo{font-weight:800;font-size:.78rem;font-family:'Syne',sans-serif;text-decoration:none;padding:4px 10px;background:linear-gradient(135deg,#5c7cfa,#a855f7);border-radius:6px;color:#fff;white-space:nowrap;flex-shrink:0;}
+.nav-links{display:flex;gap:2px;flex-wrap:wrap;}
+.nav-links a{color:var(--muted);font-size:.73rem;padding:4px 9px;border-radius:6px;text-decoration:none;font-family:'Syne',sans-serif;white-space:nowrap;transition:all .15s;}
+.nav-links a:hover{color:var(--text);background:rgba(92,124,250,.1);}
+.nav-links a.nav-active{color:#8aa4ff;background:rgba(92,124,250,.18);}
+
 /* ── AI Widget ──────────────────────────────────────────── */
 #aiw{position:fixed;z-index:9999;touch-action:none;user-select:none;bottom:24px;right:24px;}
 #aiw.circle{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#6c63ff,#a855f7);box-shadow:0 4px 22px rgba(108,99,255,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.45rem;color:#fff;transition:transform .2s;}
@@ -375,6 +383,20 @@ code {
 </head>
 <body>
 
+<nav class="site-nav">
+  <a href="embedded_plan.html" class="nav-logo">Embedplan</a>
+  <div class="nav-links">
+    <a href="embedded_plan.html">🗺 计划</a>
+    <a href="cpp_cheatsheet.html" class="nav-active">⚡ C++ Cheat</a>
+    <a href="guide_platformio.html">🛠 PlatformIO</a>
+    <a href="guide_freertos.html">🔧 FreeRTOS</a>
+    <a href="guide_tinyml.html">🤖 TinyML</a>
+    <a href="guide_python_ml.html">🐍 Python ML</a>
+    <a href="guide_ml_fundamentals.html">📐 ML入门</a>
+    <a href="guide_embedded_cpp.html">⚙️ Embedded C++</a>
+  </div>
+</nav>
+
 <div class="header">
   <div class="header-top">
     <div>
@@ -393,6 +415,9 @@ code {
   <button class="tab-btn active" onclick="switchTab('bit', this)">🔢 Bit Manipulation</button>
   <button class="tab-btn" onclick="switchTab('arr', this)">📦 Array & Two Pointers</button>
   <button class="tab-btn" onclick="switchTab('map', this)">🗺️ Map & Hash</button>
+  <button class="tab-btn" onclick="switchTab('stk', this)">📚 Stack &amp; Queue</button>
+  <button class="tab-btn" onclick="switchTab('ll',  this)">🔗 Linked List</button>
+  <button class="tab-btn" onclick="switchTab('bs',  this)">🔍 Binary Search</button>
 </div>
 
 <div class="content">
@@ -917,6 +942,418 @@ code {
   </div>
 
 </div><!-- end map tab -->
+
+<!-- ═══════════════════ STACK & QUEUE TAB ═══════════════════ -->
+<div id="tab-stk" class="tab-panel">
+
+  <div class="section-title">STL 容器速查</div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>stack（LIFO）</div>
+      <div class="code-block"><span class="line"><span class="tp">stack</span>&lt;<span class="tp">int</span>&gt; st;</span>
+<span class="line">st.<span class="fn">push</span>(<span class="st">42</span>);    <span class="c">// 入栈</span></span>
+<span class="line">st.<span class="fn">pop</span>();        <span class="c">// 出栈（无返回值！）</span></span>
+<span class="line">st.<span class="fn">top</span>();        <span class="c">// 查栈顶（不弹出）</span></span>
+<span class="line">st.<span class="fn">empty</span>();     <span class="c">// 是否为空</span></span>
+<span class="line">st.<span class="fn">size</span>();      <span class="c">// 元素数量</span></span></div>
+      <div class="note"><strong>记：</strong>先读 <code>top()</code>，再 <code>pop()</code>，否则值就丢了</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-orange"></span>queue（FIFO）</div>
+      <div class="code-block"><span class="line"><span class="tp">queue</span>&lt;<span class="tp">int</span>&gt; q;</span>
+<span class="line">q.<span class="fn">push</span>(<span class="st">1</span>);      <span class="c">// 入队（尾部）</span></span>
+<span class="line">q.<span class="fn">pop</span>();        <span class="c">// 出队（头部，无返回值）</span></span>
+<span class="line">q.<span class="fn">front</span>();     <span class="c">// 查队头</span></span>
+<span class="line">q.<span class="fn">back</span>();      <span class="c">// 查队尾</span></span>
+<span class="line">q.<span class="fn">empty</span>();     <span class="c">// 是否为空</span></span></div>
+      <div class="note">BFS 的标准容器，先进先出</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-green"></span>deque（双端队列）</div>
+      <div class="code-block"><span class="line"><span class="tp">deque</span>&lt;<span class="tp">int</span>&gt; dq;</span>
+<span class="line">dq.<span class="fn">push_front</span>(<span class="st">1</span>);  <span class="c">// 头部插入</span></span>
+<span class="line">dq.<span class="fn">push_back</span>(<span class="st">2</span>);   <span class="c">// 尾部插入</span></span>
+<span class="line">dq.<span class="fn">pop_front</span>();     <span class="c">// 删头部</span></span>
+<span class="line">dq.<span class="fn">pop_back</span>();      <span class="c">// 删尾部</span></span>
+<span class="line">dq.<span class="fn">front</span>(); dq.<span class="fn">back</span>();</span></div>
+      <div class="note">单调队列（滑动窗口最大值）的核心工具</div>
+    </div>
+  </div>
+
+  <div class="section-title">单调栈（最常考！）</div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">下一个更大元素（单调递减栈）</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-green">#496 Next Greater Element I</span>
+        <span class="ptag ptag-green">#739 Daily Temperatures</span>
+        <span class="ptag ptag-orange">#84 Largest Rectangle</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// 739: 每天等几天才能看到更高温度</span></span>
+<span class="line"><span class="tp">vector</span>&lt;<span class="tp">int</span>&gt; ans(n, <span class="st">0</span>);</span>
+<span class="line"><span class="tp">stack</span>&lt;<span class="tp">int</span>&gt; st;  <span class="c">// 存下标（不存值！）</span></span>
+<span class="line"></span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span> i = <span class="st">0</span>; i &lt; n; i++) {</span>
+<span class="line">    <span class="c">// 当前比栈顶大 → 栈顶找到了"下一个更大"</span></span>
+<span class="line">    <span class="kw">while</span> (!st.<span class="fn">empty</span>() &amp;&amp; T[i] &gt; T[st.<span class="fn">top</span>()]) {</span>
+<span class="line">        ans[st.<span class="fn">top</span>()] = i - st.<span class="fn">top</span>();  <span class="c">// 等待天数</span></span>
+<span class="line">        st.<span class="fn">pop</span>();</span>
+<span class="line">    }</span>
+<span class="line">    st.<span class="fn">push</span>(i);  <span class="c">// 当前下标入栈，等待被解决</span></span>
+<span class="line">}  <span class="c">// 栈中剩余的没有更大值，初始化为0已覆盖</span></span></div>
+      <div class="note"><strong>核心思想：</strong>栈里维护"等待被解决"的下标序列，保持栈底→栈顶单调递减。新元素 <code>&gt;</code> 栈顶时弹出并记录答案。<br>
+      <strong>记忆法：</strong>求"下一个更大" → 维护单调递减栈（从栈底到栈顶值递减）</div>
+    </div>
+  </div>
+
+  <div class="section-title">BFS 模板（队列）</div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">BFS 层序遍历 / 最短路（标准模板）</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-blue">#102 Binary Tree Level Order</span>
+        <span class="ptag ptag-blue">#200 Number of Islands</span>
+        <span class="ptag ptag-blue">#127 Word Ladder</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="tp">queue</span>&lt;<span class="tp">int</span>&gt; q;      <span class="c">// 或 queue&lt;TreeNode*&gt;、queue&lt;pair&lt;int,int&gt;&gt;</span></span>
+<span class="line">q.<span class="fn">push</span>(start);</span>
+<span class="line">visited[start] = <span class="kw">true</span>;</span>
+<span class="line"><span class="tp">int</span> step = <span class="st">0</span>;</span>
+<span class="line"></span>
+<span class="line"><span class="kw">while</span> (!q.<span class="fn">empty</span>()) {</span>
+<span class="line">    <span class="tp">int</span> sz = q.<span class="fn">size</span>();     <span class="c">// 关键：固定当前层的节点数</span></span>
+<span class="line">    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="st">0</span>; i &lt; sz; i++) {</span>
+<span class="line">        <span class="kw">auto</span> node = q.<span class="fn">front</span>(); q.<span class="fn">pop</span>();</span>
+<span class="line">        <span class="kw">if</span> (node == target) <span class="kw">return</span> step;</span>
+<span class="line">        <span class="kw">for</span> (<span class="kw">auto</span> nb : <span class="fn">neighbors</span>(node)) {</span>
+<span class="line">            <span class="kw">if</span> (!visited[nb]) {</span>
+<span class="line">                visited[nb] = <span class="kw">true</span>;</span>
+<span class="line">                q.<span class="fn">push</span>(nb);</span>
+<span class="line">            }</span>
+<span class="line">        }</span>
+<span class="line">    }</span>
+<span class="line">    step++;</span>
+<span class="line">}</span></div>
+      <div class="note"><strong>关键：</strong>用 <code>sz = q.size()</code> 在 while 循环开始时固定本层大小，然后处理完 sz 个节点后 step++，这样 step 才能准确计层数（最短距离）。</div>
+    </div>
+  </div>
+
+  <div class="section-title">单调队列（Deque）</div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">滑动窗口最大值</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-orange">#239 Sliding Window Maximum</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// deque 存下标，保持 front 始终是窗口内最大值的下标</span></span>
+<span class="line"><span class="tp">deque</span>&lt;<span class="tp">int</span>&gt; dq;</span>
+<span class="line"><span class="tp">vector</span>&lt;<span class="tp">int</span>&gt; res;</span>
+<span class="line"></span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span> i = <span class="st">0</span>; i &lt; n; i++) {</span>
+<span class="line">    <span class="c">// 1. 超出窗口的元素从左端踢出</span></span>
+<span class="line">    <span class="kw">if</span> (!dq.<span class="fn">empty</span>() &amp;&amp; dq.<span class="fn">front</span>() &lt; i - k + <span class="st">1</span>)</span>
+<span class="line">        dq.<span class="fn">pop_front</span>();</span>
+<span class="line">    <span class="c">// 2. 比当前小的从右端踢出（它们不可能再是最大值）</span></span>
+<span class="line">    <span class="kw">while</span> (!dq.<span class="fn">empty</span>() &amp;&amp; nums[dq.<span class="fn">back</span>()] &lt; nums[i])</span>
+<span class="line">        dq.<span class="fn">pop_back</span>();</span>
+<span class="line">    dq.<span class="fn">push_back</span>(i);</span>
+<span class="line">    <span class="c">// 3. 窗口满了才记录答案</span></span>
+<span class="line">    <span class="kw">if</span> (i &gt;= k - <span class="st">1</span>) res.<span class="fn">push_back</span>(nums[dq.<span class="fn">front</span>()]);</span>
+<span class="line">}</span></div>
+      <div class="note"><strong>单调队列 vs 单调栈：</strong>队列需要两端操作（新元素从右端进，过期元素从左端出），所以必须用 deque 而不是 stack。front 永远是当前窗口最大值。</div>
+    </div>
+  </div>
+
+</div><!-- end stk tab -->
+
+<!-- ═══════════════════ LINKED LIST TAB ═══════════════════ -->
+<div id="tab-ll" class="tab-panel">
+
+  <div class="section-title">结构定义 + 基础遍历</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>ListNode 结构（LeetCode 标准）</div>
+      <div class="code-block"><span class="line"><span class="kw">struct</span> <span class="tp">ListNode</span> {</span>
+<span class="line">    <span class="tp">int</span> val;</span>
+<span class="line">    <span class="tp">ListNode</span>* next;</span>
+<span class="line">    <span class="tp">ListNode</span>(<span class="tp">int</span> x) : val(x), next(<span class="kw">nullptr</span>) {}</span>
+<span class="line">};</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 遍历</span></span>
+<span class="line"><span class="tp">ListNode</span>* cur = head;</span>
+<span class="line"><span class="kw">while</span> (cur <span class="op">!=</span> <span class="kw">nullptr</span>) {</span>
+<span class="line">    <span class="c">// 操作 cur->val</span></span>
+<span class="line">    cur = cur-&gt;next;</span>
+<span class="line">}</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-orange"></span>Dummy Head（必背技巧）</div>
+      <div class="code-block"><span class="line"><span class="c">// 在 head 前加一个哑节点，统一边界情况</span></span>
+<span class="line"><span class="tp">ListNode</span> dummy(<span class="st">0</span>);</span>
+<span class="line">dummy.next = head;</span>
+<span class="line"><span class="tp">ListNode</span>* prev = &amp;dummy;  <span class="c">// prev 从 dummy 开始</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 操作完后返回 dummy.next（真正的头）</span></span>
+<span class="line"><span class="kw">return</span> dummy.next;</span></div>
+      <div class="note"><strong>何时用 Dummy：</strong>删节点 / 插节点 / 合并链表。避免 head 节点是特殊情况导致多写 if。</div>
+    </div>
+  </div>
+
+  <div class="section-title">快慢指针（Floyd 算法）</div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">找中点 + 检测环</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-blue">#876 Middle of Linked List</span>
+        <span class="ptag ptag-blue">#141 Linked List Cycle</span>
+        <span class="ptag ptag-orange">#142 Cycle II（找入口）</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// 找中点：slow 走一步，fast 走两步</span></span>
+<span class="line"><span class="tp">ListNode</span>* slow = head, *fast = head;</span>
+<span class="line"><span class="kw">while</span> (fast <span class="op">!=</span> <span class="kw">nullptr</span> &amp;&amp; fast-&gt;next <span class="op">!=</span> <span class="kw">nullptr</span>) {</span>
+<span class="line">    slow = slow-&gt;next;</span>
+<span class="line">    fast = fast-&gt;next-&gt;next;</span>
+<span class="line">}  <span class="c">// slow 是中点（偶数时是后半段起点）</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 检测环：相遇 = 有环</span></span>
+<span class="line"><span class="kw">while</span> (fast &amp;&amp; fast-&gt;next) {</span>
+<span class="line">    slow = slow-&gt;next;  fast = fast-&gt;next-&gt;next;</span>
+<span class="line">    <span class="kw">if</span> (slow == fast) <span class="kw">return</span> <span class="kw">true</span>;  <span class="c">// 有环</span></span>
+<span class="line">}</span>
+<span class="line"><span class="kw">return</span> <span class="kw">false</span>;</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 找环入口（#142）：相遇后把一个指针移到 head</span></span>
+<span class="line"><span class="c">// 然后两个同速走，再次相遇处就是环入口</span></span></div>
+      <div class="note"><strong>为什么 fast 一定能追上 slow：</strong>如果有环，fast 每次比 slow 多走一步，环内距离每轮减 1，最终差值变为 0（相遇）。</div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">反转链表（迭代）</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-green">#206 Reverse Linked List</span>
+        <span class="ptag ptag-green">#92 Reverse II（区间反转）</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// 三指针：prev → cur → nxt</span></span>
+<span class="line"><span class="tp">ListNode</span>* prev = <span class="kw">nullptr</span>;</span>
+<span class="line"><span class="tp">ListNode</span>* cur  = head;</span>
+<span class="line"><span class="kw">while</span> (cur) {</span>
+<span class="line">    <span class="tp">ListNode</span>* nxt = cur-&gt;next;   <span class="c">// 先保存下一个</span></span>
+<span class="line">    cur-&gt;next = prev;             <span class="c">// 反转指针方向</span></span>
+<span class="line">    prev = cur;                   <span class="c">// prev 前移</span></span>
+<span class="line">    cur  = nxt;                   <span class="c">// cur 前移</span></span>
+<span class="line">}</span>
+<span class="line"><span class="kw">return</span> prev;  <span class="c">// prev 是新 head</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 示意：null ← 1 ← 2 ← 3，prev 停在 3</span></span></div>
+      <div class="note"><strong>画图最好记：</strong>初始 null ← | 1 → 2 → 3。每次把当前节点的 next 指向 prev（翻转一根箭头），然后三个指针整体右移一步。</div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">合并两个有序链表</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-blue">#21 Merge Two Sorted Lists</span>
+        <span class="ptag ptag-blue">#23 Merge K Sorted Lists</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="tp">ListNode</span> dummy(<span class="st">0</span>);</span>
+<span class="line"><span class="tp">ListNode</span>* tail = &amp;dummy;</span>
+<span class="line"></span>
+<span class="line"><span class="kw">while</span> (l1 &amp;&amp; l2) {</span>
+<span class="line">    <span class="kw">if</span> (l1-&gt;val &lt;= l2-&gt;val) { tail-&gt;next = l1;  l1 = l1-&gt;next; }</span>
+<span class="line">    <span class="kw">else</span>                       { tail-&gt;next = l2;  l2 = l2-&gt;next; }</span>
+<span class="line">    tail = tail-&gt;next;</span>
+<span class="line">}</span>
+<span class="line">tail-&gt;next = l1 ? l1 : l2;  <span class="c">// 把剩余的链表直接接上</span></span>
+<span class="line"><span class="kw">return</span> dummy.next;</span></div>
+      <div class="note"><strong>Dummy + tail 指针</strong>是链表构建题的万能模板。tail 始终指向已构建链表的最末尾节点，每次把较小节点接到 tail 后面。</div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">删除倒数第 N 个节点</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-orange">#19 Remove Nth From End</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// 快指针先走 n+1 步，然后两个同速直到 fast == null</span></span>
+<span class="line"><span class="tp">ListNode</span> dummy(<span class="st">0</span>); dummy.next = head;</span>
+<span class="line"><span class="tp">ListNode</span>* fast = &amp;dummy, *slow = &amp;dummy;</span>
+<span class="line"></span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span> i = <span class="st">0</span>; i &lt;= n; i++) fast = fast-&gt;next;  <span class="c">// n+1 步</span></span>
+<span class="line"><span class="kw">while</span> (fast) { fast = fast-&gt;next;  slow = slow-&gt;next; }</span>
+<span class="line"><span class="c">// slow 停在目标节点的前一个</span></span>
+<span class="line">slow-&gt;next = slow-&gt;next-&gt;next;  <span class="c">// 跳过目标节点</span></span>
+<span class="line"><span class="kw">return</span> dummy.next;</span></div>
+      <div class="note"><strong>为什么是 n+1 步而不是 n 步：</strong>我们需要 slow 停在目标节点的"前驱"，所以 fast 和 slow 之间的距离是 n+1，这样 fast 到 null 时 slow 刚好差一步到目标。</div>
+    </div>
+  </div>
+
+</div><!-- end ll tab -->
+
+<!-- ═══════════════════ BINARY SEARCH TAB ═══════════════════ -->
+<div id="tab-bs" class="tab-panel">
+
+  <div class="section-title">二分查找三种模板</div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">标准二分（找确切值）</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-blue">#704 Binary Search</span>
+        <span class="ptag ptag-blue">#35 Search Insert Position</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// 左闭右闭 [l, r]，找确切值</span></span>
+<span class="line"><span class="tp">int</span> l = <span class="st">0</span>, r = nums.<span class="fn">size</span>() - <span class="st">1</span>;</span>
+<span class="line"><span class="kw">while</span> (l &lt;= r) {                         <span class="c">// ≤ 不是 &lt;</span></span>
+<span class="line">    <span class="tp">int</span> mid = l + (r - l) / <span class="st">2</span>;           <span class="c">// 防溢出，不用 (l+r)/2</span></span>
+<span class="line">    <span class="kw">if</span>      (nums[mid] == target) <span class="kw">return</span> mid;</span>
+<span class="line">    <span class="kw">else if</span> (nums[mid] &lt;  target) l = mid + <span class="st">1</span>;</span>
+<span class="line">    <span class="kw">else</span>                          r = mid - <span class="st">1</span>;</span>
+<span class="line">}</span>
+<span class="line"><span class="kw">return</span> -<span class="st">1</span>;  <span class="c">// 没找到时 l 就是插入位置（#35）</span></span></div>
+      <div class="note"><strong>mid = l + (r-l)/2</strong>：若用 <code>(l+r)/2</code>，当 l+r 超过 INT_MAX（约 21 亿）时整数溢出。嵌入式里数组可能很大，要养成习惯。</div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">找左边界 / 右边界</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-orange">#34 Find First and Last Position</span>
+        <span class="ptag ptag-orange">#278 First Bad Version</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// 找左边界（第一个 >= target 的位置）</span></span>
+<span class="line"><span class="tp">int</span> l = <span class="st">0</span>, r = n;    <span class="c">// r = n 开区间</span></span>
+<span class="line"><span class="kw">while</span> (l &lt; r) {       <span class="c">// &lt; 不是 &lt;=</span></span>
+<span class="line">    <span class="tp">int</span> mid = l + (r - l) / <span class="st">2</span>;</span>
+<span class="line">    <span class="kw">if</span> (nums[mid] &lt; target) l = mid + <span class="st">1</span>;</span>
+<span class="line">    <span class="kw">else</span>                     r = mid;      <span class="c">// 相等也往左收</span></span>
+<span class="line">}</span>
+<span class="line"><span class="c">// l == r 是左边界（l == n 表示不存在）</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 找右边界（最后一个 <= target 的位置）</span></span>
+<span class="line"><span class="tp">int</span> l2 = <span class="st">0</span>, r2 = n;</span>
+<span class="line"><span class="kw">while</span> (l2 &lt; r2) {</span>
+<span class="line">    <span class="tp">int</span> mid = l2 + (r2 - l2) / <span class="st">2</span>;</span>
+<span class="line">    <span class="kw">if</span> (nums[mid] &lt;= target) l2 = mid + <span class="st">1</span>;  <span class="c">// 相等也往右收</span></span>
+<span class="line">    <span class="kw">else</span>                      r2 = mid;</span>
+<span class="line">}</span>
+<span class="line"><span class="c">// r2 - 1 是右边界</span></span></div>
+      <div class="note"><strong>记忆法：</strong>找左边界：<code>nums[mid] == target</code> 时让 r = mid（继续往左）；找右边界：让 l = mid+1（继续往右）。两种只差一行。</div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">二分答案（在值域上二分，最难最重要）</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-green">#875 Koko Eating Bananas</span>
+        <span class="ptag ptag-green">#1011 Ship Within D Days</span>
+        <span class="ptag ptag-green">#410 Split Array Largest Sum</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// 875: 以速度 k 吃香蕉，能在 h 小时内吃完的最小 k</span></span>
+<span class="line"><span class="c">// 关键认知：k 越大越容易完成 → 单调性 → 可以二分</span></span>
+<span class="line"><span class="tp">int</span> l = <span class="st">1</span>, r = *<span class="fn">max_element</span>(piles.<span class="fn">begin</span>(), piles.<span class="fn">end</span>());</span>
+<span class="line"><span class="kw">while</span> (l &lt; r) {</span>
+<span class="line">    <span class="tp">int</span> mid = l + (r - l) / <span class="st">2</span>;</span>
+<span class="line">    <span class="kw">if</span> (<span class="fn">canFinish</span>(piles, mid, h)) r = mid;    <span class="c">// mid 可行，试更小</span></span>
+<span class="line">    <span class="kw">else</span>                          l = mid + <span class="st">1</span>; <span class="c">// 太慢，增大 k</span></span>
+<span class="line">}</span>
+<span class="line"><span class="kw">return</span> l;</span>
+<span class="line"></span>
+<span class="line"><span class="kw">bool</span> <span class="fn">canFinish</span>(<span class="tp">vector</span>&lt;<span class="tp">int</span>&gt;&amp; p, <span class="tp">int</span> k, <span class="tp">int</span> h) {</span>
+<span class="line">    <span class="tp">int</span> hrs = <span class="st">0</span>;</span>
+<span class="line">    <span class="kw">for</span> (<span class="tp">int</span> x : p) hrs += (x + k - <span class="st">1</span>) / k;  <span class="c">// 向上取整</span></span>
+<span class="line">    <span class="kw">return</span> hrs &lt;= h;</span>
+<span class="line">}</span></div>
+      <div class="note"><strong>三步套路：</strong>① 确定值域 [l, r]；② 写 check(mid) 判断 mid 是否满足条件；③ 根据"越大越容易/越小越容易"决定向哪边收缩。<br>
+      <strong>口诀：</strong>如果 mid 满足且要找最小值 → <code>r = mid</code>；如果要找最大值 → <code>l = mid</code>（此时 mid 要取 <code>(l+r+1)/2</code> 防死循环）。</div>
+    </div>
+  </div>
+
+  <div class="section-title">unordered_set 快查</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot dot-blue"></span>unordered_set 操作</div>
+      <div class="code-block"><span class="line"><span class="tp">unordered_set</span>&lt;<span class="tp">int</span>&gt; s;</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 插入 / 删除</span></span>
+<span class="line">s.<span class="fn">insert</span>(val);</span>
+<span class="line">s.<span class="fn">erase</span>(val);</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 查找（O(1) 平均）</span></span>
+<span class="line">s.<span class="fn">count</span>(val)              <span class="c">// 1 或 0（推荐）</span></span>
+<span class="line">s.<span class="fn">find</span>(val) != s.<span class="fn">end</span>()  <span class="c">// 同上</span></span>
+<span class="line"></span>
+<span class="line"><span class="c">// 批量构建（从 vector）</span></span>
+<span class="line"><span class="tp">unordered_set</span>&lt;<span class="tp">int</span>&gt; s(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot dot-green"></span>典型使用场景</div>
+      <div class="code-block"><span class="line"><span class="c">// 1. 去重</span></span>
+<span class="line"><span class="tp">unordered_set</span>&lt;<span class="tp">int</span>&gt; seen(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 2. O(1) 判断存在性（代替排序+二分）</span></span>
+<span class="line"><span class="kw">if</span> (seen.<span class="fn">count</span>(target - x)) { ... }</span>
+<span class="line"></span>
+<span class="line"><span class="c">// 3. 滑动窗口字符集</span></span>
+<span class="line"><span class="tp">unordered_set</span>&lt;<span class="tp">char</span>&gt; window;</span>
+<span class="line">window.<span class="fn">insert</span>(s[right]);</span>
+<span class="line">window.<span class="fn">erase</span>(s[left]);</span></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-hdr">
+      <span class="pattern-name">最长连续序列（Hash Set O(n) 解法）</span>
+      <div class="pattern-tags">
+        <span class="ptag ptag-orange">#128 Longest Consecutive Sequence</span>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="code-block"><span class="line"><span class="c">// 把所有数放 set，只从"序列起点"开始向右数</span></span>
+<span class="line"><span class="tp">unordered_set</span>&lt;<span class="tp">int</span>&gt; s(nums.<span class="fn">begin</span>(), nums.<span class="fn">end</span>());</span>
+<span class="line"><span class="tp">int</span> best = <span class="st">0</span>;</span>
+<span class="line"><span class="kw">for</span> (<span class="tp">int</span> x : s) {</span>
+<span class="line">    <span class="kw">if</span> (!s.<span class="fn">count</span>(x - <span class="st">1</span>)) {  <span class="c">// x-1 不在 set → x 是起点</span></span>
+<span class="line">        <span class="tp">int</span> len = <span class="st">1</span>;</span>
+<span class="line">        <span class="kw">while</span> (s.<span class="fn">count</span>(x + len)) len++;</span>
+<span class="line">        best = <span class="fn">max</span>(best, len);</span>
+<span class="line">    }</span>
+<span class="line">}</span>
+<span class="line"><span class="kw">return</span> best;</span></div>
+      <div class="note"><strong>为什么是 O(n)：</strong>每个数只会被"作为某个序列的成员"数一次。跳过非起点保证了不重复遍历，总操作次数 = 总元素数 = O(n)。</div>
+    </div>
+  </div>
+
+</div><!-- end bs tab -->
 
 </div><!-- content -->
 

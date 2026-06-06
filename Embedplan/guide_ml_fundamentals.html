@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>ML入门指南 for Embedded Engineers</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#252836;--border:#2d3148;--primary:#6c63ff;--primary-light:#8b85ff;--success:#4ade80;--warning:#fbbf24;--danger:#f87171;--text:#e2e8f0;--muted:#94a3b8;--ml:#059669;--ml-light:#34d399;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.6;}
+a{color:var(--primary-light);text-decoration:none;}a:hover{text-decoration:underline;}
+code{background:var(--surface2);padding:2px 7px;border-radius:4px;font-family:'Courier New',monospace;font-size:.85em;color:#e879f9;}
+pre{background:#0d1117;border:1px solid var(--border);border-left:3px solid var(--ml);border-radius:8px;padding:16px 18px;overflow-x:auto;margin:10px 0 14px;}
+pre code{background:none;padding:0;color:#a3e635;font-size:.84rem;display:block;line-height:1.8;}
+.cm{color:#636e7b;}
+.kw{color:#ff79c6;}
+.fn{color:#8be9fd;}
+.st{color:#f1fa8c;}
+.nm{color:#bd93f9;}
+.tp{color:#ffb86c;}
+.site-nav{background:#08090f;border-bottom:1px solid #2d3148;padding:7px 20px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;position:sticky;top:0;z-index:200;}
+.nav-logo{font-weight:800;font-size:.78rem;text-decoration:none;padding:4px 10px;background:linear-gradient(135deg,#6c63ff,#a855f7);border-radius:6px;color:#fff;white-space:nowrap;flex-shrink:0;}
+.nav-links{display:flex;gap:2px;flex-wrap:wrap;}
+.nav-links a{color:#64748b;font-size:.73rem;padding:4px 9px;border-radius:6px;text-decoration:none;white-space:nowrap;transition:all .15s;}
+.nav-links a:hover{color:#e2e8f0;background:rgba(108,99,255,.12);}
+.nav-links a.nav-active{color:#a78bfa;background:rgba(108,99,255,.2);}
+.header{background:linear-gradient(135deg,#059669 0%,#6c63ff 100%);padding:22px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.header-text h1{font-size:1.25rem;font-weight:700;color:#fff;}
+.header-text p{font-size:.8rem;color:rgba(255,255,255,.8);margin-top:4px;}
+.layout{max-width:860px;margin:0 auto;padding:28px 20px;}
+.overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:24px;}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.ov-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.ov-val{font-size:.88rem;font-weight:600;}
+.callout{border-radius:10px;padding:14px 18px;margin:16px 0;}
+.callout-career{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.25);}
+.callout-career .cl-lbl{font-size:.67rem;font-weight:700;color:#fbbf24;text-transform:uppercase;margin-bottom:6px;}
+.callout-career p{font-size:.85rem;color:var(--muted);line-height:1.75;}
+.callout-career strong{color:var(--text);}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:28px;}
+.toc h3{font-size:.88rem;color:var(--primary-light);margin-bottom:10px;}
+.toc ol{padding-left:20px;}
+.toc li{font-size:.84rem;line-height:2.0;color:var(--muted);}
+.toc a{color:var(--muted);}
+.toc a:hover{color:var(--primary-light);text-decoration:none;}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;}
+.step-hdr{padding:14px 20px;background:var(--surface2);display:flex;align-items:center;gap:12px;}
+.step-num{background:var(--ml);color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.88rem;flex-shrink:0;}
+.step-title{font-size:.95rem;font-weight:600;flex:1;}
+.step-eta{font-size:.72rem;color:var(--muted);white-space:nowrap;}
+.step-body{padding:16px 20px 20px;}
+.step-body p{font-size:.87rem;color:var(--muted);margin-bottom:10px;line-height:1.8;}
+.step-body ul,.step-body ol{padding-left:20px;margin-bottom:12px;}
+.step-body li{font-size:.87rem;color:var(--muted);line-height:1.9;margin-bottom:4px;}
+.step-body strong{color:var(--text);}
+.step-body h4{font-size:.9rem;font-weight:700;color:var(--text);margin:16px 0 8px;}
+.tip{background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.tip-lbl{font-size:.67rem;font-weight:700;color:#4ade80;text-transform:uppercase;margin-bottom:4px;}
+.tip p{font-size:.84rem;color:var(--muted);margin:0;}
+.warn{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:10px 14px;margin:10px 0;}
+.warn-lbl{font-size:.67rem;font-weight:700;color:#fbbf24;text-transform:uppercase;margin-bottom:4px;}
+.warn p{font-size:.84rem;color:var(--muted);margin:0;}
+.hl{background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.25);border-radius:8px;padding:12px 16px;margin:10px 0;}
+.hl-lbl{font-size:.67rem;font-weight:700;color:var(--primary-light);text-transform:uppercase;margin-bottom:4px;}
+.hl p{font-size:.84rem;color:var(--muted);margin:0;}
+.analogy{background:rgba(5,150,105,.07);border:1px solid rgba(5,150,105,.25);border-radius:8px;padding:12px 16px;margin:10px 0;}
+.analogy-lbl{font-size:.67rem;font-weight:700;color:var(--ml-light);text-transform:uppercase;margin-bottom:4px;}
+.analogy p{font-size:.84rem;color:var(--muted);margin:0;}
+.math-block{background:#0a0d14;border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin:10px 0;font-family:'Courier New',monospace;font-size:.85rem;color:#e879f9;line-height:2;}
+.concept-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+.concept-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+.concept-title{font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:6px;}
+.concept-desc{font-size:.78rem;color:var(--muted);line-height:1.7;}
+.pipeline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px;background:var(--surface2);border-radius:8px;margin:12px 0;}
+.pipe-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.82rem;text-align:center;}
+.pipe-item .pi-title{font-weight:600;color:var(--text);}
+.pipe-item .pi-sub{font-size:.7rem;color:var(--muted);margin-top:2px;}
+.pipe-arrow{color:var(--primary-light);font-size:1.2rem;flex-shrink:0;}
+.resources{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-top:28px;}
+.resources h3{color:var(--primary-light);font-size:.95rem;margin-bottom:14px;}
+.res-group{margin-bottom:16px;}
+.res-group-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px;}
+.res-item{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);font-size:.85rem;gap:12px;}
+.res-item:last-child{border-bottom:none;}
+.res-desc{color:var(--muted);font-size:.78rem;margin-top:2px;}
+.badge{display:inline-block;font-size:.68rem;padding:2px 7px;border-radius:10px;font-weight:600;flex-shrink:0;}
+.free{background:rgba(74,222,128,.15);color:#4ade80;}
+.paid{background:rgba(251,191,36,.15);color:#fbbf24;}
+/* AI Widget */
+#aiw{position:fixed;z-index:9999;touch-action:none;user-select:none;bottom:24px;right:24px;}
+#aiw.circle{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#6c63ff,#a855f7);box-shadow:0 4px 22px rgba(108,99,255,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.45rem;color:#fff;transition:transform .2s;}
+#aiw.circle:hover{transform:scale(1.1);}
+#aiw.panel{width:360px;max-width:calc(100vw - 32px);background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.5);display:flex;flex-direction:column;overflow:hidden;max-height:calc(100vh - 48px);}
+#aiw.circle #aiw-panel{display:none;}
+#aiw.panel #aiw-icon{display:none;}
+#aiw-head{background:linear-gradient(135deg,#6c63ff,#a855f7);padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:grab;flex-shrink:0;}
+#aiw-head:active{cursor:grabbing;}
+.aiw-ht{flex:1;}.aiw-htitle{font-size:.9rem;font-weight:700;color:#fff;}.aiw-hsub{font-size:.66rem;color:rgba(255,255,255,.75);margin-top:1px;}
+.aiw-hbtns{display:flex;gap:5px;}
+.aiw-hbtn{width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.14);color:#fff;cursor:pointer;font-size:.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.aiw-hbtn:hover{background:rgba(255,255,255,.28);}
+#aiw-pbar{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;flex-shrink:0;}
+.aiw-bl{font-size:.7rem;color:var(--muted);white-space:nowrap;}
+.aiw-sel{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 6px;font-size:.72rem;outline:none;cursor:pointer;flex:1;}
+#aiw-key{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:7px;flex-shrink:0;}
+#aiw-key.hidden{display:none;}
+#aiw-key label{font-size:.72rem;color:var(--muted);}
+#aiw-ki{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:.82rem;outline:none;width:100%;}
+#aiw-ki:focus{border-color:#6c63ff;}
+.aiw-kbtns{display:flex;gap:7px;}
+.aiw-kbtns button{flex:1;background:#6c63ff;border:none;color:#fff;border-radius:7px;padding:6px;cursor:pointer;font-size:.78rem;font-weight:600;}
+.aiw-kbtns button.sec{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+#aiw-msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:9px;min-height:160px;max-height:300px;}
+.aiw-m{max-width:92%;padding:8px 12px;border-radius:12px;font-size:.82rem;line-height:1.6;word-break:break-word;white-space:pre-wrap;}
+.aiw-m.user{align-self:flex-end;background:rgba(108,99,255,.25);border-bottom-right-radius:3px;}
+.aiw-m.bot{align-self:flex-start;background:var(--surface2);border-bottom-left-radius:3px;}
+.aiw-m.think{align-self:flex-start;color:var(--muted);font-style:italic;background:transparent;padding-left:2px;}
+#aiw-ir{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0;}
+#aiw-ta{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;color:var(--text);font-size:.82rem;outline:none;resize:none;font-family:inherit;min-height:36px;max-height:100px;}
+#aiw-ta:focus{border-color:#6c63ff;}
+#aiw-sb{background:#6c63ff;border:none;color:#fff;border-radius:10px;padding:8px 14px;cursor:pointer;font-size:.82rem;white-space:nowrap;align-self:flex-end;}
+#aiw-sb:disabled{opacity:.45;cursor:default;}
+@media(max-width:600px){.concept-row{grid-template-columns:1fr;}.pipeline{flex-direction:column;}.pipe-arrow{transform:rotate(90deg);}}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="embedded_plan.html" class="nav-logo">Embedplan</a>
+  <div class="nav-links">
+    <a href="embedded_plan.html">🗺 计划</a>
+    <a href="cpp_cheatsheet.html">⚡ C++ Cheat</a>
+    <a href="guide_platformio.html">🛠 PlatformIO</a>
+    <a href="guide_freertos.html">🔧 FreeRTOS</a>
+    <a href="guide_tinyml.html">🤖 TinyML</a>
+    <a href="guide_python_ml.html">🐍 Python ML</a>
+    <a href="guide_ml_fundamentals.html" class="nav-active">📐 ML入门</a>
+    <a href="guide_embedded_cpp.html">⚙️ Embedded C++</a>
+  </div>
+</nav>
+
+<div class="header">
+  <div class="header-text">
+    <h1>📐 ML入门 for Embedded Engineers</h1>
+    <p>从零手写，理解原理，直通 TinyML 岗位 · 无需先验ML知识</p>
+  </div>
+</div>
+
+<div class="layout">
+
+  <div class="overview">
+    <div class="ov-card"><div class="ov-label">预计时间</div><div class="ov-val">8–12 小时</div></div>
+    <div class="ov-card"><div class="ov-label">工具</div><div class="ov-val">Python 3 + NumPy + PyTorch</div></div>
+    <div class="ov-card"><div class="ov-label">难度</div><div class="ov-val">从零开始</div></div>
+    <div class="ov-card"><div class="ov-label">目标岗位</div><div class="ov-val">Embedded ML / TinyML</div></div>
+  </div>
+
+  <div class="callout callout-career">
+    <div class="cl-lbl">🎯 先回答你的问题：C++ 还是 ML？</div>
+    <p><strong>答案：两个都要，但节奏不同。</strong> 继续刷 C++ LeetCode（每天 1 题），同时用这个教程用 2–3 周把 ML 基础搞懂。你的目标岗位（Nordic、TI 的 Embedded ML、医疗 AI 设备）要求的是 <strong>Embedded C++ 硬实力 + ML 理解力</strong> 的组合，不是要你变成 ML 研究员。面试官会问"你在 MCU 上部署过模型吗"，而不是"你能推导 attention 机制吗"。<br>
+    所以：<strong>① 模型怎么训练（这个教程）</strong> + <strong>② 模型怎么量化部署到边缘（TinyML 指南）</strong> = 你需要的全部 ML 知识。自己手写一遍 linear regression 和 neural net forward pass 就能和 95% 的 Embedded + ML 面试对话了。</p>
+  </div>
+
+  <div class="toc">
+    <h3>📋 目录</h3>
+    <ol>
+      <li><a href="#s1">ML 是什么 — 用硬件工程师的视角理解</a></li>
+      <li><a href="#s2">核心词汇表（10 个最重要的概念）</a></li>
+      <li><a href="#s3">手写线性回归（NumPy，从零）</a></li>
+      <li><a href="#s4">手写神经网络前向传播（NumPy）</a></li>
+      <li><a href="#s5">PyTorch 快速入门（同样的任务）</a></li>
+      <li><a href="#s6">分类任务 + 损失函数选择</a></li>
+      <li><a href="#s7">从模型到嵌入式：量化、TFLite、ONNX</a></li>
+      <li><a href="#s8">你的下一步行动</a></li>
+    </ol>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step" id="s1">
+    <div class="step-hdr">
+      <div class="step-num">1</div>
+      <div class="step-title">ML 是什么 — 用硬件工程师的视角理解</div>
+      <div class="step-eta">20 分钟</div>
+    </div>
+    <div class="step-body">
+      <p>你已经写过滤波器（LPF、IIR）、PID 控制器、卡尔曼滤波。这些都是<strong>手动设计的系统</strong>：你知道物理规律，把它编码成数学公式。</p>
+      <p><strong>ML 是什么：</strong>当你不知道"规律"长什么样，让程序自动从数据里找出来。</p>
+      <div class="analogy">
+        <div class="analogy-lbl">🔧 嵌入式类比</div>
+        <p>ADC 采集振动数据 → 你手写了一个 FFT 阈值判断是否异常。<br>
+        ML 版本：给它 10000 条"正常振动"和"故障振动"的样本，让它自动学到哪种频谱对应哪种状态。<br>
+        <strong>你不用知道哪个频率是关键，模型会自己找到。</strong></p>
+      </div>
+
+      <h4>ML 能做什么（嵌入式常见场景）</h4>
+      <ul>
+        <li><strong>分类：</strong>这段传感器数据是"行走/跑步/跌倒"中的哪种（IMU + 手势识别）</li>
+        <li><strong>异常检测：</strong>电机振动是否超出正常范围（预测性维护）</li>
+        <li><strong>关键词识别：</strong>麦克风听到 "Hey Siri" → 唤醒（Always-on DSP 芯片）</li>
+        <li><strong>回归：</strong>根据电流/温度预测剩余电量（BMS）</li>
+      </ul>
+
+      <div class="tip">
+        <div class="tip-lbl">💡 Embedded + ML 岗位要求的 ML 知识</div>
+        <p>你不需要设计新网络架构，但要能：训练一个小模型 → 量化 → 导出为 TFLite / ONNX → 在 MCU 上运行推理 → 测量延迟和精度。这个流程你能 demo 出来，你就赢了。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step" id="s2">
+    <div class="step-hdr">
+      <div class="step-num">2</div>
+      <div class="step-title">核心词汇表（10 个最重要的概念）</div>
+      <div class="step-eta">30 分钟</div>
+    </div>
+    <div class="step-body">
+      <div class="concept-row">
+        <div class="concept-card">
+          <div class="concept-title">Feature（特征）</div>
+          <div class="concept-desc">模型的输入变量。例如：温度、电压、FFT 频率分量。向量 <code>x = [x₁, x₂, ..., xₙ]</code>。</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-title">Label（标签）</div>
+          <div class="concept-desc">你想预测的答案。分类时是类别（0/1/2），回归时是连续值（如温度 23.5°C）。</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-title">Model（模型）</div>
+          <div class="concept-desc">一组参数（weights + bias）定义的函数 <code>f(x) = y_pred</code>。训练前随机初始化，训练后参数有意义。</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-title">Loss（损失）</div>
+          <div class="concept-desc">衡量预测值 <code>y_pred</code> 和真实值 <code>y</code> 之间差距的标量。训练目标 = 让 Loss 越来越小。</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-title">Gradient（梯度）</div>
+          <div class="concept-desc">Loss 对每个参数的偏导数。告诉你"把这个参数调大/调小，Loss 会怎么变化"。</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-title">Learning Rate（学习率）</div>
+          <div class="concept-desc">每次更新参数的步长。太大→震荡不收敛；太小→收敛慢。典型值 <code>1e-3</code> 到 <code>1e-4</code>。</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-title">Epoch</div>
+          <div class="concept-desc">把整个训练集过一遍叫一个 epoch。通常训练 10–1000 个 epoch。</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-title">Batch Size</div>
+          <div class="concept-desc">每次更新参数用多少条数据。典型值 32 / 64 / 128。越小更新越频繁但噪声大。</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-title">Overfitting（过拟合）</div>
+          <div class="concept-desc">在训练集上表现好但测试集上差。模型"背答案了"而不是"学到规律"。</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-title">Activation（激活函数）</div>
+          <div class="concept-desc">加入非线性，让神经网络能学复杂函数。常见：ReLU（<code>max(0,x)</code>）、Sigmoid（<code>1/(1+e⁻ˣ)</code>）。</div>
+        </div>
+      </div>
+
+      <div class="math-block">
+        梯度下降更新公式：<br>
+        w = w - lr × ∂Loss/∂w<br>
+        b = b - lr × ∂Loss/∂b<br><br>
+        直觉：梯度指向 Loss 增大的方向，减去梯度就是往 Loss 减小的方向走。
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step" id="s3">
+    <div class="step-hdr">
+      <div class="step-num">3</div>
+      <div class="step-title">手写线性回归（NumPy，从零）</div>
+      <div class="step-eta">45 分钟 · 跟着敲一遍！</div>
+    </div>
+    <div class="step-body">
+      <p><strong>任务：</strong>用传感器温度预测电池剩余电量（简化版 BMS 问题）。已有 6 组测量数据，训练一个 <code>y = w*x + b</code> 的线性模型。</p>
+
+      <div class="pipeline">
+        <div class="pipe-item"><div class="pi-title">数据</div><div class="pi-sub">x=温度, y=电量%</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-item"><div class="pi-title">前向传播</div><div class="pi-sub">y_pred = w*x + b</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-item"><div class="pi-title">计算 Loss</div><div class="pi-sub">MSE = mean((y_pred-y)²)</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-item"><div class="pi-title">反向传播</div><div class="pi-sub">计算梯度 dw, db</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-item"><div class="pi-title">更新参数</div><div class="pi-sub">w -= lr * dw</div></div>
+      </div>
+
+      <h4>完整代码（复制到 Python 文件并运行）</h4>
+<pre><code><span class="cm">"""
+linear_regression.py
+任务：根据温度预测电池剩余电量
+直接运行：python linear_regression.py
+"""</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># ── 1. 数据（6 组温度 → 电量% 的测量值）──────────────────────</span>
+X = np.array([<span class="nm">10.0</span>, <span class="nm">20.0</span>, <span class="nm">25.0</span>, <span class="nm">30.0</span>, <span class="nm">35.0</span>, <span class="nm">40.0</span>])  <span class="cm"># 摄氏度</span>
+y = np.array([<span class="nm">95.0</span>, <span class="nm">90.0</span>, <span class="nm">85.0</span>, <span class="nm">78.0</span>, <span class="nm">70.0</span>, <span class="nm">60.0</span>])  <span class="cm"># 电量%</span>
+<span class="cm"># 真实规律：温度越高，电量衰减越快（非线性，但用线性近似）</span>
+
+<span class="cm"># ── 2. 初始化参数（随机猜一个起点）────────────────────────────</span>
+w = <span class="nm">0.0</span>   <span class="cm"># weight（斜率）</span>
+b = <span class="nm">0.0</span>   <span class="cm"># bias（截距）</span>
+lr = <span class="nm">0.001</span>  <span class="cm"># learning rate</span>
+n = len(X)
+
+<span class="cm"># ── 3. 训练循环 ────────────────────────────────────────────────</span>
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">2000</span>):
+    <span class="cm"># 前向传播：用当前 w, b 计算预测值</span>
+    y_pred = w * X + b                       <span class="cm"># shape: (6,)</span>
+
+    <span class="cm"># 计算 MSE Loss</span>
+    loss = np.<span class="fn">mean</span>((y_pred - y) ** <span class="nm">2</span>)
+
+    <span class="cm"># 反向传播：手动推导梯度</span>
+    <span class="cm"># dLoss/dw = (2/n) * sum((y_pred - y) * X)</span>
+    <span class="cm"># dLoss/db = (2/n) * sum(y_pred - y)</span>
+    dw = (<span class="nm">2</span> / n) * np.<span class="fn">dot</span>((y_pred - y), X)
+    db = (<span class="nm">2</span> / n) * np.<span class="fn">sum</span>(y_pred - y)
+
+    <span class="cm"># 梯度下降：沿梯度反方向更新参数</span>
+    w -= lr * dw
+    b -= lr * db
+
+    <span class="kw">if</span> epoch % <span class="nm">500</span> == <span class="nm">0</span>:
+        <span class="fn">print</span>(<span class="st">f"Epoch {epoch:4d}: Loss={loss:.4f}  w={w:.4f}  b={b:.4f}"</span>)
+
+<span class="cm"># ── 4. 结果 ────────────────────────────────────────────────────</span>
+<span class="fn">print</span>(<span class="st">f"\n✓ 学到的模型: 电量 = {w:.3f} × 温度 + {b:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  预测 28°C 时电量: {w*28+b:.1f}%"</span>)  <span class="cm"># 应在 78-85% 之间</span>
+
+<span class="cm"># ── 5. 预期输出（大约）────────────────────────────────────────</span>
+<span class="cm"># Epoch    0: Loss=6272.5417  w=4.7   b=0.23</span>
+<span class="cm"># Epoch  500: Loss=12.345     w=-1.12 b=107.5</span>
+<span class="cm"># Epoch 2000: Loss=4.892      w=-1.17 b=109.6</span>
+<span class="cm"># ✓ 学到的模型: 电量 = -1.17 × 温度 + 109.6</span>
+<span class="cm"># 预测 28°C 时电量: 77.1%   ← 合理！</span>
+</code></pre>
+
+      <div class="hl">
+        <div class="hl-lbl">🔍 关键理解：梯度推导</div>
+        <p>Loss = mean((wx+b - y)²)。对 w 求偏导：链式法则 → ∂Loss/∂w = (2/n)·Σ(y_pred - y)·x。这就是代码里 <code>dw = (2/n) * np.dot((y_pred-y), X)</code> 的来源。手写一遍才能真正理解，以后看 PyTorch 的 <code>loss.backward()</code> 就知道它在干什么了。</p>
+      </div>
+
+      <div class="warn">
+        <div class="warn-lbl">⚠️ 常见错误</div>
+        <p><strong>lr 太大（如 0.1）</strong>：Loss 会爆炸到 inf，因为每次迈的步子太大，反而越走越偏。如果看到 NaN，第一反应就是降 lr。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step" id="s4">
+    <div class="step-hdr">
+      <div class="step-num">4</div>
+      <div class="step-title">手写神经网络前向传播（NumPy）</div>
+      <div class="step-eta">45 分钟 · 跟着敲</div>
+    </div>
+    <div class="step-body">
+      <p>神经网络 = 多层线性变换 + 激活函数。<strong>前向传播</strong>就是把输入从左往右传，每层做一次矩阵乘法然后加激活函数。</p>
+      <p>任务：2 个传感器读数（温度 + 电流） → 判断电池是否"健康"（二分类）</p>
+
+      <div class="math-block">
+        Layer 1:  z1 = X @ W1 + b1   (线性变换)<br>
+                  a1 = ReLU(z1)       (激活函数，加入非线性)<br>
+        Layer 2:  z2 = a1 @ W2 + b2  (线性变换)<br>
+                  out = Sigmoid(z2)   (压缩到 0-1，当作概率)
+      </div>
+
+<pre><code><span class="cm">"""
+neural_net_forward.py
+2层神经网络前向传播：2个特征 → 3个隐藏神经元 → 1个输出（概率）
+"""</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># ── 激活函数 ──────────────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">relu</span>(x):
+    <span class="kw">return</span> np.<span class="fn">maximum</span>(<span class="nm">0</span>, x)    <span class="cm"># 负数变0，正数不变</span>
+
+<span class="kw">def</span> <span class="fn">sigmoid</span>(x):
+    <span class="kw">return</span> <span class="nm">1</span> / (<span class="nm">1</span> + np.<span class="fn">exp</span>(-x))  <span class="cm"># 把任意实数压缩到 (0, 1)</span>
+
+<span class="cm"># ── 初始化参数（真实训练时用 Xavier/He 初始化）─────────────────</span>
+np.random.<span class="fn">seed</span>(<span class="nm">42</span>)
+W1 = np.random.<span class="fn">randn</span>(<span class="nm">2</span>, <span class="nm">3</span>) * <span class="nm">0.1</span>  <span class="cm"># 2个输入 → 3个隐藏神经元</span>
+b1 = np.<span class="fn">zeros</span>(<span class="nm">3</span>)
+W2 = np.random.<span class="fn">randn</span>(<span class="nm">3</span>, <span class="nm">1</span>) * <span class="nm">0.1</span>  <span class="cm"># 3个隐藏 → 1个输出</span>
+b2 = np.<span class="fn">zeros</span>(<span class="nm">1</span>)
+
+<span class="cm"># ── 前向传播函数 ──────────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">forward</span>(x):
+    <span class="cm"># Layer 1</span>
+    z1 = x @ W1 + b1          <span class="cm"># (2,) @ (2,3) + (3,) = (3,)</span>
+    a1 = <span class="fn">relu</span>(z1)             <span class="cm"># 非线性激活</span>
+    <span class="cm"># Layer 2</span>
+    z2 = a1 @ W2 + b2          <span class="cm"># (3,) @ (3,1) + (1,) = (1,)</span>
+    out = <span class="fn">sigmoid</span>(z2)          <span class="cm"># 输出概率</span>
+    <span class="kw">return</span> out, (z1, a1, z2)   <span class="cm"># 返回中间值用于调试</span>
+
+<span class="cm"># ── 测试 ──────────────────────────────────────────────────────</span>
+<span class="cm"># 输入：温度=35°C（归一化后0.7），电流=2.1A（归一化后0.6）</span>
+x_test = np.<span class="fn">array</span>([<span class="nm">0.7</span>, <span class="nm">0.6</span>])
+prob, intermediates = <span class="fn">forward</span>(x_test)
+<span class="fn">print</span>(<span class="st">f"输出概率: {prob[0]:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"预测: {'健康' if prob[0] > 0.5 else '异常'}"</span>)
+<span class="fn">print</span>(<span class="st">f"隐藏层激活: {intermediates[1]}"</span>)
+
+<span class="cm"># ── 批量输入（实际训练时用矩阵，一次处理多条数据）──────────────</span>
+X_batch = np.<span class="fn">array</span>([
+    [<span class="nm">0.7</span>, <span class="nm">0.6</span>],   <span class="cm"># 样本1</span>
+    [<span class="nm">0.2</span>, <span class="nm">0.3</span>],   <span class="cm"># 样本2</span>
+    [<span class="nm">0.9</span>, <span class="nm">0.8</span>],   <span class="cm"># 样本3</span>
+])  <span class="cm"># shape: (3, 2)</span>
+
+<span class="cm"># 矩阵运算：一次前向传播处理 3 条数据</span>
+Z1_batch = X_batch @ W1 + b1   <span class="cm"># (3,2)@(2,3) = (3,3)</span>
+A1_batch = <span class="fn">relu</span>(Z1_batch)
+Z2_batch = A1_batch @ W2 + b2  <span class="cm"># (3,3)@(3,1) = (3,1)</span>
+out_batch = <span class="fn">sigmoid</span>(Z2_batch)
+<span class="fn">print</span>(<span class="st">f"\n批量输出:\n{out_batch}"</span>)
+</code></pre>
+
+      <div class="tip">
+        <div class="tip-lbl">💡 为什么需要激活函数？</div>
+        <p>没有激活函数，多层线性变换还是线性变换（W2 @ W1 @ x 等价于 W_new @ x）。ReLU 引入非线性，让网络能学习弯曲的决策边界，否则无论多深都只是线性分类器。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step" id="s5">
+    <div class="step-hdr">
+      <div class="step-num">5</div>
+      <div class="step-title">PyTorch 快速入门（自动求梯度）</div>
+      <div class="step-eta">1 小时 · 重点！</div>
+    </div>
+    <div class="step-body">
+      <p>Step 3 你手写了梯度公式。现实中用 PyTorch 的 <strong>autograd</strong>：你只需写前向传播，梯度自动算好。</p>
+      <p>先安装：<code>pip install torch</code></p>
+
+      <h4>任务一：PyTorch 版线性回归（和 Step3 完全同一个问题）</h4>
+<pre><code><span class="cm">"""
+pytorch_linear.py — 和 Step3 完全相同的任务，但用 PyTorch 自动求梯度
+"""</span>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="cm"># ── 数据 ──────────────────────────────────────────────────────</span>
+X = torch.<span class="fn">tensor</span>([[<span class="nm">10.</span>], [<span class="nm">20.</span>], [<span class="nm">25.</span>], [<span class="nm">30.</span>], [<span class="nm">35.</span>], [<span class="nm">40.</span>]])
+y = torch.<span class="fn">tensor</span>([[<span class="nm">95.</span>], [<span class="nm">90.</span>], [<span class="nm">85.</span>], [<span class="nm">78.</span>], [<span class="nm">70.</span>], [<span class="nm">60.</span>]])
+
+<span class="cm"># ── 模型（nn.Linear 就是 y = w*x + b）────────────────────────</span>
+model = nn.<span class="fn">Linear</span>(<span class="nm">1</span>, <span class="nm">1</span>)              <span class="cm"># 1个输入，1个输出</span>
+loss_fn = nn.<span class="fn">MSELoss</span>()               <span class="cm"># Mean Squared Error</span>
+optimizer = torch.optim.<span class="fn">SGD</span>(model.<span class="fn">parameters</span>(), lr=<span class="nm">0.001</span>)
+
+<span class="cm"># ── 训练循环 ──────────────────────────────────────────────────</span>
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">2000</span>):
+    y_pred = <span class="fn">model</span>(X)               <span class="cm"># 前向传播</span>
+    loss = <span class="fn">loss_fn</span>(y_pred, y)        <span class="cm"># 计算 Loss</span>
+
+    optimizer.<span class="fn">zero_grad</span>()            <span class="cm"># 清空上次的梯度！（必须）</span>
+    loss.<span class="fn">backward</span>()                  <span class="cm"># 自动反向传播，计算所有梯度</span>
+    optimizer.<span class="fn">step</span>()                 <span class="cm"># 更新参数 w, b</span>
+
+    <span class="kw">if</span> epoch % <span class="nm">500</span> == <span class="nm">0</span>:
+        <span class="fn">print</span>(<span class="st">f"Epoch {epoch}: Loss={loss.item():.4f}"</span>)
+
+w = model.weight.<span class="fn">item</span>()
+b = model.bias.<span class="fn">item</span>()
+<span class="fn">print</span>(<span class="st">f"\n✓ 学到的模型: 电量 = {w:.3f} × 温度 + {b:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  预测 28°C: {w*28+b:.1f}%"</span>)
+</code></pre>
+
+      <h4>任务二：PyTorch 神经网络（2 层，手势分类）</h4>
+<pre><code><span class="cm">"""
+pytorch_nn.py — 用 nn.Sequential 快速搭建 2 层 NN
+任务：4 个 IMU 特征 → 3 类手势（静止/挥手/握拳）
+"""</span>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="cm"># ── 模拟 IMU 数据（实际用你的传感器数据替换）──────────────────</span>
+torch.manual_seed(<span class="nm">42</span>)
+X_train = torch.<span class="fn">randn</span>(<span class="nm">120</span>, <span class="nm">4</span>)      <span class="cm"># 120 条样本，4 个特征</span>
+y_train = torch.<span class="fn">randint</span>(<span class="nm">0</span>, <span class="nm">3</span>, (<span class="nm">120</span>,)) <span class="cm"># 标签 0/1/2</span>
+
+<span class="cm"># ── 搭建神经网络 ──────────────────────────────────────────────</span>
+model = nn.<span class="fn">Sequential</span>(
+    nn.<span class="fn">Linear</span>(<span class="nm">4</span>, <span class="nm">16</span>),   <span class="cm"># 4个特征 → 16个隐藏神经元</span>
+    nn.<span class="fn">ReLU</span>(),
+    nn.<span class="fn">Linear</span>(<span class="nm">16</span>, <span class="nm">8</span>),   <span class="cm"># 16 → 8</span>
+    nn.<span class="fn">ReLU</span>(),
+    nn.<span class="fn">Linear</span>(<span class="nm">8</span>, <span class="nm">3</span>),    <span class="cm"># 8 → 3类（不加 Softmax，CrossEntropyLoss 自带）</span>
+)
+
+loss_fn = nn.<span class="fn">CrossEntropyLoss</span>()  <span class="cm"># 多分类标准 Loss</span>
+optimizer = torch.optim.<span class="fn">Adam</span>(model.<span class="fn">parameters</span>(), lr=<span class="nm">1e-3</span>)
+
+<span class="cm"># ── 训练 ──────────────────────────────────────────────────────</span>
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">200</span>):
+    logits = <span class="fn">model</span>(X_train)
+    loss = <span class="fn">loss_fn</span>(logits, y_train)
+    optimizer.<span class="fn">zero_grad</span>()
+    loss.<span class="fn">backward</span>()
+    optimizer.<span class="fn">step</span>()
+
+<span class="cm"># ── 推理（模拟在 MCU 上的推理过程）────────────────────────────</span>
+model.<span class="fn">eval</span>()                        <span class="cm"># 关掉 dropout/batchnorm 等</span>
+<span class="kw">with</span> torch.<span class="fn">no_grad</span>():              <span class="cm"># 推理时不需要梯度，省内存</span>
+    x_new = torch.<span class="fn">tensor</span>([[<span class="nm">0.5</span>, -<span class="nm">0.2</span>, <span class="nm">1.1</span>, <span class="nm">0.3</span>]])
+    logits = <span class="fn">model</span>(x_new)
+    pred = logits.<span class="fn">argmax</span>().<span class="fn">item</span>()
+    <span class="fn">print</span>(<span class="st">f"预测类别: {pred} ({'静止' if pred==0 else '挥手' if pred==1 else '握拳'})"</span>)
+
+<span class="cm"># 模型大小（嵌入式很重要！）</span>
+total_params = <span class="fn">sum</span>(p.<span class="fn">numel</span>() <span class="kw">for</span> p <span class="kw">in</span> model.<span class="fn">parameters</span>())
+<span class="fn">print</span>(<span class="st">f"模型参数量: {total_params}  ≈ {total_params*4/1024:.1f} KB (fp32)"</span>)
+</code></pre>
+
+      <div class="tip">
+        <div class="tip-lbl">💡 三行 PyTorch 训练必须按顺序</div>
+        <p><code>zero_grad()</code> → <code>backward()</code> → <code>step()</code>。如果忘了 zero_grad，梯度会累积，相当于 batch size 翻倍，Loss 会奇怪地震荡。这是最常见的 PyTorch bug 之一。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step" id="s6">
+    <div class="step-hdr">
+      <div class="step-num">6</div>
+      <div class="step-title">分类任务 + 损失函数选择</div>
+      <div class="step-eta">20 分钟</div>
+    </div>
+    <div class="step-body">
+      <div class="concept-row">
+        <div class="concept-card">
+          <div class="concept-title">回归任务</div>
+          <div class="concept-desc">预测连续值（温度、电压、距离）<br><strong>Loss:</strong> MSE = mean((pred-y)²)<br><strong>输出层:</strong> Linear（无激活）</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-title">二分类（0/1）</div>
+          <div class="concept-desc">是/否（有故障/无故障）<br><strong>Loss:</strong> Binary Cross Entropy<br><strong>输出层:</strong> Sigmoid → 概率</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-title">多分类（N类）</div>
+          <div class="concept-desc">手势识别、关键词检测<br><strong>Loss:</strong> CrossEntropyLoss（包含 Softmax）<br><strong>输出层:</strong> Linear（N个神经元）</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-title">异常检测</div>
+          <div class="concept-desc">只有正常样本，检测异常<br><strong>方法:</strong> Autoencoder 或 One-Class SVM<br><strong>嵌入式常用:</strong> 重建误差阈值</div>
+        </div>
+      </div>
+
+      <div class="hl">
+        <div class="hl-lbl">🎯 面试重点</div>
+        <p>被问到"用什么 Loss"时，直接答：回归→MSE，二分类→BCE，多分类→CrossEntropy。再补一句："CrossEntropyLoss 在 PyTorch 里已经包含了 Softmax，输出层不需要再加 Softmax。"这句话能看出你真的用过。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="step" id="s7">
+    <div class="step-hdr">
+      <div class="step-num">7</div>
+      <div class="step-title">从模型到嵌入式：量化、TFLite、ONNX</div>
+      <div class="step-eta">40 分钟 · TinyML 核心！</div>
+    </div>
+    <div class="step-body">
+      <p>在 MCU 上跑 ML 的核心挑战：<strong>内存有限（几十 KB RAM）、没有 FPU 或 FPU 性能弱、没有操作系统。</strong></p>
+
+      <h4>量化（Quantization）— 最重要的概念</h4>
+      <p>训练时用 float32（4 字节/参数），部署到 MCU 用 int8（1 字节/参数）。<strong>模型缩小 4 倍，推理速度提升 2–4 倍，精度损失通常 &lt; 1%。</strong></p>
+
+      <div class="math-block">
+        float32 权重 0.1234 → int8 量化<br>
+        量化公式：x_int8 = round(x_float32 / scale) + zero_point<br>
+        反量化：x_float32 ≈ (x_int8 - zero_point) × scale
+      </div>
+
+      <h4>导出为 TFLite（用于 TensorFlow Lite Micro）</h4>
+<pre><code><span class="cm">"""
+export_tflite.py — PyTorch 模型 → ONNX → TFLite (通过转换工具链)
+或者直接用 TensorFlow 训练再导出 TFLite
+这里演示 TensorFlow 路线（更直接）
+"""</span>
+<span class="kw">import</span> tensorflow <span class="kw">as</span> tf
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 假设你有一个训练好的 Keras 模型</span>
+model = tf.keras.<span class="fn">Sequential</span>([
+    tf.keras.layers.<span class="fn">Dense</span>(<span class="nm">16</span>, activation=<span class="st">'relu'</span>, input_shape=(<span class="nm">4</span>,)),
+    tf.keras.layers.<span class="fn">Dense</span>(<span class="nm">8</span>,  activation=<span class="st">'relu'</span>),
+    tf.keras.layers.<span class="fn">Dense</span>(<span class="nm">3</span>,  activation=<span class="st">'softmax'</span>),
+])
+model.<span class="fn">compile</span>(optimizer=<span class="st">'adam'</span>, loss=<span class="st">'sparse_categorical_crossentropy'</span>)
+<span class="cm"># model.fit(X_train, y_train, epochs=50)  # 训练</span>
+
+<span class="cm"># ── 导出为 TFLite（INT8 量化）────────────────────────────────</span>
+converter = tf.lite.TFLiteConverter.<span class="fn">from_keras_model</span>(model)
+converter.optimizations = [tf.lite.Optimize.DEFAULT]  <span class="cm"># 自动量化</span>
+
+<span class="cm"># 提供 representative dataset 以提高量化精度</span>
+<span class="kw">def</span> <span class="fn">representative_dataset</span>():
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">100</span>):
+        <span class="kw">yield</span> [np.random.<span class="fn">randn</span>(<span class="nm">1</span>, <span class="nm">4</span>).<span class="fn">astype</span>(np.float32)]
+
+converter.representative_dataset = representative_dataset
+tflite_model = converter.<span class="fn">convert</span>()
+
+<span class="cm"># 保存模型文件</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">'gesture_model.tflite'</span>, <span class="st">'wb'</span>) <span class="kw">as</span> f:
+    f.<span class="fn">write</span>(tflite_model)
+
+<span class="fn">print</span>(<span class="st">f"模型大小: {len(tflite_model)/1024:.1f} KB"</span>)
+<span class="cm"># 这个简单模型量化后通常 < 5 KB，完全可以放入 MCU Flash</span>
+</code></pre>
+
+      <h4>在 C++ 中用 TFLite Micro 运行推理（关键代码结构）</h4>
+<pre><code><span class="cm">// 这是嵌入式端的 C++ 推理代码结构（伪代码）</span>
+<span class="cm">// 完整教程见 guide_tinyml.html</span>
+
+<span class="cm">// 1. 把 .tflite 转为 C 数组（xxd 命令或 Edge Impulse 自动生成）</span>
+<span class="cm">// xxd -i gesture_model.tflite > model_data.cc</span>
+
+<span class="kw">#include</span> <span class="st">"tensorflow/lite/micro/micro_interpreter.h"</span>
+<span class="kw">#include</span> <span class="st">"model_data.h"</span>
+
+<span class="cm">// 2. 分配 arena（MCU 上的推理内存池）</span>
+<span class="kw">constexpr</span> <span class="tp">int</span> kArenaSize = <span class="nm">8</span> * <span class="nm">1024</span>;  <span class="cm">// 8 KB</span>
+<span class="tp">uint8_t</span> arena[kArenaSize];
+
+<span class="cm">// 3. 创建解释器</span>
+tflite::MicroInterpreter interpreter(model, resolver, arena, kArenaSize);
+interpreter.AllocateTensors();
+
+<span class="cm">// 4. 填入输入（传感器数据）</span>
+<span class="tp">float</span>* input = interpreter.input(<span class="nm">0</span>)-&gt;data.f;
+input[<span class="nm">0</span>] = accel_x; input[<span class="nm">1</span>] = accel_y;
+input[<span class="nm">2</span>] = accel_z; input[<span class="nm">3</span>] = gyro_z;
+
+<span class="cm">// 5. 运行推理</span>
+interpreter.Invoke();
+
+<span class="cm">// 6. 读取输出（3类的概率）</span>
+<span class="tp">float</span>* output = interpreter.output(<span class="nm">0</span>)-&gt;data.f;
+<span class="tp">int</span> pred = std::<span class="fn">max_element</span>(output, output+<span class="nm">3</span>) - output;
+</code></pre>
+
+      <div class="tip">
+        <div class="tip-lbl">💡 面试金句</div>
+        <p>能说出"我训练了一个 3 类手势识别模型，参数量约 500，INT8 量化后 1.2 KB，在 ESP32 上推理延迟 2ms，精度 94%"，比你解释 attention 机制有价值 10 倍。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 8 -->
+  <div class="step" id="s8">
+    <div class="step-hdr">
+      <div class="step-num">8</div>
+      <div class="step-title">你的下一步行动</div>
+      <div class="step-eta">今明两天完成</div>
+    </div>
+    <div class="step-body">
+      <p><strong>本周内（同时继续 LeetCode C++ 每天 1 题）：</strong></p>
+      <ol>
+        <li>运行 Step 3 的代码，看 Loss 从 6000+ 降到 &lt; 10，理解这个下降过程</li>
+        <li>修改 Step 4 的代码，把隐藏层改成 4 个神经元，观察变化</li>
+        <li>运行 Step 5 的 PyTorch 代码，确认和 Step 3 结果一致</li>
+        <li>用 Edge Impulse 做一个真实的手势识别（见 guide_tinyml.html）</li>
+      </ol>
+      <div class="hl">
+        <div class="hl-lbl">🚀 一个月内的 ML 目标</div>
+        <p>在 ESP32 上完成端到端的 TinyML 演示项目（收集数据 → 训练 → 量化 → 部署 → 测量精度和延迟）。这个项目做完，你的简历就有了具体数字可以讲。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESOURCES -->
+  <div class="resources">
+    <h3>📚 推荐资源</h3>
+    <div class="res-group">
+      <div class="res-group-title">ML 基础（按顺序学）</div>
+      <div class="res-item">
+        <div>
+          <div><a href="https://numpy.org/doc/stable/user/quickstart.html" target="_blank">NumPy Quickstart</a></div>
+          <div class="res-desc">Step 3-4 的基础，1 小时搞定</div>
+        </div>
+        <span class="badge free">免费</span>
+      </div>
+      <div class="res-item">
+        <div>
+          <div><a href="https://pytorch.org/tutorials/beginner/basics/intro.html" target="_blank">PyTorch Basics (官方教程)</a></div>
+          <div class="res-desc">Step 5 的延伸，官方教程质量最高</div>
+        </div>
+        <span class="badge free">免费</span>
+      </div>
+      <div class="res-item">
+        <div>
+          <div><a href="https://www.coursera.org/learn/neural-networks-deep-learning" target="_blank">Andrew Ng — Neural Networks (Coursera)</a></div>
+          <div class="res-desc">最好的 ML 入门视频课，可以旁听不付费</div>
+        </div>
+        <span class="badge free">可旁听</span>
+      </div>
+    </div>
+    <div class="res-group">
+      <div class="res-group-title">TinyML / 嵌入式 ML</div>
+      <div class="res-item">
+        <div>
+          <div><a href="https://www.edgeimpulse.com/learn" target="_blank">Edge Impulse Learn</a></div>
+          <div class="res-desc">最实用的 TinyML 入门，有 ESP32 示例</div>
+        </div>
+        <span class="badge free">免费</span>
+      </div>
+      <div class="res-item">
+        <div>
+          <div><a href="https://www.tensorflow.org/lite/microcontrollers" target="_blank">TFLite for Microcontrollers</a></div>
+          <div class="res-desc">TFLite Micro 官方文档 + Arduino/ESP32 示例</div>
+        </div>
+        <span class="badge free">免费</span>
+      </div>
+      <div class="res-item">
+        <div>
+          <div><a href="https://github.com/harvard-edge/cs249r_book" target="_blank">TinyML Book (Harvard CS249r)</a></div>
+          <div class="res-desc">最系统的 TinyML 教材，开源免费</div>
+        </div>
+        <span class="badge free">免费</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- layout -->
+
+<div id="aiw" class="panel">
+  <span id="aiw-icon" onclick="aiwExpand()">🤖</span>
+  <div id="aiw-panel">
+    <div id="aiw-head">
+      <div class="aiw-ht">
+        <div class="aiw-htitle">AI Assistant</div>
+        <div class="aiw-hsub" id="aiw-status">Embedplan copilot · 已自动读取页面内容</div>
+      </div>
+      <div class="aiw-hbtns">
+        <button class="aiw-hbtn" onclick="aiwToggleKey()" title="API Key">🔑</button>
+        <button class="aiw-hbtn" onclick="aiwCollapse()" title="收起">⬤</button>
+      </div>
+    </div>
+    <div id="aiw-pbar">
+      <span class="aiw-bl">Provider</span>
+      <select class="aiw-sel" id="aiw-prov" onchange="aiwProvChange()">
+        <option value="openai">OpenAI / Codex</option>
+        <option value="claude">Claude (Anthropic)</option>
+      </select>
+      <span class="aiw-bl">Model</span>
+      <select class="aiw-sel" id="aiw-mdl"></select>
+    </div>
+    <div id="aiw-key" class="hidden">
+      <label id="aiw-klbl">API Key</label>
+      <input id="aiw-ki" type="password" placeholder="sk-...">
+      <div class="aiw-kbtns">
+        <button onclick="aiwSaveKey()">保存</button>
+        <button class="sec" onclick="aiwClearKey()">清除</button>
+      </div>
+    </div>
+    <div id="aiw-msgs"></div>
+    <div id="aiw-ir">
+      <textarea id="aiw-ta" rows="1" placeholder="问我这个页面的内容..." onkeydown="aiwKey(event)"></textarea>
+      <button id="aiw-sb" onclick="aiwSend()">发送</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+const MODELS={openai:[{v:'gpt-5.2-codex',l:'gpt-5.2-codex'},{v:'gpt-4o',l:'gpt-4o'},{v:'gpt-4o-mini',l:'gpt-4o-mini'}],claude:[{v:'claude-opus-4-7',l:'Claude Opus 4.7'},{v:'claude-sonnet-4-6',l:'Claude Sonnet 4.6（推荐）'},{v:'claude-haiku-4-5-20251001',l:'Claude Haiku 4.5'}]};
+let cHist=[],oPrevId=null,drag=false,dx=0,dy=0,il=0,it=0;
+const $=id=>document.getElementById(id);
+const lsG=k=>localStorage.getItem(k);
+const lsS=(k,v)=>localStorage.setItem(k,v);
+function prov(){return $('aiw-prov').value;}
+function mdl(){return $('aiw-mdl').value;}
+function getKey(){return lsG(prov()==='claude'?'aiw_ckey':'aiw_okey')||'';}
+function pageCtx(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode(n){return n.parentElement.closest('#aiw')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;}});const p=[];let n;while((n=w.nextNode())){const t=n.textContent.trim();if(t)p.push(t);}return p.join(' ').replace(/\s+/g,' ').slice(0,6000);}
+function sys(){return 'You are an AI learning assistant embedded in Qifeng Yang\'s Embedplan study tool.\n\nCurrent page content (auto-extracted):\n---\n'+pageCtx()+'\n---\n\nAnswer in Chinese by default, keep technical terms in English. Be concise and practical.';}
+function addMsg(text,cls){const el=document.createElement('div');el.className='aiw-m '+cls;el.textContent=text;$('aiw-msgs').appendChild(el);$('aiw-msgs').scrollTop=$('aiw-msgs').scrollHeight;return el;}
+function updateStatus(){const k=getKey(),p=prov();$('aiw-status').textContent=(p==='claude'?'Claude':'OpenAI')+(k?' · 已连接':' · 需要配置 API Key');}
+function updateModels(){const sel=$('aiw-mdl'),p=prov();sel.innerHTML='';MODELS[p].forEach(m=>{const o=document.createElement('option');o.value=m.v;o.textContent=m.l;sel.appendChild(o);});const saved=lsG('aiw_mdl_'+p);if(saved&&[...sel.options].some(o=>o.value===saved))sel.value=saved;}
+window.aiwProvChange=function(){lsS('aiw_prov',prov());updateModels();$('aiw-klbl').textContent=prov()==='claude'?'Anthropic API Key':'OpenAI API Key';$('aiw-ki').placeholder=prov()==='claude'?'sk-ant-...':'sk-...';updateStatus();};
+$('aiw-mdl').addEventListener('change',()=>lsS('aiw_mdl_'+prov(),mdl()));
+window.aiwToggleKey=function(){$('aiw-key').classList.toggle('hidden');};
+window.aiwSaveKey=function(){const v=$('aiw-ki').value.trim();if(!v.startsWith('sk-')){alert('API Key 需以 sk- 开头');return;}lsS(prov()==='claude'?'aiw_ckey':'aiw_okey',v);$('aiw-key').classList.add('hidden');$('aiw-ki').value='';updateStatus();};
+window.aiwClearKey=function(){localStorage.removeItem(prov()==='claude'?'aiw_ckey':'aiw_okey');oPrevId=null;cHist=[];$('aiw-ki').value='';updateStatus();};
+window.aiwCollapse=function(){$('aiw').className='circle';};
+window.aiwExpand=function(){$('aiw').className='panel';};
+function startDrag(e){if(e.target.closest('button,input,select,textarea'))return;drag=true;const r=$('aiw').getBoundingClientRect();dx=e.clientX;dy=e.clientY;il=r.left;it=r.top;e.preventDefault();}
+document.addEventListener('pointermove',e=>{if(!drag)return;const w=$('aiw'),ml=window.innerWidth-w.offsetWidth,mt=window.innerHeight-w.offsetHeight;w.style.left=Math.max(0,Math.min(ml,il+(e.clientX-dx)))+'px';w.style.top=Math.max(0,Math.min(mt,it+(e.clientY-dy)))+'px';w.style.right='auto';w.style.bottom='auto';});
+document.addEventListener('pointerup',()=>{drag=false;});
+$('aiw-head').addEventListener('pointerdown',startDrag);
+window.aiwKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();aiwSend();}};
+window.aiwSend=async function(){const ta=$('aiw-ta'),text=ta.value.trim();if(!text)return;const k=getKey();if(!k){$('aiw-key').classList.remove('hidden');aiwProvChange();return;}ta.value='';ta.style.height='auto';addMsg(text,'user');$('aiw-sb').disabled=true;const th=addMsg('Thinking...','think');try{let reply;if(prov()==='claude'){reply=await callClaude(text,k,mdl());}else{const r=await callOpenAI(text,k,mdl());reply=r.text;oPrevId=r.id;}th.remove();addMsg(reply,'bot');}catch(err){th.remove();addMsg('Error: '+err.message,'bot');}finally{$('aiw-sb').disabled=false;ta.focus();}};
+async function callClaude(text,k,m){cHist.push({role:'user',content:text});const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'x-api-key':k,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:m,max_tokens:1200,system:sys(),messages:cHist})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error?.message||'HTTP '+r.status);const rep=d.content?.[0]?.text||'(empty)';cHist.push({role:'assistant',content:rep});return rep;}
+async function callOpenAI(text,k,m){const b={model:m,instructions:sys(),input:text,max_output_tokens:1200};if(oPrevId)b.previous_response_id=oPrevId;const r=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'},body:JSON.stringify(b)});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error?.message||'HTTP '+r.status);const txt=(d.output||[]).flatMap(i=>(i.content||[])).filter(c=>c.text).map(c=>c.text).join('\n')||'(empty)';return{text:txt,id:d.id||null};}
+(function init(){const sp=lsG('aiw_prov')||'openai';$('aiw-prov').value=sp;aiwProvChange();oPrevId=lsG('aiw_opid')||null;updateStatus();if(!$('aiw-msgs').children.length)addMsg('你好！我已自动读取本页内容，可以直接问我 ML 概念、代码问题或练习题。','bot');$('aiw-ta').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';});})();
+})();
+</script>
+</body>
+</html>

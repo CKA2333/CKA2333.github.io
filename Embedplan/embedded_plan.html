@@ -116,6 +116,12 @@ a{color:var(--primary-light);text-decoration:none;}a:hover{text-decoration:under
 ::-webkit-scrollbar-track{background:var(--surface);}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 @media(max-width:700px){.content{padding:16px;}.header{padding:16px;}.phase-hdr{grid-template-columns:1fr;}.tabs{padding:0 12px;}}
+.site-nav{background:#08090f;border-bottom:1px solid #2d3148;padding:7px 20px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;position:sticky;top:0;z-index:200;}
+.nav-logo{font-weight:800;font-size:.78rem;text-decoration:none;padding:4px 10px;background:linear-gradient(135deg,#6c63ff,#a855f7);border-radius:6px;color:#fff;white-space:nowrap;flex-shrink:0;}
+.nav-links{display:flex;gap:2px;flex-wrap:wrap;}
+.nav-links a{color:#64748b;font-size:.73rem;padding:4px 9px;border-radius:6px;text-decoration:none;white-space:nowrap;transition:all .15s;}
+.nav-links a:hover{color:#e2e8f0;background:rgba(108,99,255,.12);}
+.nav-links a.nav-active{color:#a78bfa;background:rgba(108,99,255,.2);}
 
 /* ── AI Widget ──────────────────────────────────────────── */
 #aiw{position:fixed;z-index:9999;touch-action:none;user-select:none;bottom:24px;right:24px;}
@@ -154,6 +160,20 @@ a{color:var(--primary-light);text-decoration:none;}a:hover{text-decoration:under
 </style>
 </head>
 <body>
+
+<nav class="site-nav">
+  <a href="embedded_plan.html" class="nav-logo">Embedplan</a>
+  <div class="nav-links">
+    <a href="embedded_plan.html" class="nav-active">🗺 计划</a>
+    <a href="cpp_cheatsheet.html">⚡ C++ Cheat</a>
+    <a href="guide_platformio.html">🛠 PlatformIO</a>
+    <a href="guide_freertos.html">🔧 FreeRTOS</a>
+    <a href="guide_tinyml.html">🤖 TinyML</a>
+    <a href="guide_python_ml.html">🐍 Python ML</a>
+    <a href="guide_ml_fundamentals.html">📐 ML入门</a>
+    <a href="guide_embedded_cpp.html">⚙️ Embedded C++</a>
+  </div>
+</nav>
 
 <div class="header">
   <div>
